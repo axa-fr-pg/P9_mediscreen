@@ -1,8 +1,8 @@
 package mediscreen.patient.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import mediscreen.patient.model.Patient;
-import mediscreen.patient.model.PatientDisplay;
+import mediscreen.patient.model.PatientEntity;
+import mediscreen.patient.model.PatientDTO;
 import mediscreen.patient.repository.PatientRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Optional;
 
@@ -37,14 +36,14 @@ public class PatientControllerIT {
     @Test
     public void givenExistingPatient_whenGet_thenReturnsCorrectPatient() throws Exception {
         // GIVEN
-        Patient patient = new Patient();
+        PatientEntity patient = new PatientEntity();
         patient.id = 123456789;
-        PatientDisplay display = new PatientDisplay(patient);
-        Optional<Patient> optional = Optional.of(patient);
+        PatientDTO display = new PatientDTO(patient);
+        Optional<PatientEntity> optional = Optional.of(patient);
         when(repository.findById(1L)).thenReturn(optional);
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(get("/patient/1")).andReturn().getResponse();
-        PatientDisplay result = objectMapper.readValue(response.getContentAsString(), PatientDisplay.class);
+        PatientDTO result = objectMapper.readValue(response.getContentAsString(), PatientDTO.class);
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(patient.id, result.id);

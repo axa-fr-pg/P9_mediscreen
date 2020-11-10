@@ -6,12 +6,20 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Date;
 
-@AllArgsConstructor
+@Entity
+@Table(name="patient")
+//@AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level=AccessLevel.PUBLIC)
-public class PatientDisplay {
+public class PatientEntity {
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     long id;
     String family;
     String given;
@@ -19,8 +27,4 @@ public class PatientDisplay {
     String sex;
     String address;
     String phone;
-
-    public PatientDisplay(Patient patient) {
-        this(patient.id, patient.family, patient.given, patient.dob, patient.sex, patient.address, patient.phone);
-    }
 }

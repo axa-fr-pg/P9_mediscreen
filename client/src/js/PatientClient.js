@@ -2,7 +2,7 @@ import React from 'react';
 import '../client.css';
 import axios from 'axios';
 
-const patientApiUrl = "http://patient:8081/patient";
+const patientApiUrl = "http://patient:8081/patients";
 
 function PatientLink (props) {
     const target = patientApiUrl + "/" + props.id;
@@ -13,7 +13,7 @@ function PatientLink (props) {
 function PatientTable () {
     const [patients, setPatients] = React.useState([]);
     React.useEffect(() => {
-        axios.get(patientApiUrl + "/list")
+        axios.get(patientApiUrl)
             .then(response => setPatients(response.data))
             .catch(exception => { console.error("Error in GET request : ", exception) });
     }, []);

@@ -6,19 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
 import java.util.Date;
 
-@FieldDefaults(level=AccessLevel.PUBLIC)
-@NoArgsConstructor
 @AllArgsConstructor
-public class PatientInput {
+@NoArgsConstructor
+@FieldDefaults(level=AccessLevel.PUBLIC)
+public class PatientDTO {
+    long id;
+
     @NotBlank(message="Family name must contain at least one non-whitespace character")
     String family;
 
@@ -40,4 +39,8 @@ public class PatientInput {
     @NotBlank(message="Phone number must contain at least one non-whitespace character")
     @Pattern(regexp = ".*[- +()0-9]", message="Phone number may only include plus sign, spaces, digits, brackets and dashes")
     String phone;
+
+    public PatientDTO(PatientEntity patient) {
+        this(patient.id, patient.family, patient.given, patient.dob, patient.sex, patient.address, patient.phone);
+    }
 }
