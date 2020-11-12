@@ -4,27 +4,42 @@ import axios from 'axios';
 
 const patientApiUrl = "http://patient:8081/patients";
 
-function PatientDetail (props) {
-    const [patient, setPatient] = React.useState(null);
-
-    const target = patientApiUrl + "/" + props.id;
+function PatientDetailLine(props) {
     return (<div>
-        <div>Patient id</div>
-        <div>Family name</div>
-        <div>Given name</div>
-        <div>Date of birth</div>
-        <div>Sex</div>
-        <div>Address</div>
-        <div>Phone</div>
+        <label>{props.label}
+            <input value={props.input} />
+        </label>
     </div>);
 }
 
-function PatientLink (props) {
-    const target = patientApiUrl + "/" + props.id;
-    return (<a href={target}> {props.id}</a>);
+function PatientDetail (props) {
+    const [patient, setPatient] = React.useState(props.id);
+    React.useEffect(() => {
+        axios.get(patientApiUrl + "/" + props.id)
+            .then(response => setPatient(response.data))
+            .catch(exception => { console.error("Error in GET request : ", exception) });
+    }, [props.id]);
+
+    if (props.id === 0) return null;
+    return (<form>
+        <PatientDetailLine label="Patient id" input={patient.id} />
+        <PatientDetailLine label="Family name" input={patient.family} />
+        <PatientDetailLine label="Given name" input={patient.given} />
+        <PatientDetailLine label="Date of birth" input={patient.dob} />
+        <PatientDetailLine label="Sex" input={patient.sex} />
+        <PatientDetailLine label="Address" input={patient.address} />
+        <PatientDetailLine label="Phone" input={patient.phone} />
+    </form>);
 }
 
-function PatientTable () {
+function PatientLink (props) {
+    function changeId(id) {
+        props.setId(props.id);
+    }
+    return (<a href="#" onClick={changeId}>{props.id}</a>);
+}
+
+function PatientTable (props) {
     const [patients, setPatients] = React.useState([]);
     React.useEffect(() => {
         axios.get(patientApiUrl)
@@ -36,21 +51,13 @@ function PatientTable () {
             <tr>
                 <th>Patient id</th>
                 <th>Family name</th>
-                <th>Given name</th>
                 <th>Date of birth</th>
-                <th>Sex</th>
-                <th>Address</th>
-                <th>Phone</th>
             </tr>
             {patients.map(patient => (
                 <tr>
-                    <td><PatientLink id={patient.id}/></td>
+                    <td><PatientLink setId={props.setId} id={patient.id}/></td>
                     <td>{patient.family}</td>
-                    <td>{patient.given}</td>
                     <td>{patient.dob}</td>
-                    <td>{patient.sex}</td>
-                    <td>{patient.address}</td>
-                    <td>{patient.phone}</td>
                 </tr>
             ))}
         </table>
@@ -58,11 +65,12 @@ function PatientTable () {
 }
 
 function PatientClient() {
-  return (
+    const [id, setId] = React.useState(1);
+    return (
       <div>
-          <PatientTable />
-          <PatientDetail />
-          <button type="Search">Bouton à implémenter</button>
+          <PatientTable setId={setId} />
+          <PatientDetail id={id}/>
+          <button type="Search">Futur bouton de mise à jour</button>
       </div>
   );
 }
