@@ -7,4 +7,5 @@ import java.util.List;
 public interface PatientService {
     List<PatientDTO> getList();
     PatientDTO get(long patientId) throws PatientNotFoundException;
+    PatientDTO put(PatientDTO patient) throws PatientNotFoundException;
 }

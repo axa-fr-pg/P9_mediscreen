@@ -1,6 +1,7 @@
 package mediscreen.patient.controller;
 
 import mediscreen.patient.service.PatientNotFoundException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
         List<String> errorList = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(x -> x.getDefaultMessage())
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
         return new ResponseEntity<>(errorList, HttpStatus.BAD_REQUEST);
     }

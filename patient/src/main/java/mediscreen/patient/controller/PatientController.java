@@ -9,9 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -21,14 +24,21 @@ public class PatientController {
     @Autowired
     PatientService service;
 
-    @GetMapping("/{patientId}")
-    public ResponseEntity<PatientDTO> get(@PathVariable Long patientId)
-                throws PatientNotFoundException {
-        return new ResponseEntity<PatientDTO>(service.get(patientId), HttpStatus.OK);
-    }
-
     @GetMapping("")
     public ResponseEntity<List<PatientDTO>> getList() {
         return new ResponseEntity<List<PatientDTO>>(service.getList(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{patientId}")
+    public ResponseEntity<PatientDTO> get(@PathVariable Long patientId)
+            throws PatientNotFoundException {
+        return new ResponseEntity<PatientDTO>(service.get(patientId), HttpStatus.OK);
+    }
+
+    @PutMapping("/{patientId}")
+    public ResponseEntity<PatientDTO> put(@PathVariable Long patientId, @RequestBody @Valid PatientDTO patient)
+            throws PatientNotFoundException {
+        if (patientId != patient.id) throw new PatientNotFoundException();
+        return new ResponseEntity<PatientDTO>(service.put(patient), HttpStatus.OK);
     }
 }

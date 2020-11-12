@@ -4,9 +4,23 @@ import axios from 'axios';
 
 const patientApiUrl = "http://patient:8081/patients";
 
+function PatientDetail (props) {
+    const [patient, setPatient] = React.useState(null);
+
+    const target = patientApiUrl + "/" + props.id;
+    return (<div>
+        <div>Patient id</div>
+        <div>Family name</div>
+        <div>Given name</div>
+        <div>Date of birth</div>
+        <div>Sex</div>
+        <div>Address</div>
+        <div>Phone</div>
+    </div>);
+}
+
 function PatientLink (props) {
     const target = patientApiUrl + "/" + props.id;
-    console.log("je crée un PatientLink pour ", target);
     return (<a href={target}> {props.id}</a>);
 }
 
@@ -47,6 +61,7 @@ function PatientClient() {
   return (
       <div>
           <PatientTable />
+          <PatientDetail />
           <button type="Search">Bouton à implémenter</button>
       </div>
   );
