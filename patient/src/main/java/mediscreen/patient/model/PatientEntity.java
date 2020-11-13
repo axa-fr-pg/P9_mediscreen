@@ -1,5 +1,6 @@
 package mediscreen.patient.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ public class PatientEntity {
     String phone;
 
     public PatientEntity(PatientDTO patient) {
-        this(patient.id, patient.family, patient.given, new Date(patient.dob.getTime()), patient.sex, patient.address, patient.phone);
+        this(patient.id, patient.family, patient.given, patient.dob, patient.sex, patient.address, patient.phone);
     }
 
     public static PatientEntity random() {

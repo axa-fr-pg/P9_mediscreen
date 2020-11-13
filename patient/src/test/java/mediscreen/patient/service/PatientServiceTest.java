@@ -13,6 +13,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -30,30 +32,45 @@ public class PatientServiceTest {
         reset(repository);
     }
 
-    private PatientEntity mockEntity(long id, boolean exists)  {
+    private PatientEntity mockEntityFind(long id, boolean exists)  {
         PatientEntity patient = PatientEntity.random();
         patient.id = id;
-        PatientDTO display = new PatientDTO(patient);
         Optional<PatientEntity> optional = exists ? Optional.of(patient) : Optional.empty();
         when(repository.findById(id)).thenReturn(optional);
-        when(repository.save(patient)).thenReturn(patient);
         return patient;
+    }
+
+    private PatientEntity mockEntitySave(Long patientId)  {
+        PatientEntity patient = PatientEntity.random();
+        patient.id = patientId;
+        when(repository.save(any(PatientEntity.class))).thenReturn(patient);
+        return patient;
+    }
+
+    private void assertEntityEqual(PatientEntity expected, PatientEntity received) {
+        assertEquals(expected.id, received.id);
+        assertEquals(expected.family, received.family);
+        assertEquals(expected.given, received.given);
+        assertEquals(expected.dob, received.dob);
+        assertEquals(expected.sex, received.sex);
+        assertEquals(expected.address, received.address);
+        assertEquals(expected.phone, received.phone);
     }
 
     @Test
     public void givenExistingPatient_whenGetPatient_thenReturnsCorrectPatient() throws PatientNotFoundException {
         // GIVEN
-        PatientEntity patient = mockEntity(46, true);
+        PatientEntity patient = mockEntityFind(46, true);
         // WHEN
         PatientDTO result = service.get(patient.id);
         // THEN
-        assertEquals(patient.id, result.id);
+        assertEntityEqual(patient, new PatientEntity(result));
     }
 
     @Test
     public void givenNoPatient_whenGetPatient_thenThrowsPatientNotFoundException() {
         // GIVEN
-        PatientEntity patient = mockEntity(56, false);
+        PatientEntity patient = mockEntityFind(56, false);
         // WHEN
         // THEN
         assertThrows(PatientNotFoundException.class, () -> service.get(patient.id));
@@ -62,17 +79,18 @@ public class PatientServiceTest {
     @Test
     public void givenExistingPatient_whenPutPatient_thenReturnsCorrectPatient() throws PatientNotFoundException {
         // GIVEN
-        PatientDTO patient = new PatientDTO(mockEntity(65, true));
+        PatientDTO patientBefore = new PatientDTO(mockEntityFind(75, true));
+        PatientEntity patientAfter = mockEntitySave(patientBefore.id);
         // WHEN
-        PatientDTO result = service.put(patient);
+        PatientDTO result = service.put(new PatientDTO(patientAfter));
         // THEN
-        assertEquals(patient.id, result.id);
+        assertEntityEqual(patientAfter, new PatientEntity(result));
     }
 
     @Test
     public void givenNoPatient_whenPutPatient_thenThrowsPatientNotFoundException() {
         // GIVEN
-        PatientEntity patient = mockEntity(75, false);
+        PatientEntity patient = mockEntityFind(85, false);
         // WHEN
         // THEN
         assertThrows(PatientNotFoundException.class, () -> service.put(new PatientDTO(patient)));

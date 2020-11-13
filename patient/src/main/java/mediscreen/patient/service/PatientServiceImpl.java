@@ -31,7 +31,7 @@ public class PatientServiceImpl implements PatientService {
     public PatientDTO put(PatientDTO patient) throws PatientNotFoundException {
         Optional<PatientEntity> optional = repository.findById(patient.id);
         if (optional.isPresent()) {
-            PatientEntity result = repository.save(optional.get());
+            PatientEntity result = repository.save(new PatientEntity(patient));
             if (result != null) return new PatientDTO(result);
             throw new PatientNotFoundException();
         }
