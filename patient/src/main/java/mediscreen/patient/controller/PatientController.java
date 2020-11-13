@@ -1,6 +1,7 @@
 package mediscreen.patient.controller;
 
 import mediscreen.patient.model.PatientDTO;
+import mediscreen.patient.service.CreateExistingPatientException;
 import mediscreen.patient.service.PatientNotFoundException;
 import mediscreen.patient.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,5 +42,10 @@ public class PatientController {
             throws PatientNotFoundException {
         if (patientId != patient.id) throw new PatientNotFoundException();
         return new ResponseEntity<PatientDTO>(service.put(patient), HttpStatus.OK);
+    }
+
+    @PostMapping("")
+    public ResponseEntity<PatientDTO> post(@RequestBody @Valid PatientDTO patient) throws CreateExistingPatientException {
+        return new ResponseEntity<PatientDTO>(service.post(patient), HttpStatus.OK);
     }
 }

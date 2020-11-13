@@ -9,7 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,6 +47,13 @@ public class PatientServiceTest {
     private PatientEntity mockEntitySave(Long patientId)  {
         PatientEntity patient = PatientEntity.random();
         patient.id = patientId;
+        when(repository.save(any(PatientEntity.class))).thenReturn(patient);
+        return patient;
+    }
+
+    private PatientEntity mockEntityCreate()  {
+        PatientEntity patient = PatientEntity.random();
+        patient.id = new Random().nextLong();
         when(repository.save(any(PatientEntity.class))).thenReturn(patient);
         return patient;
     }
@@ -94,5 +105,41 @@ public class PatientServiceTest {
         // WHEN
         // THEN
         assertThrows(PatientNotFoundException.class, () -> service.put(new PatientDTO(patient)));
+    }
+
+    @Test
+    public void givenPatientWithId_whenPostPatient_thenThrowsCreateExistingPatientException() {
+        // GIVEN
+        PatientEntity patient = new PatientEntity();
+        patient.id = 1;
+        // WHEN
+        // THEN
+        assertThrows(CreateExistingPatientException.class, () -> service.post(new PatientDTO(patient)));
+    }
+
+    @Test
+    public void givenPatientSameFamilyAndDob_whenPostPatient_thenThrowsCreateExistingPatientException() {
+        // GIVEN
+        PatientEntity patient = mockEntityFind(112, true);
+        when(repository.findByFamilyAndDob(patient.family, patient.dob)).thenReturn(Collections.singletonList(patient));
+        PatientEntity duplicate = new PatientEntity(new PatientDTO(patient));
+        duplicate.id = 0;
+        duplicate.family = patient.family;
+        duplicate.dob = patient.dob;
+        // WHEN
+        // THEN
+        assertThrows(CreateExistingPatientException.class, () -> service.post(new PatientDTO(duplicate)));
+    }
+
+    @Test
+    public void givenNewPatient_whenPostPatient_thenReturnsCorrectPatient() throws CreateExistingPatientException {
+        // GIVEN
+        PatientEntity patient = mockEntityCreate();
+        PatientEntity request = new PatientEntity(new PatientDTO(patient));
+        request.id = 0;
+        // WHEN
+        PatientDTO result = service.post(new PatientDTO(request));
+        // THEN
+        assertEntityEqual(patient, new PatientEntity(result));
     }
 }

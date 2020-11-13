@@ -37,4 +37,13 @@ public class PatientServiceImpl implements PatientService {
         }
         throw new PatientNotFoundException();
     }
+
+    @Override
+    public PatientDTO post(PatientDTO patient) throws CreateExistingPatientException {
+        if (patient.id != 0) throw new CreateExistingPatientException();
+        List<PatientEntity> existingPatients = repository.findByFamilyAndDob(patient.family, patient.dob);
+        if (existingPatients.size() > 0) throw new CreateExistingPatientException();
+        PatientEntity result = repository.save(new PatientEntity(patient));
+        return new PatientDTO(result);
+    }
 }

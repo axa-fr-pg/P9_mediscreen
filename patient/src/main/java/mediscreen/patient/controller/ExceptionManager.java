@@ -1,5 +1,6 @@
 package mediscreen.patient.controller;
 
+import mediscreen.patient.service.CreateExistingPatientException;
 import mediscreen.patient.service.PatientNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     public final static String EXCEPTION_MANAGER_PATIENT_NOT_FOUND = "Patient has not been found";
+    public final static String EXCEPTION_MANAGER_CREATE_EXISTING_PATIENT = "Patient cannot be created with id=0 or with an already existing family/dob value";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -34,5 +36,10 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value=PatientNotFoundException.class)
     public ResponseEntity<Object> handlePatientNotFound(PatientNotFoundException ex, WebRequest request) {
         return new ResponseEntity<>(EXCEPTION_MANAGER_PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value=CreateExistingPatientException.class)
+    public ResponseEntity<Object> handleCreateExistingPatient(CreateExistingPatientException ex, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_CREATE_EXISTING_PATIENT, HttpStatus.CONFLICT);
     }
 }
