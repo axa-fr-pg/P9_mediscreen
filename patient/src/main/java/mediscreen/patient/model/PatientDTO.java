@@ -20,7 +20,7 @@ public class PatientDTO {
     public final static String FAMILY_NOT_BLANK_ERROR = "Family name must contain at least one non-whitespace character";
     public final static String GIVEN_NOT_BLANK_ERROR = "Given name must contain at least one non-whitespace character";
     public final static String DOB_NOT_NULL_ERROR = "Date of birth may not be null";
-    public final static String DOB_PAST_ERROR = "Date of birth must be a date in the past. Did you use format yyyy-mm-dd for JSON input ?";
+    public final static String DOB_PAST_ERROR = "Date of birth must be a date in the past with format yyyy-mm-dd";
     public final static String SEX_NOT_NULL_ERROR = "Sex may not be null";
     public final static String SEX_PATTERN_ERROR = "Sex must be M or F";
     public final static String ADDRESS_NOT_BLANK_ERROR = "Address must contain at least one non-whitespace character";
