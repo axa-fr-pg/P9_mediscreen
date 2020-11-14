@@ -20,12 +20,14 @@ function PatientDetail (props) {
     const [patient, setPatient] = React.useState({ id : '', family : '', given : '', dob : '', sex : '', address : '', phone : ''});
 
     React.useEffect(() => {
-        axios.get(patientApiUrl + "/" + props.id)
-            .then(response => {
-                setPatient(response.data);
-                props.displayError('');
-            })
-            .catch(exception => props.displayError(exception.response.data));
+        if (props.id !== 0) {
+            axios.get(patientApiUrl + "/" + props.id)
+                .then(response => {
+                    setPatient(response.data);
+                    props.displayError('');
+                })
+                .catch(exception => props.displayError(exception.response));
+        }
     }, [props.id]);
 
     if (props.id === 0) return null;
@@ -38,7 +40,7 @@ function PatientDetail (props) {
                 setPatient(response.data);
                 props.displayError('');
             })
-            .catch(exception => props.displayError(exception.response.data));
+            .catch(exception => props.displayError(exception.response));
     }
 
     function onChange (field) {
@@ -80,7 +82,14 @@ function PatientTable (props) {
                 setPatients(response.data);
                 props.displayError('');
             })
-            .catch(exception => props.displayError(exception.response.data));
+            .catch( error => {
+                if (error.response) {
+                    props.displayError(error.status + " " + error.response);
+                } else {
+                    props.displayError(error.message + " : check that the server is up and running !");
+                }
+            }
+        );
     }, []);
 
     return (
@@ -111,7 +120,7 @@ function PatientError(props) {
 
 function PatientClient() {
 
-    const [id, setId] = React.useState(1);
+    const [id, setId] = React.useState(0);
     const [error, setError] = React.useState('');
 
     return (
