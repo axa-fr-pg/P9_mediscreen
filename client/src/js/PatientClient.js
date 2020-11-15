@@ -1,5 +1,5 @@
 import React from 'react';
-//import '../client.css';
+//import '../MediscreenClient.css';
 import axios from 'axios';
 
 const patientApiUrl = "http://patient:8081/patients";

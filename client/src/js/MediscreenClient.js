@@ -1,8 +1,10 @@
 // inspiré de https://github.com/vijitail/react-router-demo/tree/master/src
 
-import React, {useState} from 'react';
+import React from 'react';
 import { BrowserRouter, Switch, Route, NavLink, useParams } from "react-router-dom";
 import Patients from "./patients/Patients";
+import Patient from "./patients/Patient";
+import "../css/MediscreenClient.css";
 
 const Home = () => (
     <div>
@@ -39,41 +41,17 @@ const Doctor = () => {
 const MediscreenMenu = () => {
 
     return (
-        <nav>
-            <div>
-                <div className="menu">
-                    <div className="navbar-start">
-                        <NavLink
-                            className="navbar-item"
-                            activeClassName="is-active"
-                            to="/"
-                            exact
-                        >
-                            Home
-                        </NavLink>
+        <nav className="mediscreen-menu">
+            <NavLink class="mediscreen-link" to="/" exact>
+                Home
+            </NavLink>
+            <NavLink class="mediscreen-link" to="/patients">
+                Patients
+            </NavLink>
 
-                        <NavLink
-                            className="navlink"
-                            activeClassName="is-active"
-                            to="/patients"
-                            exact
-                        >
-                            Patients
-                        </NavLink>
-
-                        <NavLink
-                            className="navlink"
-                            activeClassName="is-active"
-                            to="/doctor"
-                            exact
-                        >
-                            Doctor
-                        </NavLink>
-
-                    </div>
-
-                </div>
-            </div>
+            <NavLink class="mediscreen-link" to="/doctor">
+                Doctor
+            </NavLink>
         </nav>
     );
 };
@@ -87,8 +65,11 @@ function MediscreenClient() {
                     <Route exact path="/">
                         <Home />
                     </Route>
-                    <Route path="/patients">
+                    <Route exact path="/patients">
                         <Patients />
+                    </Route>
+                    <Route path="/patients">
+                        <Patient />
                     </Route>
                     <Route path="/doctor">
                         <Doctor />

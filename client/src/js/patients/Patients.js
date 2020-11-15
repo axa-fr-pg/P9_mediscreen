@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
 import patientsApiUrl from './api';
+import Patient from './Patient';
+import {BrowserRouter, NavLink, Route, Switch} from "react-router-dom";
 
-function Patients (props) {
+function Patients () {
 
     const [error, setError] = useState('');
     const [patients, setPatients] = useState([]);
@@ -28,29 +30,42 @@ function Patients (props) {
     function displayError() {
         if (! error) return null;
         return (
-            <div>
-                <p>{error}</p>
-            </div>
+            <footer>
+                {error}
+            </footer>
+        );
+    }
+
+    function displayPatients() {
+        if (patients.length === 0) return null;
+        return (
+            <nav className="patients-menu">
+                <table>
+                    <tr>
+                        <th>Patient id</th>
+                        <th>Family name</th>
+                        <th>Date of birth</th>
+                    </tr>
+                    {patients.map(patient => (
+                        <tr>
+                            <td>
+                                <a class="patients-link" href={"/patients/"+patient.id}>
+                                    {patient.id}
+                                </a>
+                            </td>
+                            <td>{patient.family}</td>
+                            <td>{patient.dob}</td>
+                        </tr>
+                    ))}
+                </table>
+            </nav>
         );
     }
 
     return (
         <div>
             <h1>Patients management</h1>
-            <table>
-                <tr>
-                    <th>Patient id</th>
-                    <th>Family name</th>
-                    <th>Date of birth</th>
-                </tr>
-                {patients.map(patient => (
-                    <tr>
-                        <td>{patient.id}</td>
-                        <td>{patient.family}</td>
-                        <td>{patient.dob}</td>
-                    </tr>
-                ))}
-            </table>
+            {displayPatients()}
             {displayError()}
         </div>
     );
