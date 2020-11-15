@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import PatientClient from './js/PatientClient';
+import MediscreenClient from './js/MediscreenClient';
 
 ReactDOM.render(
   <React.StrictMode>
-    <PatientClient />
+    <MediscreenClient />
   </React.StrictMode>,
   document.getElementById('root')
 );
-
