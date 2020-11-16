@@ -14,6 +14,7 @@ const patientFields = [
 
 function Patient() {
 
+    const [input, setInput] = useState(true);
     const [error, setError] = useState('');
     const [patient, setPatient] = React.useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
 
@@ -34,13 +35,13 @@ function Patient() {
                     setError('');
                 })
                 .catch( error => {
-                        if (error.response) {
-                            setError(error.response.status + " " + error.response.data);
-                        } else {
-                            setError(error.message + " : check that the server is up and running !");
-                        }
+                    setInput(false);
+                    if (error.response) {
+                        setError(error.response.status + " " + error.response.data);
+                    } else {
+                        setError(error.message + " : check that the server is up and running !");
                     }
-                );
+                });
         }
     }, [patient.id]);
 
@@ -52,11 +53,10 @@ function Patient() {
             axios.post(patientsApiUrl, body)
                 .then(response => {
                     body.id=response.data.id;
-                    setPatient(body);
+                    setInput(false);
                     setError("Patient created successfully with id=" + body.id);
                 })
                 .catch(error => {
-                    console.error("J'ai une erreur au POST", error.response);
                     if (error.response) {
                         setError(error.response.status + " " + error.response.data);
                     } else {
@@ -89,7 +89,7 @@ function Patient() {
     }
 
     function displayField(field, label, readonly) {
-//        if (error !== '') return null;
+        if (!input) return null;
         const disabled = !!readonly;
         return (<div>
             <label>{label}
@@ -99,7 +99,7 @@ function Patient() {
     }
 
     function displaySaveButton() {
-//        if (error !== '') return null;
+        if (!input) return null;
         return(
             <button onClick={onClick}>Save</button>
         );

@@ -3,6 +3,24 @@ table, td, th {
     border-collapse:collapse;
 }
 
-.mediscreen-link {
-    margin-outside: 10px;
+th {
+    background-color: grey;
+    color: white;
+}
+tr:hover {
+    background-color: lightgrey;
+}
+
+a {
+    margin-right: 20px;
+}
+
+button {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+footer {
+    font-style: italic;
+    font-weight: bold;
 }

@@ -35,7 +35,7 @@ function Patients () {
     function displayPatients() {
         if (patients.length === 0) return null;
         return (
-            <nav className="patients-menu">
+            <nav>
                 <table>
                     <tr>
                         <th>Patient id</th>
@@ -43,12 +43,8 @@ function Patients () {
                         <th>Date of birth</th>
                     </tr>
                     {patients.map(patient => (
-                        <tr>
-                            <td>
-                                <a className="patients-link" href={"/patients/"+patient.id}>
-                                    {patient.id}
-                                </a>
-                            </td>
+                        <tr onClick={()=>window.location.href="/patients/"+patient.id}>
+                            <td>{patient.id}</td>
                             <td>{patient.family}</td>
                             <td>{patient.dob}</td>
                         </tr>
