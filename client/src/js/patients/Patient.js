@@ -28,7 +28,12 @@ function Patient() {
     }
 
     React.useEffect(() => {
-        if (patient.id !== '' && patient.id !== 'new') {
+        if (patient.id === 'new') return null;
+        if (isNaN(parseInt(patient.id))) {
+            setError('Patient id must have a numeric value !');
+            setInput(false);
+        } else
+        {
             axios.get(patientsApiUrl + "/" + patient.id)
                 .then(response => {
                     setPatient(response.data);
@@ -91,6 +96,7 @@ function Patient() {
     function displayField(field, label, readonly) {
         if (!input) return null;
         const disabled = !!readonly;
+        if (field === 'id' && patient.id === 'new') return null;
         return (<div>
             <label>{label}
                 <input value={patient[field]} name={field} onChange={onChange} disabled={disabled} />
@@ -105,9 +111,16 @@ function Patient() {
         );
     }
 
+    function displayTitle() {
+        const title = patient.id === 'new' ? 'creation' : 'edit';
+        return(
+            <h1>Patient {title}</h1>
+        );
+    }
+
     return (
         <div>
-            <h1>Patient edit</h1>
+            {displayTitle()}
             <form>
                 {patientFields.map(fieldSpec => displayField(fieldSpec.field, fieldSpec.label, fieldSpec.readonly))}
                 {displaySaveButton()}

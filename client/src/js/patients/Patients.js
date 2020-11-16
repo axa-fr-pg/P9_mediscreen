@@ -16,7 +16,7 @@ function Patients () {
             })
             .catch( error => {
                     if (error.response) {
-                        setError(error.status + " " + error.response);
+                        setError(error.response.status + " " + error.response.data);
                     } else {
                         setError(error.message + " : check that the server is up and running !");
                     }
