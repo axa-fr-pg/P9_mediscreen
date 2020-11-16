@@ -1,8 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
 import patientsApiUrl from './api';
-import Patient from './Patient';
-import {BrowserRouter, NavLink, Route, Switch} from "react-router-dom";
 
 function Patients () {
 
@@ -13,7 +11,6 @@ function Patients () {
         axios.get(patientsApiUrl)
             .then(response => {
                 setPatients(response.data);
-                console.log(response.data);
                 if (response.data.length === 0) setError('Database is empty !');
                 else setError('');
             })
@@ -23,8 +20,7 @@ function Patients () {
                     } else {
                         setError(error.message + " : check that the server is up and running !");
                     }
-                }
-            );
+            });
     }, []);
 
     function displayError() {
@@ -49,7 +45,7 @@ function Patients () {
                     {patients.map(patient => (
                         <tr>
                             <td>
-                                <a class="patients-link" href={"/patients/"+patient.id}>
+                                <a className="patients-link" href={"/patients/"+patient.id}>
                                     {patient.id}
                                 </a>
                             </td>
@@ -64,8 +60,9 @@ function Patients () {
 
     return (
         <div>
-            <h1>Patients management</h1>
+            <h1>Patient list</h1>
             {displayPatients()}
+            <button onClick={() => window.location.href='/patients/new'}>Add patient</button>
             {displayError()}
         </div>
     );

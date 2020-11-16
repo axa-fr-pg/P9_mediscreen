@@ -42,14 +42,13 @@ const MediscreenMenu = () => {
 
     return (
         <nav className="mediscreen-menu">
-            <NavLink class="mediscreen-link" to="/" exact>
+            <NavLink className="mediscreen-link" to="/" exact>
                 Home
             </NavLink>
-            <NavLink class="mediscreen-link" to="/patients">
+            <NavLink className="mediscreen-link" to="/patients">
                 Patients
             </NavLink>
-
-            <NavLink class="mediscreen-link" to="/doctor">
+            <NavLink className="mediscreen-link" to="/doctor">
                 Doctor
             </NavLink>
         </nav>
@@ -67,6 +66,9 @@ function MediscreenClient() {
                     </Route>
                     <Route exact path="/patients">
                         <Patients />
+                    </Route>
+                    <Route exact path="/patients/new">
+                        <Patient />
                     </Route>
                     <Route path="/patients">
                         <Patient />
