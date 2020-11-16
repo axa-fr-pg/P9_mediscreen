@@ -142,4 +142,15 @@ public class PatientServiceTest {
         // THEN
         assertEntityEqual(patient, new PatientEntity(result));
     }
+
+    @Test
+    public void givenRandomRequest_whenPostPatient_thenReturnsListOfCorrectSize() {
+        // GIVEN
+        mockEntityCreate();
+        int expectedNumberOfPatients = 5;
+        // WHEN
+        List<PatientDTO> result = service.post(expectedNumberOfPatients);
+        // THEN
+        assertEquals(expectedNumberOfPatients, result.size());
+    }
 }

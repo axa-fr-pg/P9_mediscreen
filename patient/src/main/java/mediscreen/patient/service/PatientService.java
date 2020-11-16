@@ -9,4 +9,5 @@ public interface PatientService {
     PatientDTO get(long patientId) throws PatientNotFoundException;
     PatientDTO put(PatientDTO patient) throws PatientNotFoundException;
     PatientDTO post(PatientDTO patient) throws CreateExistingPatientException;
+    List<PatientDTO> post(int numberOfRows);
 }

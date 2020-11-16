@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -45,5 +46,12 @@ public class PatientServiceImpl implements PatientService {
         if (existingPatients.size() > 0) throw new CreateExistingPatientException();
         PatientEntity result = repository.save(new PatientEntity(patient));
         return new PatientDTO(result);
+    }
+
+    @Override
+    public List<PatientDTO> post(int numberOfRows) {
+        return Stream.generate(PatientEntity::random).limit(numberOfRows)
+                .map(patient -> new PatientDTO(repository.save(patient)))
+                .collect(Collectors.toList());
     }
 }
