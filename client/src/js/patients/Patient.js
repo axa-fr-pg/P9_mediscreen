@@ -52,6 +52,14 @@ function Patient() {
 
     function onClick(event) {
         event.preventDefault();
+
+        const dobHasCorrectFormat = patient.dob.valueOf().match(/^\d{4}-\d{2}-\d{2}$/);
+        if (!dobHasCorrectFormat) {
+            setError("Please enter date of birth with format YYYY-MM-DD ("+ patient.dob + " is invalid).");
+            return;
+        }
+        console.log("date conforme ?", dobHasCorrectFormat)  ;
+
         const body = {...patient};
         if (patient.id === 'new') {
             body.id=0;
