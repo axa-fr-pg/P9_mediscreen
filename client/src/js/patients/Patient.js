@@ -89,7 +89,6 @@ function Patient() {
                     } else {
                         setError(error.message + " : check that the server is up and running !");
                     }
-
                 });
         }
     }

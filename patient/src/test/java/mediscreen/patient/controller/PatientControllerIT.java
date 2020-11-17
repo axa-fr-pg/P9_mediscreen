@@ -3,8 +3,8 @@ package mediscreen.patient.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import mediscreen.patient.model.PatientEntity;
 import mediscreen.patient.model.PatientDTO;
+import mediscreen.patient.model.PatientEntity;
 import mediscreen.patient.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -96,6 +95,11 @@ public class PatientControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new PatientDTO(patient)))
                 .accept(MediaType.APPLICATION_JSON);
+    }
+
+    private MockHttpServletRequestBuilder buildPostRandomRequest(Integer expectedNumberOfPatients) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .post(ENTITY_URL+"/random/"+expectedNumberOfPatients);
     }
 
     private void assertEntityEqual(PatientEntity expected, PatientEntity received) throws JsonProcessingException {
@@ -255,5 +259,19 @@ public class PatientControllerIT {
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEntityEqual(patient, new PatientEntity(result));
+    }
+
+    @Test
+    public void givenRandomRequest_whenPostPatient_thenReturnsListOfCorrectSize() throws Exception {
+        // GIVEN
+        mockEntityCreate();
+        int expectedNumberOfPatients = 8;
+        MockHttpServletRequestBuilder builder = buildPostRandomRequest(expectedNumberOfPatients);
+        // WHEN
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        List<PatientDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<PatientDTO>>() {});
+        // THEN
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(expectedNumberOfPatients, result.size());
     }
 }
