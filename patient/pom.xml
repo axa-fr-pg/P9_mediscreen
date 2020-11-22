@@ -48,10 +48,7 @@
 				<configuration>
 					<contextDirectory>docker</contextDirectory>
 					<dockerfile>docker/Dockerfile</dockerfile>
-					<repository>patient</repository>
-					<buildArgs>
-						<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
-					</buildArgs>
+					<repository>${project.name}</repository>
 				</configuration>
 			</plugin>
 		</plugins>
