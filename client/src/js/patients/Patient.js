@@ -81,7 +81,7 @@ function Patient() {
             axios.put(patientsApiUrl + "/" + patient.id, body)
                 .then(response => {
                     setPatient(response.data);
-                    setError('');
+                    setError('Patient has been saved successfully !');
                 })
                 .catch(error => {
                     if (error.response) {
