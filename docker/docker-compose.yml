@@ -1,6 +1,7 @@
 version: "2"
 services :
   patient:
+    container_name: patient
     image: patient
     ports:
       - "8081:8081"

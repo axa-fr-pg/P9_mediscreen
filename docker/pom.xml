@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>mediscreen</groupId>
+        <version>1.0.0-RELEASE</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>docker</artifactId>
+    <version>1.0.0-RELEASE</version>
+    <name>docker</name>
+    <description>Docker installation</description>
+    <packaging>pom</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>mediscreen</groupId>
+            <artifactId>patient</artifactId>
+            <version>1.0.0-RELEASE</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.dkanejs.maven.plugins</groupId>
+                    <artifactId>docker-compose-maven-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <id>up</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>up</goal>
+                        </goals>
+                        <configuration>
+                            <composeFile>${project.basedir}/docker-compose.yml</composeFile>
+                            <projectName>mediscreen_containers</projectName>
+                            <detachedMode>true</detachedMode>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
