@@ -26,29 +26,17 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>assembly</id>
-						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<archive>
-								<manifest>
-									<mainClass>
-										mediscreen.patient.PatientApplication
-									</mainClass>
-								</manifest>
-							</archive>
-							<descriptorRefs>
-								<descriptorRef>jar-with-dependencies</descriptorRef>
-							</descriptorRefs>
-							<finalName>patient</finalName>
-							<appendAssemblyId>false</appendAssemblyId>
+							<mainClass>mediscreen.patient.PatientApplication</mainClass>
 							<outputDirectory>docker</outputDirectory>
+							<finalName>${project.name}</finalName>
 						</configuration>
 					</execution>
 				</executions>
