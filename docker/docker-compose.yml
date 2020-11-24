@@ -4,3 +4,7 @@ services :
     image: patient
     ports:
       - "8081:8081"
+    environment:
+      - JASYPT_ENCRYPTOR_PASSWORD
+    expose:
+      - "3306"
