@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,7 +38,7 @@ public class PatientDTO {
     @NotNull(message=DOB_NOT_NULL_ERROR)
     @Past(message=DOB_PAST_ERROR)
     @JsonFormat(pattern="yyyy-MM-dd")
-    Date dob;
+    LocalDate dob;
 
     @NotNull(message=SEX_NOT_NULL_ERROR)
     @Pattern(regexp = "^[M|F]{1}$", message=SEX_PATTERN_ERROR)

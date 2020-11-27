@@ -1,6 +1,5 @@
 package mediscreen.patient.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -11,14 +10,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomUtils.nextBoolean;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.apache.commons.lang3.RandomUtils.nextLong;
 
 @Entity
 @Table(name="patient")
@@ -31,7 +28,7 @@ public class PatientEntity {
     long id;
     String family;
     String given;
-    Date dob;
+    LocalDate dob;
     String sex;
     String address;
     String phone;
@@ -44,7 +41,7 @@ public class PatientEntity {
         PatientEntity patient = new PatientEntity();
         patient.family = randomAlphabetic(nextInt(3, 10));
         patient.given = randomAlphabetic(nextInt(3, 10));
-        patient.dob = new Date(nextLong(0, 946681200000L));
+        patient.dob = LocalDate.of(nextInt(1, 2019), nextInt(1, 12), nextInt(1, 28));
         patient.sex = nextBoolean() ? "F" : "M";
         patient.address = randomAlphabetic(nextInt(3, 10));
         patient.phone = randomNumeric(nextInt(1, 3)) + "-" + randomNumeric(nextInt(2, 4)) + "-" + randomNumeric(nextInt(1, 3));

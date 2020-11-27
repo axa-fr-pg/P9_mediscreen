@@ -20,8 +20,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -173,7 +173,7 @@ public class PatientControllerIT {
         // GIVEN
         PatientEntity patientBefore = mockEntityFind(146, true);
         PatientEntity patientAfter = mockEntitySave(patientBefore.id);
-        patientAfter.dob = new Date((new Date()).getTime()+24*60*60*1000L);
+        patientAfter.dob = LocalDate.of(9000, 12, 01);
         MockHttpServletRequestBuilder builder = buildPutRequest(patientAfter);
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
@@ -233,7 +233,7 @@ public class PatientControllerIT {
     public void givenPatientSameFamilyAndDob_whenPost_thenReturnsCreateExistingPatientError() throws Exception {
         // GIVEN
         PatientEntity patient = mockEntityFind(230, true);
-        when(repository.findByFamilyAndDob(eq(patient.family), any(Date.class))).thenReturn(Collections.singletonList(patient));
+        when(repository.findByFamilyAndDob(eq(patient.family), any(LocalDate.class))).thenReturn(Collections.singletonList(patient));
         PatientEntity duplicate = new PatientEntity(new PatientDTO(patient));
         duplicate.id = 0;
         duplicate.family = patient.family;
