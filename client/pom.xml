@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>mediscreen</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0-RELEASE</version>
+	</parent>
+	<groupId>mediscreen</groupId>
+	<artifactId>client</artifactId>
+	<version>1.0.0-RELEASE</version>
+	<name>client</name>
+	<description>Client user interface</description>
+	<packaging>pom</packaging>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>npm install</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Installing npm dependencies" />
+								<echo message="Exec dir: ${project.basedir}" />
+								<exec dir="${project.basedir}" executable="npm.cmd" spawn="false" failonerror="true">
+									<arg value="ci" />
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm run build</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Compiling client" />
+								<echo message="Exec dir: ${project.basedir}" />
+								<exec dir="${project.basedir}" executable="npm.cmd" spawn="false" failonerror="true">
+									<arg value="run" />
+									<arg value="build" />
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
