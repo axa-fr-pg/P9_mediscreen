@@ -61,7 +61,9 @@ function PatientsError({error}) {
 
 function generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError) {
     event.preventDefault();
-    inputField.blur();
+    if (!!inputField) {
+        inputField.blur();
+    }
     setError("Processing request...");
 
     axios.post(patientsApiUrl+"/random/"+randomVolume)
