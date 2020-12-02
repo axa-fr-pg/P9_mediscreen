@@ -19,7 +19,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
-					<execution>
+					<!--execution>
 						<id>npm-install</id>
 						<phase>generate-resources</phase>
 						<goals>
@@ -49,7 +49,7 @@
 								</exec>
 							</target>
 						</configuration>
-					</execution>
+					</execution-->
 					<execution>
 						<id>serve</id>
 						<phase>generate-resources</phase>
@@ -60,7 +60,7 @@
 							<target>
 								<echo message="Starting client" />
 								<echo message="Exec dir: ${project.basedir}" />
-								<exec dir="${project.basedir}" executable="serve-mediscreen.cmd" spawn="false" failonerror="true">
+								<exec dir="${project.basedir}" executable="${project.basedir}/serve-mediscreen.cmd" spawn="false" failonerror="true">
 								</exec>
 							</target>
 						</configuration>
