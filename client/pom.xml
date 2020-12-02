@@ -20,15 +20,14 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>npm install</id>
+						<id>npm-install</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
 						<configuration>
 							<target>
-								<echo message="Installing npm dependencies" />
-								<echo message="Exec dir: ${project.basedir}" />
+								<echo message="Installing client dependencies" />
 								<exec dir="${project.basedir}" executable="npm.cmd" spawn="false" failonerror="true">
 									<arg value="ci" />
 								</exec>
@@ -36,7 +35,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>npm run build</id>
+						<id>npm-build</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>run</goal>
@@ -44,10 +43,24 @@
 						<configuration>
 							<target>
 								<echo message="Compiling client" />
-								<echo message="Exec dir: ${project.basedir}" />
 								<exec dir="${project.basedir}" executable="npm.cmd" spawn="false" failonerror="true">
 									<arg value="run" />
 									<arg value="build" />
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+					<execution>
+						<id>serve</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<echo message="Starting client" />
+								<echo message="Exec dir: ${project.basedir}" />
+								<exec dir="${project.basedir}" executable="serve-mediscreen.cmd" spawn="false" failonerror="true">
 								</exec>
 							</target>
 						</configuration>

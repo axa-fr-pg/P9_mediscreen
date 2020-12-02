@@ -1,0 +1,1 @@
+start "Mediscreen client" node_modules\.bin\serve.cmd -s build
