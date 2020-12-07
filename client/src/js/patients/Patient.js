@@ -33,7 +33,7 @@ function Patient() {
     React.useEffect(() => {
         if (patient.id === 'new') return;
         if (isNaN(parseInt(patient.id))) {
-            setError('Patient id must have a numeric value !');
+            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
             setInput(false);
         } else
         {
