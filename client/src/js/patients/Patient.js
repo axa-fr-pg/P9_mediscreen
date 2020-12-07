@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import axios from "axios";
 import patientsApiUrl from './api';
 import Switch from "react-switch";
+import moment from 'moment'
 
 const patientFields = [
     {field : "id", label : "Patient id", readonly : true},
@@ -55,9 +56,11 @@ function Patient() {
     function onClickSave(event) {
         event.preventDefault();
 
-        const dobHasCorrectFormat = patient.dob.valueOf().match(/^\d{4}-\d{2}-\d{2}$/);
-        if (!dobHasCorrectFormat) {
-            setError("Please enter date of birth with format YYYY-MM-DD ("+ patient.dob + " is invalid).");
+        const givenDate = moment(patient.dob, "YYYY-MM-DD", true).toDate();
+        const givenTime = givenDate.getTime();
+
+        if (isNaN(givenTime) || givenTime < -5000000000000) {
+            setError("Please enter a valid date of birth with format YYYY-MM-DD ("+ patient.dob + " is invalid).");
             return;
         }
 
