@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import axios from "axios";
 import patientsApiUrl from './api';
-import ToggleButton from 'react-toggle-button';
+import Switch from "react-switch";
 
 const patientFields = [
     {field : "id", label : "Patient id", readonly : true},
@@ -112,7 +112,7 @@ function Patient() {
         </div>);
     }
 
-    function onToggleModify() {
+    function onChangeModify() {
         setModify(!modify);
         setError('');
     }
@@ -122,11 +122,12 @@ function Patient() {
             return null;
         }
         return(
-            <div key={"toggle-readOnly"} class="toggle-div">
-                <label>Modify client</label>
-                <div class="toggle-button">
-                    <ToggleButton value={modify} onToggle={onToggleModify} />
+            <div key={"toggle-readOnly"} className="toggle-div">
+                <label>View</label>
+                <div className="toggle-button">
+                    <Switch checked={modify} onChange={onChangeModify} checkedIcon={false} uncheckedIcon={false} />
                 </div>
+                <label>Edit</label>
             </div>
         );
     }
@@ -139,7 +140,8 @@ function Patient() {
     }
 
     function displayTitle() {
-        const title = patient.id === 'new' ? 'creation' : 'edit';
+        const view = modify ? 'edit' : 'view';
+        const title = patient.id === 'new' ? 'creation' : view;
         return(
             <h1>Patient {title}</h1>
         );
