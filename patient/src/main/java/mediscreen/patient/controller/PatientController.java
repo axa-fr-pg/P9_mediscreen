@@ -46,11 +46,11 @@ public class PatientController {
 
     @PostMapping("")
     public ResponseEntity<PatientDTO> post(@RequestBody @Valid PatientDTO patient) throws CreateExistingPatientException {
-        return new ResponseEntity<PatientDTO>(service.post(patient), HttpStatus.OK);
+        return new ResponseEntity<PatientDTO>(service.post(patient), HttpStatus.CREATED);
     }
 
     @PostMapping("/random/{expectedNumberOfPatients}")
     public ResponseEntity<List<PatientDTO>> post(@PathVariable Integer expectedNumberOfPatients) throws CreateExistingPatientException {
-        return new ResponseEntity<List<PatientDTO>>(service.post(expectedNumberOfPatients), HttpStatus.OK);
+        return new ResponseEntity<List<PatientDTO>>(service.post(expectedNumberOfPatients), HttpStatus.CREATED);
     }
 }

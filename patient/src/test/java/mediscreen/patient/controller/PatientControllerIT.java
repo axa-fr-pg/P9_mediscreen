@@ -257,7 +257,7 @@ public class PatientControllerIT {
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
         PatientDTO result = objectMapper.readValue(response.getContentAsString(), PatientDTO.class);
         // THEN
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
         assertEntityEqual(patient, new PatientEntity(result));
     }
 
@@ -271,7 +271,7 @@ public class PatientControllerIT {
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
         List<PatientDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<PatientDTO>>() {});
         // THEN
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
         assertEquals(expectedNumberOfPatients, result.size());
     }
 }
