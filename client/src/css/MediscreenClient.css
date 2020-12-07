@@ -34,3 +34,12 @@ footer {
     border-width: 0px;
     text-align: center;
 }
+
+.toggle-div {
+    margin-top: 20px;
+    display: flex;
+}
+
+.toggle-button {
+    margin-left: 10px;
+}

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import axios from "axios";
 import patientsApiUrl from './api';
+import ToggleButton from 'react-toggle-button';
 
 const patientFields = [
     {field : "id", label : "Patient id", readonly : true},
@@ -17,6 +18,7 @@ function Patient() {
     const [input, setInput] = useState(true);
     const [error, setError] = useState('');
     const [patient, setPatient] = React.useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
+    const [modify, setModify] = useState(false);
 
     function displayError() {
         if (! error) return null;
@@ -28,7 +30,7 @@ function Patient() {
     }
 
     React.useEffect(() => {
-        if (patient.id === 'new') return null;
+        if (patient.id === 'new') return;
         if (isNaN(parseInt(patient.id))) {
             setError('Patient id must have a numeric value !');
             setInput(false);
@@ -50,7 +52,7 @@ function Patient() {
         }
     }, [patient.id]);
 
-    function onClick(event) {
+    function onClickSave(event) {
         event.preventDefault();
 
         const dobHasCorrectFormat = patient.dob.valueOf().match(/^\d{4}-\d{2}-\d{2}$/);
@@ -58,7 +60,6 @@ function Patient() {
             setError("Please enter date of birth with format YYYY-MM-DD ("+ patient.dob + " is invalid).");
             return;
         }
-        console.log("date conforme ?", dobHasCorrectFormat)  ;
 
         const body = {...patient};
         if (patient.id === 'new') {
@@ -104,17 +105,34 @@ function Patient() {
         if (!input) return null;
         const disabled = !!readonly;
         if (field === 'id' && patient.id === 'new') return null;
-        return (<div>
+        return (<div key={field}>
             <label>{label}
-                <input value={patient[field]} name={field} onChange={onChange} disabled={disabled} />
+                <input value={patient[field]} name={field} onChange={onChange} disabled={disabled||modify===false} />
             </label>
         </div>);
     }
 
-    function displaySaveButton() {
+    function onToggleModify() {
+        setModify(!modify);
+        setError('');
+    }
+
+    function displayModifyButton() {
         if (!input) return null;
         return(
-            <button onClick={onClick}>Save</button>
+            <div key={"toggle-readOnly"} class="toggle-div">
+                <label>Modify client</label>
+                <div class="toggle-button">
+                    <ToggleButton value={modify} onToggle={onToggleModify} />
+                </div>
+            </div>
+        );
+    }
+
+    function displaySaveButton() {
+        if (!input || !modify) return null;
+        return(
+            <button onClick={onClickSave}>Save</button>
         );
     }
 
@@ -130,6 +148,7 @@ function Patient() {
             {displayTitle()}
             <form>
                 {patientFields.map(fieldSpec => displayField(fieldSpec.field, fieldSpec.label, fieldSpec.readonly))}
+                {displayModifyButton()}
                 {displaySaveButton()}
                 {displayError()}
             </form>
