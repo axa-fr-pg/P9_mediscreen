@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ExceptionManager extends ResponseEntityExceptionHandler {
 
-    public final static String EXCEPTION_MANAGER_PATIENT_NOT_FOUND = "Patient has not been found";
-    public final static String EXCEPTION_MANAGER_CREATE_EXISTING_PATIENT = "Patient cannot be created with id=0 or with an already existing family/dob value";
+    public final static String EXCEPTION_MANAGER_PATIENT_NOT_FOUND = "No such patient has been found. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_CREATE_EXISTING_PATIENT = "It looks like the patient you wan't to save already exists in the database. Please check your request or ask your IT support.";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {

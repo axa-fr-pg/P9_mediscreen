@@ -34,7 +34,7 @@ public class PatientEntity {
     String phone;
 
     public PatientEntity(PatientDTO patient) {
-        this(patient.id, patient.family, patient.given, patient.dob, patient.sex, patient.address, patient.phone);
+        this(patient.id, patient.family, patient.given, patient.dob, patient.sex.toUpperCase(), patient.address, patient.phone);
     }
 
     public static PatientEntity random() {

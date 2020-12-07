@@ -109,6 +109,7 @@ public class PatientServiceTest {
     public void givenPatientWithId_whenPostPatient_thenThrowsCreateExistingPatientException() {
         // GIVEN
         PatientEntity patient = new PatientEntity();
+        patient.sex = "M";
         patient.id = 1;
         // WHEN
         // THEN
