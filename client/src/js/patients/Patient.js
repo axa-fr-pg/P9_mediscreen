@@ -18,7 +18,7 @@ function Patient() {
     const [input, setInput] = useState(true);
     const [error, setError] = useState('');
     const [patient, setPatient] = React.useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
-    const [modify, setModify] = useState(false);
+    const [modify, setModify] = useState(window.location.href.includes('new'));
 
     function displayError() {
         if (! error) return null;
@@ -118,7 +118,9 @@ function Patient() {
     }
 
     function displayModifyButton() {
-        if (!input) return null;
+        if (!input || window.location.href.includes('new')) {
+            return null;
+        }
         return(
             <div key={"toggle-readOnly"} class="toggle-div">
                 <label>Modify client</label>
