@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
 import patientsApiUrl from './api';
+import {useHistory} from "react-router";
 
 function getPatients(setPatients, setUpdateRequired, setError) {
     axios.get(patientsApiUrl)
@@ -85,7 +86,6 @@ function PatientsRandom({setUpdateRequired, setError}) {
     const [inputField, setInputField] = useState(null);
 
     function onChange (field) {
-        console.log("Saisie : ", field.target.nodeName);
         setRandomVolume(field.target.value);
         setInputField(field.target);
     }
@@ -105,13 +105,14 @@ function Patients() {
     const [patients, setPatients] = useState([]);
     const [error, setError] = useState('');
     const [updateRequired, setUpdateRequired] = useState('false');
+    const history = useHistory();
 
     return (
         <div>
             <h1>Patient list</h1>
             <PatientsList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                           setUpdateRequired={setUpdateRequired} setError={setError} />
-            <button onClick={() => window.location.href='/patients/new'}>Register new patient</button>
+            <button onClick={() => history.push('/patients/new')}>Register new patient</button>
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError} />
             <PatientsError error={error} />
         </div>
