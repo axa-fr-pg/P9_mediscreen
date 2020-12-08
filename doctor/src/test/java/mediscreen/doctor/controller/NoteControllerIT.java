@@ -67,9 +67,9 @@ public class NoteControllerIT {
     @Test
     public void givenBlankNote_whenPostByPatientId_thenReturnsNoteNotBlankError() throws Exception {
         // GIVEN
-        NoteEntity request = mockEntityCreate();
-        request.e = "";
-        MockHttpServletRequestBuilder builder = buildPostRequest(request);
+        NoteEntity note = mockEntityCreate();
+        note.e = "";
+        MockHttpServletRequestBuilder builder = buildPostRequest(note);
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
         List<String> errors = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<String>>() {});
@@ -79,6 +79,17 @@ public class NoteControllerIT {
         assertEquals(NOTE_NOT_BLANK_ERROR, errors.get(0));
     }
 
-
-
+    @Test
+    public void givenPatientIdAndNewNote_whenPostByPatientId_thenReturnsCorrectNote() throws Exception {
+        // GIVEN
+        NoteEntity note = mockEntityCreate();
+        MockHttpServletRequestBuilder builder = buildPostRequest(note);
+        // WHEN
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        NoteDTO result = objectMapper.readValue(response.getContentAsString(), NoteDTO.class);
+        // THEN
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(note.noteId.toString(), result.noteId);
+        assertEquals(note.e, result.e);
+    }
 }
