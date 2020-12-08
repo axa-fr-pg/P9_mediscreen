@@ -1,6 +1,7 @@
 package mediscreen.doctor.controller;
 
 import mediscreen.doctor.model.NoteDTO;
+import mediscreen.doctor.service.CreateExistingNoteException;
 import mediscreen.doctor.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,11 +34,11 @@ public class NoteController {
 
     @PutMapping("/note/{noteId}")
     public ResponseEntity<NoteDTO> putByNoteId(@PathVariable String noteId, @RequestBody @Valid NoteDTO e) {
-        return new ResponseEntity<NoteDTO>(new NoteDTO(), HttpStatus.OK);
+        return new ResponseEntity<>(new NoteDTO(), HttpStatus.OK);
     }
 
     @PostMapping("/patient/{patId}")
-    public ResponseEntity<NoteDTO> postByPatientId(@PathVariable Long patId, @RequestBody @Valid NoteDTO e) {
-        return new ResponseEntity<NoteDTO>(new NoteDTO(), HttpStatus.CREATED);
+    public ResponseEntity<NoteDTO> postByPatientId(@PathVariable Long patId, @RequestBody @Valid NoteDTO e) throws CreateExistingNoteException {
+        return new ResponseEntity<>(service.postNoteByPatientId(patId, e), HttpStatus.CREATED);
     }
 }

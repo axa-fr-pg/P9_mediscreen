@@ -13,6 +13,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
 import static org.apache.commons.lang3.RandomUtils.nextBoolean;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
+import static org.apache.commons.lang3.RandomUtils.nextLong;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,18 +26,15 @@ public class NoteEntity {
 
     String e;
 
-    public NoteEntity(NoteDTO note) throws IllegalArgumentException {
-        this(UUID.fromString(note.noteId), 0, note.e);
+    public NoteEntity(long patientId, NoteDTO note) throws IllegalArgumentException {
+        this(UUID.fromString(note.noteId), patientId, note.e);
     }
 
     public static NoteEntity random() {
-        NoteEntity patient = new NoteEntity();
-/*        patient.family = randomAlphabetic(nextInt(3, 15));
-        patient.given = randomAlphabetic(nextInt(3, 15));
-        patient.dob = LocalDate.of(nextInt(1900, 2019), nextInt(1, 12), nextInt(1, 28));
-        patient.sex = nextBoolean() ? "F" : "M";
-        patient.address = randomAlphabetic(nextInt(3, 30));
-        patient.phone = randomNumeric(nextInt(1, 3)) + "-" + randomNumeric(nextInt(3, 6)) + "-" + randomNumeric(nextInt(3, 6));*/
-        return patient;
+        NoteEntity note = new NoteEntity();
+        note.noteId = UUID.randomUUID();
+        note.patId = nextLong();
+        note.e = "random";
+        return note;
     }
 }
