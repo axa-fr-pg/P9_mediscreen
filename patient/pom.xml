@@ -7,7 +7,6 @@
 		<artifactId>parent</artifactId>
 		<version>1.0.0-RELEASE</version>
 	</parent>
-	<groupId>mediscreen</groupId>
 	<artifactId>patient</artifactId>
 	<version>1.0.0-RELEASE</version>
 	<name>patient</name>
