@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NoteRepository extends MongoRepository<NoteEntity, UUID> {
-    List<NoteEntity> findByFamilyAndDob(String family, LocalDate dob);
+    //List<NoteEntity> findByFamilyAndDob(String family, LocalDate dob);
 }

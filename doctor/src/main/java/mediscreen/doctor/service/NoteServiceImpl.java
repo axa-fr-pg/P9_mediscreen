@@ -5,6 +5,7 @@ import mediscreen.doctor.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<NoteDTO> getList() {
-        return repository.findAll().stream().map(NoteDTO::new).collect(Collectors.toList());
+//        return repository.findAll().stream().map(NoteDTO::new).collect(Collectors.toList());
+        return Arrays.asList(new NoteDTO(), new NoteDTO(), new NoteDTO());
     }
 }
