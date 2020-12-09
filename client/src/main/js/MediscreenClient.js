@@ -1,28 +1,15 @@
-// inspiré de https://github.com/vijitail/react-router-demo/tree/master/src
-
 import React from 'react';
-import { BrowserRouter, Switch, Route, NavLink, useParams } from "react-router-dom";
+import { BrowserRouter, Switch, Route, NavLink } from "react-router-dom";
 import Patients from "./patients/Patients";
 import Patient from "./patients/Patient";
 import "../css/MediscreenClient.css";
+import Notes from "./notes/Notes";
 
 const Home = () => (
     <div>
         <h1>Mediscreen home page</h1>
     </div>
 );
-
-
-
-const Doctor = () => {
-    const { name } = useParams();
-    return (
-        <div>
-            <h1 >This is the Doctor Page</h1>
-            <p>We expect to deliver this page on early January 2021 latest. Thank you for your understanding.</p>
-        </div>
-    );
-};
 
 const MediscreenMenu = () => {
 
@@ -34,8 +21,8 @@ const MediscreenMenu = () => {
             <NavLink className="mediscreen-link" to="/patients">
                 Patients
             </NavLink>
-            <NavLink className="mediscreen-link" to="/doctor">
-                Doctor
+            <NavLink className="mediscreen-link" to="/notes">
+                Notes
             </NavLink>
         </nav>
     );
@@ -59,8 +46,8 @@ function MediscreenClient() {
                     <Route path="/patients">
                         <Patient />
                     </Route>
-                    <Route path="/doctor">
-                        <Doctor />
+                    <Route path="/notes">
+                        <Notes />
                     </Route>
                 </Switch>
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import MediscreenClient from './js/MediscreenClient';
+import MediscreenClient from './main/js/MediscreenClient';
 
 ReactDOM.render(
   <React.StrictMode>
