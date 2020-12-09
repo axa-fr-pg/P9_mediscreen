@@ -12,7 +12,7 @@ function getPatients(setPatients, setUpdateRequired, setError) {
         })
         .catch( error => {
             if (error.response) {
-                setError(error.response.status + " " + error.response.data);
+                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it looks like the database is not ready !");
             } else {
                 setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
             }
@@ -74,7 +74,7 @@ function generateRandomPatients(event, inputField, randomVolume, setUpdateRequir
         })
         .catch(error => {
             if (error.response) {
-                setError(error.response.status + " " + error.response.data);
+                setError(error.response.status + " " + error.response.data+ " ! Please ask your IT support : it looks like the database is not ready !");
             } else {
                 setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
             }
