@@ -1,8 +1,7 @@
-/.idea/
-/patient/.mvn/
-/patient/target/
-/patient.log.txt
-/patient/patient.log.txt
-/client/client.iml
-
-/patient/docker/patient-1.0.0-RELEASE.jar
+.idea/
+.mvn/
+target/
+*.log.txt
+*.log.txt*.gz
+*.iml
+*.jar
