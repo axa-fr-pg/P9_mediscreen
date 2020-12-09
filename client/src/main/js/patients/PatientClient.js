@@ -1,16 +1,13 @@
 import React from 'react';
-//import '../MediscreenClient.css';
 import axios from 'axios';
 
 const patientApiUrl = "http://patient:8081/patients";
 
 function PatientDetailLine(props) {
 
-    const disabled = props.disabled ? true : false;
-
     return (<div>
         <label>{props.label}
-            <input value={props.input} name={props.name} onChange={props.onChange} disabled={disabled} />
+            <input value={props.input} name={props.name} onChange={props.onChange} disabled={!!props.disabled} />
         </label>
     </div>);
 }
