@@ -28,7 +28,7 @@ public class NoteServiceImpl implements NoteService {
         if (note.noteId != null && note.noteId.length() > 0) {
             throw new CreateExistingNoteException();
         }
-        NoteEntity given = new NoteEntity(UUID.randomUUID(), patientId, note.e);
+        NoteEntity given = new NoteEntity(patientId, note);
         NoteEntity result = repository.save(given);
         return new NoteDTO(result);
     }

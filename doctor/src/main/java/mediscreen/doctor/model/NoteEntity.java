@@ -7,13 +7,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static org.apache.commons.lang3.RandomStringUtils.randomNumeric;
-import static org.apache.commons.lang3.RandomUtils.nextBoolean;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.apache.commons.lang3.RandomUtils.nextLong;
 
 @AllArgsConstructor
@@ -22,19 +17,19 @@ import static org.apache.commons.lang3.RandomUtils.nextLong;
 @Document(collection = "notes")
 public class NoteEntity {
     @Id
-    UUID noteId;
+    String noteId;
 
     long patId;
 
     String e;
 
     public NoteEntity(long patientId, NoteDTO note) throws IllegalArgumentException {
-        this(UUID.fromString(note.noteId), patientId, note.e);
+        this(note.noteId, patientId, note.e);
     }
 
     public static NoteEntity random() {
         NoteEntity note = new NoteEntity();
-        note.noteId = UUID.randomUUID();
+        note.noteId = UUID.randomUUID().toString();
         note.patId = nextLong();
         note.e = "random";
         return note;

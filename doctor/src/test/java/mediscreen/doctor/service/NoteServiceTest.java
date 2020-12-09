@@ -52,10 +52,10 @@ public class NoteServiceTest {
     }
 
     @Test
-    public void givenNoteId_whenPostPatient_thenThrowsCreateExistingNoteException() {
+    public void givenNonEmptyNoteId_whenPostPatient_thenThrowsCreateExistingNoteException() {
         // GIVEN
-        NoteEntity note = new NoteEntity();
-        note.noteId = UUID.randomUUID();
+        NoteEntity note = mockEntityCreate();
+        note.noteId = "non empty";
         // WHEN
         // THEN
         assertThrows(CreateExistingNoteException.class, () -> service.postNoteByPatientId(0, new NoteDTO(note)));

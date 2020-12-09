@@ -8,7 +8,6 @@ import mediscreen.doctor.model.NoteEntity;
 import mediscreen.doctor.repository.NoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.util.reflection.FieldInitializationReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,8 +20,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 import static mediscreen.doctor.model.NoteDTO.NOTE_NOT_BLANK_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,7 +52,7 @@ public class NoteControllerIT {
         return MockMvcRequestBuilders
                 .post(ENTITY_URL + "/patient/" + note.patId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new NoteDTO("", note.e)))
+                .content(objectMapper.writeValueAsString(note))
                 .accept(MediaType.APPLICATION_JSON);
     }
 
@@ -82,14 +79,16 @@ public class NoteControllerIT {
     @Test
     public void givenPatientIdAndNewNote_whenPostByPatientId_thenReturnsCorrectNote() throws Exception {
         // GIVEN
-        NoteEntity note = mockEntityCreate();
-        MockHttpServletRequestBuilder builder = buildPostRequest(note);
+        NoteEntity expected = mockEntityCreate();
+        NoteEntity requested = new NoteEntity(0, new NoteDTO(expected));
+        requested.noteId = "";
+        MockHttpServletRequestBuilder builder = buildPostRequest(requested);
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
         NoteDTO result = objectMapper.readValue(response.getContentAsString(), NoteDTO.class);
         // THEN
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-        assertEquals(note.noteId.toString(), result.noteId);
-        assertEquals(note.e, result.e);
+        assertEquals(expected.noteId.toString(), result.noteId);
+        assertEquals(expected.e, result.e);
     }
 }

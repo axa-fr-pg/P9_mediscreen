@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +20,6 @@ public class NoteDTO {
     String e;
 
     public NoteDTO(NoteEntity note) {
-        this(note.noteId.toString(), note.e);
+        this(note.noteId, note.e);
     }
 }
