@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import axios from "axios";
-import patientsApiUrl from './api';
+import {patientsApiUrl} from '../api/URLs';
 import Switch from "react-switch";
 import moment from 'moment'
 
