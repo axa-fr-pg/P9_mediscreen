@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
-import patientsApiUrl from './patientApi';
+import {patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
 
 function getPatients(setPatients, setUpdateRequired, setError) {
