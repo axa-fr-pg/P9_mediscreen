@@ -92,7 +92,7 @@ function PatientsRandom({setUpdateRequired, setError}) {
 
     return (
         <form>
-            <label>
+            <label className="random-label">
                 <button onClick={(event) => generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError)}>Add</button>
                 <input className="smallest-width" value={randomVolume} onChange={onChange} />
                 random patient(s) to database
@@ -112,7 +112,7 @@ function Patients() {
             <h1>Patient list</h1>
             <PatientsList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                           setUpdateRequired={setUpdateRequired} setError={setError} />
-            <button onClick={() => history.push('/patients/new')}>Register new patient</button>
+            <button className="new-button" onClick={() => history.push('/patients/new')}>Register new patient</button>
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError} />
             <PatientsError error={error} />
         </div>

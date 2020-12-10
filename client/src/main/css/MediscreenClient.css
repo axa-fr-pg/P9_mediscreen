@@ -19,11 +19,6 @@ input {
     width: 500px;
 }
 
-button {
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
 footer {
     font-style: italic;
     font-weight: bold;
@@ -35,12 +30,27 @@ footer {
     text-align: center;
 }
 
-.toggle-div {
+.switch-div {
     margin-top: 20px;
     display: flex;
 }
 
-.toggle-button {
+.switch-read-only {
     margin-left: 10px;
     margin-right: 10px;
+}
+
+.switch-patient-id {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.random-label {
+    display: flex;
+    height: 20px;
+    margin-top: 20px;
+}
+
+.new-button {
+    margin-top: 20px;
 }

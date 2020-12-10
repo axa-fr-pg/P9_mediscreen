@@ -3,6 +3,7 @@ import Note from "./Note";
 import {useHistory} from "react-router";
 import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
+import Switch from "react-switch";
 
 function generateRandomNotes(event, inputField, randomVolume, setUpdateRequired, setError) {
     event.preventDefault();
@@ -25,9 +26,30 @@ function generateRandomNotes(event, inputField, randomVolume, setUpdateRequired,
         });
 }
 
+function onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError) {
+    setPatientIdGiven(!patientIdGiven);
+    setError('');
+    console.log("patientIdGiven ", patientIdGiven);
+}
+
+function displayPatientIdSwitch(patientIdGiven, setPatientIdGiven, setError) {
+
+    return(
+        <div key={"switch-patient-id"} className="switch-div">
+            <label>View</label>
+            <div className="switch-patient-id">
+                <Switch checked={patientIdGiven} onChange={() => onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError)}
+                        checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={15} />
+            </div>
+            <label>Edit</label>
+        </div>
+    );
+}
+
 function NotesRandom({setUpdateRequired, setError}) {
     const [randomVolume, setRandomVolume] = useState(5);
     const [inputField, setInputField] = useState(null);
+    const [patientIdGiven, setPatientIdGiven] = useState(false);
 
     function onChange (field) {
         setRandomVolume(field.target.value);
@@ -36,10 +58,11 @@ function NotesRandom({setUpdateRequired, setError}) {
 
     return (
         <form>
-            <label>
+            <label className="random-label">
                 <button onClick={(event) => generateRandomNotes(event, inputField, randomVolume, setUpdateRequired, setError)}>Add</button>
                 <input className="smallest-width" value={randomVolume} onChange={onChange} />
                 random note(s) to database
+                {displayPatientIdSwitch(patientIdGiven, setPatientIdGiven, setError)}
             </label>
         </form>
     );
@@ -48,7 +71,6 @@ function NotesRandom({setUpdateRequired, setError}) {
 function Notes() {
     const [updateRequired, setUpdateRequired] = useState('false');
     const [error, setError] = useState('');
-
     const history = useHistory();
     history.push('/notes/patient/1/new');
 

@@ -120,14 +120,14 @@ function Patient() {
         setError('');
     }
 
-    function displayModifyButton() {
+    function displayModifySwitch() {
         if (!input || window.location.href.includes('new')) {
             return null;
         }
         return(
-            <div key={"toggle-readOnly"} className="toggle-div">
+            <div key={"switch-read-only"} className="switch-div">
                 <label>View</label>
-                <div className="toggle-button">
+                <div className="switch-read-only">
                     <Switch checked={modify} onChange={onChangeModify} checkedIcon={false} uncheckedIcon={false} />
                 </div>
                 <label>Edit</label>
@@ -155,7 +155,7 @@ function Patient() {
             {displayTitle()}
             <form>
                 {patientFields.map(fieldSpec => displayField(fieldSpec.field, fieldSpec.label, fieldSpec.readonly))}
-                {displayModifyButton()}
+                {displayModifySwitch()}
                 {displaySaveButton()}
                 {displayError()}
             </form>
