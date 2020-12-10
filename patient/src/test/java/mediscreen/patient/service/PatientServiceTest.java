@@ -67,7 +67,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenExistingPatient_whenGetPatient_thenReturnsCorrectPatient() throws PatientNotFoundException {
+    public void givenExistingPatient_whenGet_thenReturnsCorrectPatient() throws PatientNotFoundException {
         // GIVEN
         PatientEntity patient = mockEntityFind(46, true);
         // WHEN
@@ -77,7 +77,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenNoPatient_whenGetPatient_thenThrowsPatientNotFoundException() {
+    public void givenNoPatient_whenGet_thenThrowsPatientNotFoundException() {
         // GIVEN
         PatientEntity patient = mockEntityFind(56, false);
         // WHEN
@@ -86,7 +86,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenExistingPatient_whenPutPatient_thenReturnsCorrectPatient() throws PatientNotFoundException {
+    public void givenExistingPatient_whenPut_thenReturnsCorrectPatient() throws PatientNotFoundException {
         // GIVEN
         PatientDTO patientBefore = new PatientDTO(mockEntityFind(75, true));
         PatientEntity patientAfter = mockEntitySave(patientBefore.id);
@@ -97,7 +97,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenNoPatient_whenPutPatient_thenThrowsPatientNotFoundException() {
+    public void givenNoPatient_whenPut_thenThrowsPatientNotFoundException() {
         // GIVEN
         PatientEntity patient = mockEntityFind(85, false);
         // WHEN
@@ -106,7 +106,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenPatientWithId_whenPostPatient_thenThrowsCreateExistingPatientException() {
+    public void givenPatientWithId_whenPost_thenThrowsCreateExistingPatientException() {
         // GIVEN
         PatientEntity patient = new PatientEntity();
         patient.sex = "M";
@@ -117,7 +117,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenPatientSameFamilyAndDob_whenPostPatient_thenThrowsCreateExistingPatientException() {
+    public void givenPatientSameFamilyAndDob_whenPost_thenThrowsCreateExistingPatientException() {
         // GIVEN
         PatientEntity patient = mockEntityFind(112, true);
         when(repository.findByFamilyAndDob(patient.family, patient.dob)).thenReturn(Collections.singletonList(patient));
@@ -131,7 +131,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenNewPatient_whenPostPatient_thenReturnsCorrectPatient() throws CreateExistingPatientException {
+    public void givenNewPatient_whenPost_thenReturnsCorrectPatient() throws CreateExistingPatientException {
         // GIVEN
         PatientEntity patient = mockEntityCreate();
         PatientEntity request = new PatientEntity(new PatientDTO(patient));
@@ -143,7 +143,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void givenRandomRequest_whenPostPatient_thenReturnsListOfCorrectSize() {
+    public void givenRandomRequest_whenPost_thenReturnsListOfCorrectSize() {
         // GIVEN
         mockEntityCreate();
         int expectedNumberOfPatients = 5;

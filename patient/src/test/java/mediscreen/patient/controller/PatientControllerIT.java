@@ -97,7 +97,7 @@ public class PatientControllerIT {
                 .accept(MediaType.APPLICATION_JSON);
     }
 
-    private MockHttpServletRequestBuilder buildPostRandomRequest(Integer expectedNumberOfPatients) throws JsonProcessingException {
+    private MockHttpServletRequestBuilder buildPostRandomRequest(Integer expectedNumberOfPatients) {
         return MockMvcRequestBuilders
                 .post(ENTITY_URL+"/random/"+expectedNumberOfPatients);
     }
@@ -262,7 +262,7 @@ public class PatientControllerIT {
     }
 
     @Test
-    public void givenRandomRequest_whenPostPatient_thenReturnsListOfCorrectSize() throws Exception {
+    public void givenRandomRequest_whenPost_thenReturnsListOfCorrectSize() throws Exception {
         // GIVEN
         mockEntityCreate();
         int expectedNumberOfPatients = 8;

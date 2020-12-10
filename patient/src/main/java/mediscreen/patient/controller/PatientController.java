@@ -28,29 +28,29 @@ public class PatientController {
 
     @GetMapping("")
     public ResponseEntity<List<PatientDTO>> getList() {
-        return new ResponseEntity<List<PatientDTO>>(service.getList(), HttpStatus.OK);
+        return new ResponseEntity<>(service.getList(), HttpStatus.OK);
     }
 
     @GetMapping("/{patientId}")
     public ResponseEntity<PatientDTO> get(@PathVariable Long patientId)
             throws PatientNotFoundException {
-        return new ResponseEntity<PatientDTO>(service.get(patientId), HttpStatus.OK);
+        return new ResponseEntity<>(service.get(patientId), HttpStatus.OK);
     }
 
     @PutMapping("/{patientId}")
     public ResponseEntity<PatientDTO> put(@PathVariable Long patientId, @RequestBody @Valid PatientDTO patient)
             throws PatientNotFoundException {
         if (patientId != patient.id) throw new PatientNotFoundException();
-        return new ResponseEntity<PatientDTO>(service.put(patient), HttpStatus.OK);
+        return new ResponseEntity<>(service.put(patient), HttpStatus.OK);
     }
 
     @PostMapping("")
     public ResponseEntity<PatientDTO> post(@RequestBody @Valid PatientDTO patient) throws CreateExistingPatientException {
-        return new ResponseEntity<PatientDTO>(service.post(patient), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.post(patient), HttpStatus.CREATED);
     }
 
     @PostMapping("/random/{expectedNumberOfPatients}")
     public ResponseEntity<List<PatientDTO>> post(@PathVariable Integer expectedNumberOfPatients) throws CreateExistingPatientException {
-        return new ResponseEntity<List<PatientDTO>>(service.post(expectedNumberOfPatients), HttpStatus.CREATED);
+        return new ResponseEntity<>(service.post(expectedNumberOfPatients), HttpStatus.CREATED);
     }
 }
