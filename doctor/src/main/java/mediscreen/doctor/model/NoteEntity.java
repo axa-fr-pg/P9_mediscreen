@@ -36,4 +36,10 @@ public class NoteEntity {
         note.e = randomAlphabetic(nextInt(20, 500));
         return note;
     }
+
+    public static NoteEntity random(long patientId) {
+        NoteEntity note = NoteEntity.random();
+        note.patId = patientId;
+        return note;
+    }
 }

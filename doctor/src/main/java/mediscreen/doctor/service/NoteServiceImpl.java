@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,9 +39,20 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<NoteDTO> getList() {
-//        return repository.findAll().stream().map(NoteDTO::new).collect(Collectors.toList());
-        return Arrays.asList(new NoteDTO(), new NoteDTO(), new NoteDTO());
+    public List<NoteDTO> getAll() {
+        return repository.findAll().stream().map(NoteDTO::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NoteDTO> getAllByPatientId(long patientId) {
+        return repository.findAllByPatId(patientId).stream().map(NoteDTO::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public NoteDTO get(String noteId) throws NoteNotFoundException {
+        Optional<NoteEntity> note = repository.findById(noteId);
+        if (note.isPresent()) return new NoteDTO(note.get());
+        throw new NoteNotFoundException();
     }
 
     @Override
@@ -55,8 +67,8 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<NoteDTO> post(long patientId, int numberOfRows) {
-        return Stream.generate(NoteEntity::random).limit(numberOfRows)
+    public List<NoteDTO> post(long patientId, int numberOfRandomRows) {
+        return Stream.generate(NoteEntity::random).limit(numberOfRandomRows)
                 .map(note -> {
                     if (patientId != 0) {
                         note.patId = patientId;

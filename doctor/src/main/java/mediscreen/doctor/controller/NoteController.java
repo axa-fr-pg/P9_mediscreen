@@ -2,6 +2,7 @@ package mediscreen.doctor.controller;
 
 import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.service.CreateExistingNoteException;
+import mediscreen.doctor.service.NoteNotFoundException;
 import mediscreen.doctor.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,12 +27,22 @@ public class NoteController {
     @Autowired
     NoteService service;
 
-    @GetMapping("/patient/{patId}")
-    public ResponseEntity<List<NoteDTO>> getListByPatientId(@PathVariable Long patId) {
-        return new ResponseEntity<>(service.getList(), HttpStatus.OK);
+    @GetMapping("")
+    public ResponseEntity<List<NoteDTO>> getListByPatientId() {
+        return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
     }
 
-    @PutMapping("/note/{noteId}")
+    @GetMapping("/patient/{patId}")
+    public ResponseEntity<List<NoteDTO>> getListByPatientId(@PathVariable Long patId) {
+        return new ResponseEntity<>(service.getAllByPatientId(patId), HttpStatus.OK);
+    }
+
+    @GetMapping("/{noteId}")
+    public ResponseEntity<NoteDTO> get(@PathVariable String noteId) throws NoteNotFoundException {
+        return new ResponseEntity<>(service.get(noteId), HttpStatus.OK);
+    }
+
+    @PutMapping("/{noteId}")
     public ResponseEntity<NoteDTO> putByNoteId(@PathVariable String noteId, @RequestBody @Valid NoteDTO e) {
         return new ResponseEntity<>(new NoteDTO(), HttpStatus.OK);
     }

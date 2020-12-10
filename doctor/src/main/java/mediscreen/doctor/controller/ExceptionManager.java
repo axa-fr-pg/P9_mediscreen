@@ -1,6 +1,7 @@
 package mediscreen.doctor.controller;
 
 import mediscreen.doctor.service.CreateExistingNoteException;
+import mediscreen.doctor.service.NoteNotFoundException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,5 +34,10 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value=CreateExistingNoteException.class)
     public ResponseEntity<Object> handleCreateExistingPatient(CreateExistingNoteException ex, WebRequest request) {
         return new ResponseEntity<>(EXCEPTION_MANAGER_CREATE_EXISTING_NOTE, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value= NoteNotFoundException.class)
+    public ResponseEntity<Object> handleCreateExistingPatient(NoteNotFoundException ex, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_NOTE_NOT_FOUND, HttpStatus.NOT_FOUND);
     }
 }
