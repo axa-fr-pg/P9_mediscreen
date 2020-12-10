@@ -1,7 +1,9 @@
+*.iml
 .idea/
 .mvn/
+build/
 target/
 *.log.txt
-*.log.txt*.gz
-*.iml
+*.log.txt*gz
 *.jar
+node_modules/
