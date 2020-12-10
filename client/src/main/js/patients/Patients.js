@@ -92,11 +92,13 @@ function PatientsRandom({setUpdateRequired, setError}) {
 
     return (
         <form>
-            <label className="random-label">
+            <div className="div-random">
                 <button onClick={(event) => generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError)}>Add</button>
-                <input className="smallest-width" value={randomVolume} onChange={onChange} />
-                random patient(s) to database
-            </label>
+                <input className="input-small" value={randomVolume} onChange={onChange} />
+                <label>
+                    random patient(s) to database
+                </label>
+            </div>
         </form>
     );
 }

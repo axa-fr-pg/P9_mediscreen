@@ -5,10 +5,14 @@ import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 
-function generateRandomNotes(event, inputField, randomVolume, setUpdateRequired, setError) {
+function generateRandomNotes(event, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom,
+                             patientIdForRandom, setUpdateRequired, setError) {
     event.preventDefault();
-    if (!!inputField) {
-        inputField.blur();
+    if (!!inputFieldRandomVolume) {
+        inputFieldRandomVolume.blur();
+    }
+    if (!!inputFieldPatientIdForRandom) {
+        inputFieldPatientIdForRandom.blur();
     }
     setError("Processing request...");
 
@@ -32,38 +36,52 @@ function onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError) {
     console.log("patientIdGiven ", patientIdGiven);
 }
 
-function displayPatientIdSwitch(patientIdGiven, setPatientIdGiven, setError) {
+function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError}) {
 
     return(
-        <div key={"switch-patient-id"} className="switch-div">
-            <label>View</label>
-            <div className="switch-patient-id">
-                <Switch checked={patientIdGiven} onChange={() => onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError)}
-                        checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={15} />
-            </div>
-            <label>Edit</label>
+        <div key={"switch-patient-id"} className="switch-patient-id">
+            <Switch checked={patientIdGiven} onChange={() => onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError)}
+                    checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={15} />
         </div>
     );
 }
 
 function NotesRandom({setUpdateRequired, setError}) {
     const [randomVolume, setRandomVolume] = useState(5);
-    const [inputField, setInputField] = useState(null);
+    const [inputFieldRandomVolume, setInputFieldRandomVolume] = useState(null);
     const [patientIdGiven, setPatientIdGiven] = useState(false);
+    const [patientIdForRandom, setPatientIdForRandom] = useState(0);
+    const [inputFieldPatientIdForRandom, setInputFieldPatientIdForRandom] = useState(null);
 
-    function onChange (field) {
+    function onChangePatientIdForRandom (field) {
+        setPatientIdForRandom(field.target.value);
+        setInputFieldPatientIdForRandom(field.target);
+    }
+
+    function onChangeRandomVolume (field) {
         setRandomVolume(field.target.value);
-        setInputField(field.target);
+        setInputFieldRandomVolume(field.target);
     }
 
     return (
         <form>
-            <label className="random-label">
-                <button onClick={(event) => generateRandomNotes(event, inputField, randomVolume, setUpdateRequired, setError)}>Add</button>
-                <input className="smallest-width" value={randomVolume} onChange={onChange} />
-                random note(s) to database
-                {displayPatientIdSwitch(patientIdGiven, setPatientIdGiven, setError)}
-            </label>
+            <div className="div-random">
+                <button onClick={(event) => generateRandomNotes(event, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom, patientIdForRandom, setUpdateRequired, setError)}>
+                    Add
+                </button>
+                <input className="input-small" value={randomVolume} onChange={onChangeRandomVolume} />
+                <label >
+                    random note(s) to database
+                </label>
+                <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setError={setError} />
+                <div hidden={patientIdGiven}>
+                    <label>regardless of the patient Id</label>
+                </div>
+                <div hidden={!patientIdGiven}>
+                    <label>for patient Id </label>
+                    <input className="input-small"  value={patientIdForRandom} onChange={onChangePatientIdForRandom} />
+                </div>
+            </div>
         </form>
     );
 }

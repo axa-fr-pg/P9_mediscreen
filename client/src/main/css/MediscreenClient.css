@@ -24,15 +24,10 @@ footer {
     font-weight: bold;
 }
 
-.smallest-width {
+.input-small {
     width: 30px;
     border-width: 0px;
     text-align: center;
-}
-
-.switch-div {
-    margin-top: 20px;
-    display: flex;
 }
 
 .switch-read-only {
@@ -45,10 +40,10 @@ footer {
     margin-right: 10px;
 }
 
-.random-label {
+.div-random, .div-read-only, .div-patient-id {
+    height: 60px;
     display: flex;
-    height: 20px;
-    margin-top: 20px;
+    align-items: center;
 }
 
 .new-button {

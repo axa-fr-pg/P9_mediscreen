@@ -125,7 +125,7 @@ function Patient() {
             return null;
         }
         return(
-            <div key={"switch-read-only"} className="switch-div">
+            <div key={"div-read-only"} className="div-read-only">
                 <label>View</label>
                 <div className="switch-read-only">
                     <Switch checked={modify} onChange={onChangeModify} checkedIcon={false} uncheckedIcon={false} />
