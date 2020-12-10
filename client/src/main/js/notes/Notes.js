@@ -5,8 +5,9 @@ import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 
-function generateRandomNotes(event, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom,
+function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom,
                              patientIdForRandom, setUpdateRequired, setError) {
+    let url = notesApiUrl;
     event.preventDefault();
     if (!!inputFieldRandomVolume) {
         inputFieldRandomVolume.blur();
@@ -16,7 +17,11 @@ function generateRandomNotes(event, inputFieldRandomVolume, randomVolume, inputF
     }
     setError("Processing request...");
 
-    axios.post(notesApiUrl+"/random/"+randomVolume)
+    if (patientIdGiven) {
+        url = url + "/patient/" + patientIdForRandom;
+    }
+
+    axios.post(url + "/random/" + randomVolume)
         .then(response => {
             setUpdateRequired(true);
             setError(response.data.length + " random notes have been generated successfully !");
@@ -66,7 +71,7 @@ function NotesRandom({setUpdateRequired, setError}) {
     return (
         <form>
             <div className="div-random">
-                <button onClick={(event) => generateRandomNotes(event, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom, patientIdForRandom, setUpdateRequired, setError)}>
+                <button onClick={(event) => generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom, patientIdForRandom, setUpdateRequired, setError)}>
                     Add
                 </button>
                 <input className="input-small" value={randomVolume} onChange={onChangeRandomVolume} />
