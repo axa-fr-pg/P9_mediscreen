@@ -56,6 +56,16 @@ public class NoteControllerIT {
                 .accept(MediaType.APPLICATION_JSON);
     }
 
+    private MockHttpServletRequestBuilder buildPostRandomRequest(int expectedNumberOfNotes) {
+        return MockMvcRequestBuilders
+                .post(ENTITY_URL + "/random/" + expectedNumberOfNotes);
+    }
+
+    private MockHttpServletRequestBuilder buildPostRandomRequest(long patientId, int expectedNumberOfNotes) {
+        return MockMvcRequestBuilders
+                .post(ENTITY_URL + "/patient/" + patientId + "/random/" + expectedNumberOfNotes);
+    }
+
     @BeforeEach
     public void init() {
         reset(repository);
@@ -90,5 +100,34 @@ public class NoteControllerIT {
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
         assertEquals(expected.noteId.toString(), result.noteId);
         assertEquals(expected.e, result.e);
+    }
+
+    @Test
+    public void givenRandomRequest_whenPostByPatientId_thenReturnsListOfCorrectSize() throws Exception {
+        // GIVEN
+        mockEntityCreate();
+        long patientId = 123456;
+        int expectedNumberOfNotes = 8;
+        MockHttpServletRequestBuilder builder = buildPostRandomRequest(patientId, expectedNumberOfNotes);
+        // WHEN
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        List<NoteDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<NoteDTO>>() {});
+        // THEN
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(expectedNumberOfNotes, result.size());
+    }
+
+    @Test
+    public void givenRandomRequest_whenPostWithoutPatientId_thenReturnsListOfCorrectSize() throws Exception {
+        // GIVEN
+        mockEntityCreate();
+        int expectedNumberOfNotes = 8;
+        MockHttpServletRequestBuilder builder = buildPostRandomRequest(expectedNumberOfNotes);
+        // WHEN
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        List<NoteDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<NoteDTO>>() {});
+        // THEN
+        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+        assertEquals(expectedNumberOfNotes, result.size());
     }
 }

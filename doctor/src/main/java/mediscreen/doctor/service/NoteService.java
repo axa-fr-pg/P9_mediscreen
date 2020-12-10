@@ -7,4 +7,5 @@ import java.util.List;
 public interface NoteService {
     List<NoteDTO> getList();
     NoteDTO postNoteByPatientId(long patientId, NoteDTO note) throws CreateExistingNoteException;
+    List<NoteDTO> post(long patientId, int numberOfRows);
 }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -57,5 +59,16 @@ public class NoteServiceTest {
         // WHEN
         // THEN
         assertThrows(CreateExistingNoteException.class, () -> service.postNoteByPatientId(0, new NoteDTO(note)));
+    }
+    @Test
+    public void givenRandomRequest_whenPost_thenReturnsListOfCorrectSize() {
+        // GIVEN
+        long patientId = 123456;
+        mockEntityCreate();
+        int expectedNumberOfNotes = 5;
+        // WHEN
+        List<NoteDTO> result = service.post(patientId, expectedNumberOfNotes);
+        // THEN
+        assertEquals(expectedNumberOfNotes, result.size());
     }
 }

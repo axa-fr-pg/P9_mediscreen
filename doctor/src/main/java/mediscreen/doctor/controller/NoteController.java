@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/notes")
@@ -40,5 +39,15 @@ public class NoteController {
     @PostMapping("/patient/{patId}")
     public ResponseEntity<NoteDTO> postByPatientId(@PathVariable Long patId, @RequestBody @Valid NoteDTO e) throws CreateExistingNoteException {
         return new ResponseEntity<>(service.postNoteByPatientId(patId, e), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/random/{expectedNumberOfNotes}")
+    public ResponseEntity<List<NoteDTO>> post(@PathVariable Integer expectedNumberOfNotes) {
+        return new ResponseEntity<>(service.post(0, expectedNumberOfNotes), HttpStatus.CREATED);
+    }
+
+    @PostMapping("/patient/{patId}/random/{expectedNumberOfNotes}")
+    public ResponseEntity<List<NoteDTO>> post(@PathVariable Long patId, @PathVariable Integer expectedNumberOfNotes) {
+        return new ResponseEntity<>(service.post(patId, expectedNumberOfNotes), HttpStatus.CREATED);
     }
 }
