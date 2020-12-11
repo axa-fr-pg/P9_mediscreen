@@ -19,7 +19,7 @@ function getPatients(setPatients, setUpdateRequired, setError) {
         });
 }
 
-function PatientsList({patients, setPatients, error, updateRequired, setUpdateRequired, setError}) {
+function PatientList({patients, setPatients, error, updateRequired, setUpdateRequired, setError}) {
 
     useEffect(() => {
         if (updateRequired) getPatients(setPatients, setUpdateRequired, setError);
@@ -112,7 +112,7 @@ function Patients() {
     return (
         <div>
             <h1>Patient list</h1>
-            <PatientsList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
+            <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                           setUpdateRequired={setUpdateRequired} setError={setError} />
             <button className="new-button" onClick={() => history.push('/patients/new')}>Register new patient</button>
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError} />

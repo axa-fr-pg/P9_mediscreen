@@ -21,7 +21,7 @@ function Patient() {
     const [patient, setPatient] = React.useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
     const [modify, setModify] = useState(window.location.href.includes('new'));
 
-    function displayError() {
+    function DisplayError() {
         if (! error) return null;
         return (
             <footer>
@@ -157,7 +157,7 @@ function Patient() {
                 {patientFields.map(fieldSpec => displayField(fieldSpec.field, fieldSpec.label, fieldSpec.readonly))}
                 {displayModifySwitch()}
                 {displaySaveButton()}
-                {displayError()}
+                <DisplayError />
             </form>
         </div>
     );

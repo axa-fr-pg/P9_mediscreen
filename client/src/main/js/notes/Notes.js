@@ -1,24 +1,24 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Note from "./Note";
 import {useHistory} from "react-router";
 import axios from "axios";
-import {notesApiUrl} from "../api/URLs";
+import {notesApiUrl, patientsApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 
-function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom,
-                             patientIdForRandom, setUpdateRequired, setError) {
+function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientId,
+                             setUpdateRequired, setError) {
     let url = notesApiUrl;
     event.preventDefault();
     if (!!inputFieldRandomVolume) {
         inputFieldRandomVolume.blur();
     }
-    if (!!inputFieldPatientIdForRandom) {
-        inputFieldPatientIdForRandom.blur();
+    if (!!inputFieldPatientId) {
+        inputFieldPatientId.blur();
     }
     setError("Processing request...");
 
-    if (patientIdGiven) {
-        url = url + "/patient/" + patientIdForRandom;
+    if (patientIdGiven>=0) {
+        url = url + "/patient/" + patientIdGiven;
     }
 
     axios.post(url + "/random/" + randomVolume)
@@ -36,32 +36,27 @@ function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, rand
 }
 
 function onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError) {
-    setPatientIdGiven(!patientIdGiven);
+    if (patientIdGiven<0) {
+        setPatientIdGiven(0);
+    } else {
+        setPatientIdGiven(-1);
+    }
     setError('');
-    console.log("patientIdGiven ", patientIdGiven);
 }
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError}) {
 
     return(
         <div key={"switch-patient-id"} className="switch-patient-id">
-            <Switch checked={patientIdGiven} onChange={() => onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError)}
-                    checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={15} />
+            <Switch checked={patientIdGiven>=0} onChange={() => onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError)}
+                    checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={13} />
         </div>
     );
 }
 
-function NotesRandom({setUpdateRequired, setError}) {
+function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, setError}) {
     const [randomVolume, setRandomVolume] = useState(5);
     const [inputFieldRandomVolume, setInputFieldRandomVolume] = useState(null);
-    const [patientIdGiven, setPatientIdGiven] = useState(false);
-    const [patientIdForRandom, setPatientIdForRandom] = useState(0);
-    const [inputFieldPatientIdForRandom, setInputFieldPatientIdForRandom] = useState(null);
-
-    function onChangePatientIdForRandom (field) {
-        setPatientIdForRandom(field.target.value);
-        setInputFieldPatientIdForRandom(field.target);
-    }
 
     function onChangeRandomVolume (field) {
         setRandomVolume(field.target.value);
@@ -71,37 +66,112 @@ function NotesRandom({setUpdateRequired, setError}) {
     return (
         <form>
             <div className="div-random">
-                <button onClick={(event) => generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientIdForRandom, patientIdForRandom, setUpdateRequired, setError)}>
+                <button onClick={(event) => generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientId, setUpdateRequired, setError)}>
                     Add
                 </button>
                 <input className="input-small" value={randomVolume} onChange={onChangeRandomVolume} />
                 <label >
                     random note(s) to database
                 </label>
-                <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setError={setError} />
-                <div hidden={patientIdGiven}>
-                    <label>regardless of the patient Id</label>
-                </div>
-                <div hidden={!patientIdGiven}>
-                    <label>for patient Id </label>
-                    <input className="input-small"  value={patientIdForRandom} onChange={onChangePatientIdForRandom} />
-                </div>
             </div>
         </form>
     );
 }
 
+function getNotes(setNotes, setUpdateRequired, setError) {
+    axios.get(notesApiUrl)
+        .then(response => {
+            setNotes(response.data);
+            setUpdateRequired(false);
+            if (response.data.length === 0) setError('It looks like the database is empty : please generate some random patients or ask your IT support.');
+        })
+        .catch( error => {
+            if (error.response) {
+                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it looks like the database is not ready !");
+            } else {
+                setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+            }
+        });
+}
+
+function NoteList({notes, setNotes, error, updateRequired, setUpdateRequired, setError, history}) {
+
+    useEffect(() => {
+        if (updateRequired) getNotes(setNotes, setUpdateRequired, setError);
+    });
+
+    if (notes.length === 0) return null;
+    return (
+        <nav>
+            <table>
+                <thead>
+                <tr>
+                    <th>Note id</th>
+                    <th>Content</th>
+                </tr>
+                </thead>
+                <tbody>
+                {notes.map(note => (
+                    <tr key={note.noteId} onClick={()=>history.push('/notes/'+note.noteId)}>
+                        <td>{note.noteId}</td>
+                        <td>{note.e}</td>
+                    </tr>
+                ))}
+                </tbody>
+            </table>
+        </nav>
+    );
+}
+
+function NotesError({error}) {
+
+    if (! error) return null;
+    return (
+        <footer>
+            {error}
+        </footer>
+    );
+}
+
+function NotesPatientSelector({patientIdGiven, setPatientIdGiven, setInputFieldPatientId, setError}) {
+
+    function onChangePatientIdGiven (field) {
+        setPatientIdGiven(field.target.value);
+        setInputFieldPatientId(field.target);
+    }
+
+    return (
+        <div className="notes-patient-selector">
+            <label>Work on</label>
+            <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setError={setError} />
+            <div hidden={patientIdGiven>=0}>
+                <label>all patients together</label>
+            </div>
+            <div hidden={patientIdGiven<0}>
+                <label>patient with id</label>
+                <input className="input-small"  value={patientIdGiven} onChange={onChangePatientIdGiven} />
+            </div>
+        </div>
+    );
+}
+
 function Notes() {
+    const [notes, setNotes] = useState([]);
     const [updateRequired, setUpdateRequired] = useState('false');
     const [error, setError] = useState('');
+    const [patientIdGiven, setPatientIdGiven] = useState(-1);
+    const [inputFieldPatientId, setInputFieldPatientId] = useState(null);
     const history = useHistory();
-    history.push('/notes/patient/1/new');
 
     return (
         <div>
             <h1>Note list</h1>
-            <NotesRandom setUpdateRequired={setUpdateRequired} setError={setError} />
-            <Note />
+            <NoteList notes={notes} setNotes={setNotes} updateRequired={updateRequired}
+                      setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
+            <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} setError={setError} />
+            <button hidden={patientIdGiven<0} className="new-button" onClick={() => history.push('/notes/patient/'+patientIdGiven+'/new')}>Register new note</button>
+            <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId} setUpdateRequired={setUpdateRequired} setError={setError} />
+            <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} error={error} />
         </div>
     );
 }

@@ -40,7 +40,7 @@ footer {
     margin-right: 10px;
 }
 
-.div-random, .div-read-only, .div-patient-id {
+.div-random, .div-read-only, .div-patient-id, .notes-patient-selector {
     height: 60px;
     display: flex;
     align-items: center;
@@ -48,4 +48,23 @@ footer {
 
 .new-button {
     margin-top: 20px;
+}
+
+.form-note {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-note-label {
+    width: 10%;
+    background-color: red;
+}
+
+.form-note-input {
+    width: 80%;
+}
+
+.div-textarea {
+    vertical-align: middle;
+    background-color: darkgreen;
 }
