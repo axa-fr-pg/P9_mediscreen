@@ -46,8 +46,13 @@ footer {
     align-items: center;
 }
 
-.new-button {
+.button-new {
     margin-top: 20px;
+}
+
+.button-save {
+    margin-top: 20px;
+    width: 50px;
 }
 
 .form-note {

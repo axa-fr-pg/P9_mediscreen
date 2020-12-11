@@ -82,7 +82,7 @@ function Note() {
     function displaySaveButton() {
         if (!input || !modify) return null;
         return (
-            <button onClick={onClickSave}>Save</button>
+            <button className="button-save" onClick={onClickSave}>Save</button>
         );
     }
 
@@ -93,32 +93,26 @@ function Note() {
         setNote(newNote);
     }
 
-    function displayField(field, label, readonly) {
-        if (!input) return null;
-        const disabled = !!readonly;
-        if (field === 'noteId' && note.noteId === 'new') return null;
-        return (<div key={field}>
-            <label>{label}
-                <input value={note[field]} name={field} onChange={onChange} disabled={disabled || modify === false}/>
-            </label>
-        </div>);
-    }
+    console.log("input=", input);
 
     return (
         <div>
             {displayTitle()}
-            <form className="form-note">
-                <div className="form-note-element" key="note-id">
-                    <label className="form-note-label">Note Id</label>
-                    <input className="form-note-input" value={note.noteId} name="note-id" onChange={onChange} disabled={true}/>
-                </div>
-                <div className="form-note-element div-textarea" key="note-content">
-                    <label className="form-note-label">Content</label>
-                    <textarea className="form-note-input" value={note.e} name="note-content" onChange={onChange} disabled={modify === false}/>
-                </div>
-                {displaySaveButton()}
-                <DisplayError/>
-            </form>
+            <div hidden={!input}>
+                <form className="form-note">
+                    <div hidden={note.noteId === 'new'} className="form-note-element" key="note-id">
+                        <label className="form-note-label">Note Id</label>
+                        <input className="form-note-input" value={note.noteId} name="noteId" disabled={true}/>
+                    </div>
+                    <div className="form-note-element div-textarea" key="note-content">
+                        <label className="form-note-label">Content</label>
+                        <textarea className="form-note-input" value={note.e} name="e" onChange={onChange}
+                                  disabled={modify === false}/>
+                    </div>
+                    {displaySaveButton()}
+                </form>
+            </div>
+            <DisplayError/>
         </div>
     );
 }

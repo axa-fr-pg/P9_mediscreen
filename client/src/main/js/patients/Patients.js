@@ -114,7 +114,7 @@ function Patients() {
             <h1>Patient list</h1>
             <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                           setUpdateRequired={setUpdateRequired} setError={setError} />
-            <button className="new-button" onClick={() => history.push('/patients/new')}>Register new patient</button>
+            <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError} />
             <PatientsError error={error} />
         </div>

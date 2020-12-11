@@ -138,7 +138,7 @@ function Patient() {
     function displaySaveButton() {
         if (!input || !modify) return null;
         return(
-            <button onClick={onClickSave}>Save</button>
+            <button className="button-save" onClick={onClickSave}>Save</button>
         );
     }
 

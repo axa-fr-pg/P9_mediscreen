@@ -169,7 +169,7 @@ function Notes() {
             <NoteList notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} setError={setError} />
-            <button hidden={patientIdGiven<0} className="new-button" onClick={() => history.push('/notes/patient/'+patientIdGiven+'/new')}>Register new note</button>
+            <button hidden={patientIdGiven<0} className="button-new" onClick={() => history.push('/notes/patient/'+patientIdGiven+'/new')}>Register new note</button>
             <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId} setUpdateRequired={setUpdateRequired} setError={setError} />
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} error={error} />
         </div>
