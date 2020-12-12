@@ -19,7 +19,7 @@ function getPatients(setPatients, setUpdateRequired, setError) {
         });
 }
 
-function PatientList({patients, setPatients, error, updateRequired, setUpdateRequired, setError}) {
+function PatientList({patients, setPatients, error, updateRequired, setUpdateRequired, setError, history}) {
 
     useEffect(() => {
         if (updateRequired) getPatients(setPatients, setUpdateRequired, setError);
@@ -38,7 +38,7 @@ function PatientList({patients, setPatients, error, updateRequired, setUpdateReq
                 </thead>
                 <tbody>
                 {patients.map(patient => (
-                    <tr key={patient.id} onClick={()=>window.location.href="/patients/"+patient.id}>
+                    <tr key={patient.id} onClick={()=>history.push("/patients/"+patient.id)}>
                         <td>{patient.id}</td>
                         <td>{patient.family}</td>
                         <td>{patient.dob}</td>
@@ -113,7 +113,7 @@ function Patients() {
         <div>
             <h1>Patient list</h1>
             <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
-                          setUpdateRequired={setUpdateRequired} setError={setError} />
+                          setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError} />
             <PatientsError error={error} />
