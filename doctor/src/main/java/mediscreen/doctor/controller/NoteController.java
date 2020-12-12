@@ -1,6 +1,7 @@
 package mediscreen.doctor.controller;
 
 import mediscreen.doctor.model.NoteDTO;
+import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.service.CreateExistingNoteException;
 import mediscreen.doctor.service.NoteNotFoundException;
 import mediscreen.doctor.service.NoteService;
@@ -33,7 +34,7 @@ public class NoteController {
     }
 
     @GetMapping("/patient/{patId}")
-    public ResponseEntity<List<NoteDTO>> getListByPatientId(@PathVariable Long patId) {
+    public ResponseEntity<PatientNotesDTO> getListByPatientId(@PathVariable Long patId) {
         return new ResponseEntity<>(service.getAllByPatientId(patId), HttpStatus.OK);
     }
 

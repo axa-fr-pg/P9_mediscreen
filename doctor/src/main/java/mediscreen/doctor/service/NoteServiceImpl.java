@@ -2,6 +2,7 @@ package mediscreen.doctor.service;
 
 import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.model.NoteEntity;
+import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -44,8 +45,8 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<NoteDTO> getAllByPatientId(long patientId) {
-        return repository.findAllByPatId(patientId).stream().map(NoteDTO::new).collect(Collectors.toList());
+    public PatientNotesDTO getAllByPatientId(long patientId) {
+        return new PatientNotesDTO(patientId, repository.findAllByPatId(patientId).stream().map(NoteDTO::new).collect(Collectors.toList()));
     }
 
     @Override

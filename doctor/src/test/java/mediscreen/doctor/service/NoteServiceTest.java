@@ -2,6 +2,7 @@ package mediscreen.doctor.service;
 
 import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.model.NoteEntity;
+import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -89,9 +90,10 @@ public class NoteServiceTest {
         int numberOfEntities = 5;
         List<NoteEntity> noteEntityList = mockEntityFindAllByPatId(patientId, numberOfEntities);
         // WHEN
-        List<NoteDTO> result = service.getAllByPatientId(patientId);
+        PatientNotesDTO result = service.getAllByPatientId(patientId);
         // THEN
-        assertEquals(numberOfEntities, result.size());
+        assertEquals(patientId, result.patId);
+        assertEquals(numberOfEntities, result.noteDTOList.size());
     }
 
     @Test

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.model.NoteEntity;
+import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
-import mediscreen.doctor.service.NoteNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 import static mediscreen.doctor.controller.ExceptionManager.EXCEPTION_MANAGER_NOTE_NOT_FOUND;
 import static mediscreen.doctor.model.NoteDTO.NOTE_NOT_BLANK_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -131,10 +130,11 @@ public class NoteControllerIT {
         mockEntityFindAllByPatId(patientId, numberOfEntities);
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(get( ENTITY_URL + "/patient/" + patientId)).andReturn().getResponse();
-        List<NoteDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<NoteDTO>>() {});
+        PatientNotesDTO result = objectMapper.readValue(response.getContentAsString(), PatientNotesDTO.class);
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(numberOfEntities, result.size());
+        assertEquals(patientId, result.patId);
+        assertEquals(numberOfEntities, result.noteDTOList.size());
     }
 
     @Test
@@ -177,7 +177,7 @@ public class NoteControllerIT {
         NoteDTO result = objectMapper.readValue(response.getContentAsString(), NoteDTO.class);
         // THEN
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-        assertEquals(expected.noteId.toString(), result.noteId);
+        assertEquals(expected.noteId, result.noteId);
         assertEquals(expected.e, result.e);
     }
 
