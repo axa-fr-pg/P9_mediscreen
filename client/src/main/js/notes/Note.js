@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {notesApiUrl, patientsApiUrl} from "../api/URLs";
+import {notesApiUrl} from "../api/URLs";
 
 function Note() {
     const currentUrl = window.location.pathname.split("/");

@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
-import Note from "./Note";
 import {useHistory} from "react-router";
 import axios from "axios";
-import {notesApiUrl, patientsApiUrl} from "../api/URLs";
+import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
+import {TreeView, TreeItem} from '@material-ui/lab';
 
 function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientId,
                              setUpdateRequired, setError) {
@@ -78,12 +78,18 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
     );
 }
 
-function getNotes(setNotes, setUpdateRequired, setError) {
-    axios.get(notesApiUrl)
+function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
+    let url = notesApiUrl;
+    if (patientIdGiven >= 0) {
+        url = url + "/patient/" + patientIdGiven;
+    }
+    axios.get(url)
         .then(response => {
             setNotes(response.data);
             setUpdateRequired(false);
-            if (response.data.length === 0) setError('It looks like the database is empty : please generate some random patients or ask your IT support.');
+            if (response.data.length === 0) {
+                setError('It looks like the database is empty : please generate some random patients or ask your IT support.');
+            }
         })
         .catch( error => {
             if (error.response) {
@@ -94,31 +100,40 @@ function getNotes(setNotes, setUpdateRequired, setError) {
         });
 }
 
-function NoteList({notes, setNotes, error, updateRequired, setUpdateRequired, setError, history}) {
+function PatientNotes({notes, history}) {
+
+    return(
+        <TreeItem nodeId={notes.patId.toString()} label={"Patient " + notes.patId}>
+            {notes.noteDTOList.map(note => (
+                <TreeItem key={note.noteId} nodeId={note.noteId} label={note.e} onLabelClick={()=>history.push('/notes/'+note.noteId)}>
+                    {note.e}
+                </TreeItem>
+            ))}
+        </TreeItem>
+    );
+}
+
+function NoteList({patientIdGiven, notes, setNotes, error, updateRequired, setUpdateRequired, setError, history}) {
+
+    const [expanded, setExpanded] = React.useState([patientIdGiven.toString()]);
+
+    const handleToggle = (event, nodeIds) => {
+        setExpanded(nodeIds);
+    };
 
     useEffect(() => {
-        if (updateRequired) getNotes(setNotes, setUpdateRequired, setError);
+        if (updateRequired) {
+            getNotes(patientIdGiven, setNotes, setUpdateRequired, setError);
+        }
     });
 
     if (notes.length === 0) return null;
+
     return (
         <nav>
-            <table>
-                <thead>
-                <tr>
-                    <th>Note id</th>
-                    <th>Content</th>
-                </tr>
-                </thead>
-                <tbody>
-                {notes.map(note => (
-                    <tr key={note.noteId} onClick={()=>history.push('/notes/'+note.noteId)}>
-                        <td>{note.noteId}</td>
-                        <td>{note.e}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+            <TreeView className="tree-view" expanded={expanded} onNodeToggle={handleToggle}>
+                <PatientNotes notes={notes} history={history}/>
+            </TreeView>
         </nav>
     );
 }
@@ -159,16 +174,21 @@ function Notes() {
     const [notes, setNotes] = useState([]);
     const [updateRequired, setUpdateRequired] = useState('false');
     const [error, setError] = useState('');
-    const [patientIdGiven, setPatientIdGiven] = useState(-1);
+    const [patientIdGiven, setPatientIdGiven] = useState(
+        window.location.href.includes('patient') ?
+            window.location.pathname.split("/").pop() : -1);
     const [inputFieldPatientId, setInputFieldPatientId] = useState(null);
+    const [patientSelectorHidden, setPatientSelectorHidden] = useState(window.location.href.includes('patient'));
     const history = useHistory();
 
     return (
         <div>
             <h1>Note list</h1>
-            <NoteList notes={notes} setNotes={setNotes} updateRequired={updateRequired}
+            <NoteList patientIdGiven={patientIdGiven} notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} setError={setError} />
+            <div hidden={patientSelectorHidden}>
+                <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} setError={setError} />
+            </div>
             <button hidden={patientIdGiven<0} className="button-new" onClick={() => history.push('/notes/patient/'+patientIdGiven+'/new')}>Register new note</button>
             <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId} setUpdateRequired={setUpdateRequired} setError={setError} />
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} error={error} />
