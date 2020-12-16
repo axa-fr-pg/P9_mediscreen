@@ -60,16 +60,15 @@ footer {
     flex-direction: column;
 }
 
+.form-note-element {
+    display: flex;
+    align-items: center;
+}
+
 .form-note-label {
-    width: 10%;
-    background-color: red;
+    width: 60px;
 }
 
 .form-note-input {
     width: 80%;
-}
-
-.div-textarea {
-    vertical-align: middle;
-    background-color: darkgreen;
 }

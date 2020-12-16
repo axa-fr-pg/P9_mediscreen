@@ -33,7 +33,7 @@ public class NoteController {
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/patient/{patId}")
+    @GetMapping("/patients/{patId}")
     public ResponseEntity<PatientNotesDTO> getListByPatientId(@PathVariable Long patId) {
         return new ResponseEntity<>(service.getAllByPatientId(patId), HttpStatus.OK);
     }
@@ -48,7 +48,7 @@ public class NoteController {
         return new ResponseEntity<>(new NoteDTO(), HttpStatus.OK);
     }
 
-    @PostMapping("/patient/{patId}")
+    @PostMapping("/patients/{patId}")
     public ResponseEntity<NoteDTO> postByPatientId(@PathVariable Long patId, @RequestBody @Valid NoteDTO e) throws CreateExistingNoteException {
         return new ResponseEntity<>(service.postNoteByPatientId(patId, e), HttpStatus.CREATED);
     }
@@ -58,7 +58,7 @@ public class NoteController {
         return new ResponseEntity<>(service.post(0, expectedNumberOfNotes), HttpStatus.CREATED);
     }
 
-    @PostMapping("/patient/{patId}/random/{expectedNumberOfNotes}")
+    @PostMapping("/patients/{patId}/random/{expectedNumberOfNotes}")
     public ResponseEntity<List<NoteDTO>> post(@PathVariable Long patId, @PathVariable Integer expectedNumberOfNotes) {
         return new ResponseEntity<>(service.post(patId, expectedNumberOfNotes), HttpStatus.CREATED);
     }

@@ -77,7 +77,7 @@ public class NoteControllerIT {
 
     private MockHttpServletRequestBuilder buildPostRequest(NoteEntity note) throws JsonProcessingException {
         return MockMvcRequestBuilders
-                .post(ENTITY_URL + "/patient/" + note.patId)
+                .post(ENTITY_URL + "/patients/" + note.patId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(note))
                 .accept(MediaType.APPLICATION_JSON);
@@ -90,7 +90,7 @@ public class NoteControllerIT {
 
     private MockHttpServletRequestBuilder buildPostRandomRequest(long patientId, int expectedNumberOfNotes) {
         return MockMvcRequestBuilders
-                .post(ENTITY_URL + "/patient/" + patientId + "/random/" + expectedNumberOfNotes);
+                .post(ENTITY_URL + "/patients/" + patientId + "/random/" + expectedNumberOfNotes);
     }
 
     @BeforeEach
@@ -129,7 +129,7 @@ public class NoteControllerIT {
         int numberOfEntities = 5;
         mockEntityFindAllByPatId(patientId, numberOfEntities);
         // WHEN
-        MockHttpServletResponse response = mockMvc.perform(get( ENTITY_URL + "/patient/" + patientId)).andReturn().getResponse();
+        MockHttpServletResponse response = mockMvc.perform(get( ENTITY_URL + "/patients/" + patientId)).andReturn().getResponse();
         PatientNotesDTO result = objectMapper.readValue(response.getContentAsString(), PatientNotesDTO.class);
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());

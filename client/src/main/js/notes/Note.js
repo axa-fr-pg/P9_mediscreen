@@ -41,7 +41,7 @@ function Note() {
         const body = {...note};
         if (note.noteId === 'new') {
             body.noteId = '';
-            axios.post(notesApiUrl + '/patient/' + note.patId, body)
+            axios.post(notesApiUrl + '/patients/' + note.patId, body)
                 .then(response => {
                     body.noteId = response.data.noteId;
                     setInput(false);
@@ -104,7 +104,7 @@ function Note() {
                         <label className="form-note-label">Note Id</label>
                         <input className="form-note-input" value={note.noteId} name="noteId" disabled={true}/>
                     </div>
-                    <div className="form-note-element div-textarea" key="note-content">
+                    <div className="form-note-element" key="note-content">
                         <label className="form-note-label">Content</label>
                         <textarea className="form-note-input" value={note.e} name="e" onChange={onChange}
                                   disabled={modify === false}/>

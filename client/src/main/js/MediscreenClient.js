@@ -50,10 +50,10 @@ function MediscreenClient() {
                     <Route exact path="/notes">
                         <Notes />
                     </Route>
-                    <Route path="/notes/patient/*/new">
+                    <Route path="/notes/patients/*/new">
                         <Note />
                     </Route>
-                    <Route path="/notes/patient">
+                    <Route path="/notes/patients">
                         <Notes />
                     </Route>
                     <Route path="/notes">

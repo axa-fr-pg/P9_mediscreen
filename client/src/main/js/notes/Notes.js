@@ -18,7 +18,7 @@ function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, rand
     setError("Processing request...");
 
     if (patientIdGiven>=0) {
-        url = url + "/patient/" + patientIdGiven;
+        url = url + "/patients/" + patientIdGiven;
     }
 
     axios.post(url + "/random/" + randomVolume)
@@ -81,7 +81,7 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
 function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
     let url = notesApiUrl;
     if (patientIdGiven >= 0) {
-        url = url + "/patient/" + patientIdGiven;
+        url = url + "/patients/" + patientIdGiven;
     }
     axios.get(url)
         .then(response => {
@@ -189,7 +189,7 @@ function Notes() {
             <div hidden={patientSelectorHidden}>
                 <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} setError={setError} />
             </div>
-            <button hidden={patientIdGiven<0} className="button-new" onClick={() => history.push('/notes/patient/'+patientIdGiven+'/new')}>Register new note</button>
+            <button hidden={patientIdGiven<0} className="button-new" onClick={() => history.push('/notes/patients/'+patientIdGiven+'/new')}>Register new note</button>
             <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId} setUpdateRequired={setUpdateRequired} setError={setError} />
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setInputFieldPatientId={setInputFieldPatientId} error={error} />
         </div>
