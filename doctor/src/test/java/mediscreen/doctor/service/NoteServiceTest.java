@@ -4,19 +4,32 @@ import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.model.NoteEntity;
 import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
+import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.RandomUtils.nextInt;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import org.hamcrest.Matchers;
+
+import org.apache.commons.collections4.IterableUtils;
+
+import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
@@ -45,11 +58,23 @@ public class NoteServiceTest {
         return noteEntityList;
     }
 
-    private List<NoteEntity> mockEntityFindAll(int numberOfEntities) {
-        List<NoteEntity> noteEntityList = Stream.generate(NoteEntity::random)
-                .limit(numberOfEntities).collect(Collectors.toList());
-        when(repository.findAll()).thenReturn(noteEntityList);
-        return noteEntityList;
+    private List<PatientNotesDTO> mockEntityFindAllGroupedByPatientId() {
+        List<PatientNotesDTO> result = new ArrayList<>();
+        List<NoteEntity> allNotes = new ArrayList<>();
+        long patientId = nextInt(100, 200);
+        for (int branch=0; branch< nextInt(3, 15) ; branch++) {
+            List<NoteDTO> branchNotes = new ArrayList<>();
+            patientId += nextInt(1, 20);
+            for (int index=0; index < (branch + nextInt(2, 10)); index++) {
+                NoteEntity noteEntity = NoteEntity.random(patientId);
+                NoteDTO noteDTO = new NoteDTO(noteEntity);
+                allNotes.add(noteEntity);
+                branchNotes.add(noteDTO);
+            }
+            result.add(new PatientNotesDTO(patientId, branchNotes));
+        }
+        when(repository.findByOrOrderByPatIdAsc()).thenReturn(allNotes);
+        return result;
     }
 
     private NoteEntity mockEntityCreate()  {
@@ -97,14 +122,17 @@ public class NoteServiceTest {
     }
 
     @Test
-    public void givenNoPatientId_whenGetAll_thenReturnsCorrectListOfNotes() {
+    public void givenNoPatientId_whenGetAllGroupedByPatientId_thenReturnsCorrectTreeOfNotes() {
         // GIVEN
-        int numberOfEntities = 10;
-        List<NoteEntity> noteEntityList = mockEntityFindAll(numberOfEntities);
+        List<PatientNotesDTO> patientNotesDTOList = mockEntityFindAllGroupedByPatientId();
         // WHEN
-        List<NoteDTO> result = service.getAll();
+        List<PatientNotesDTO> result = service.getAllGroupedByPatientId();
         // THEN
-        assertEquals(numberOfEntities, result.size());
+        assertEquals(patientNotesDTOList.size(), result.size());
+        patientNotesDTOList.forEach(patientNotesDTO ->
+                assertNotNull(IterableUtils.find(result, resultPatientNotesDTO ->
+                        resultPatientNotesDTO.patId == patientNotesDTO.patId))
+        );
     }
 
     @Test

@@ -40,8 +40,15 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public List<NoteDTO> getAll() {
-        return repository.findAll().stream().map(NoteDTO::new).collect(Collectors.toList());
+    public List<PatientNotesDTO> getAllGroupedByPatientId() {
+        List<PatientNotesDTO> result = new ArrayList<>();
+        repository.findByOrOrderByPatIdAsc().stream()
+                .collect(Collectors.groupingBy((note) -> note.patId)).values().forEach(noteList -> {
+                    result.add(new PatientNotesDTO(
+                            noteList.get(0).patId,
+                            noteList.stream().map(NoteDTO::new).collect(Collectors.toList())));
+                });
+        return result;
     }
 
     @Override

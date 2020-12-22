@@ -29,8 +29,8 @@ public class NoteController {
     NoteService service;
 
     @GetMapping("")
-    public ResponseEntity<List<NoteDTO>> getListByPatientId() {
-        return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<PatientNotesDTO>> getListGroupedByPatientId() {
+        return new ResponseEntity<>(service.getAllGroupedByPatientId(), HttpStatus.OK);
     }
 
     @GetMapping("/patients/{patId}")
