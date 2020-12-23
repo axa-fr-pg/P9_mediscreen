@@ -24,10 +24,14 @@ footer {
     font-weight: bold;
 }
 
-.input-small {
+.input-narrow {
     width: 30px;
     border-width: 0px;
     text-align: center;
+}
+
+.input-with-parent-font {
+    font: inherit;
 }
 
 .switch-read-only {
@@ -40,7 +44,7 @@ footer {
     margin-right: 10px;
 }
 
-.div-random, .div-read-only, .div-patient-id, .notes-patient-selector {
+.div-random, .div-read-only, .div-patient-id, .title-note-list {
     height: 60px;
     display: flex;
     align-items: center;
