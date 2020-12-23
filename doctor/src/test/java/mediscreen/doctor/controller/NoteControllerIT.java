@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 
 import static mediscreen.doctor.controller.ExceptionManager.EXCEPTION_MANAGER_NOTE_NOT_FOUND;
 import static mediscreen.doctor.model.NoteDTO.NOTE_NOT_BLANK_ERROR;
+import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
@@ -62,11 +64,23 @@ public class NoteControllerIT {
         return noteEntityList;
     }
 
-    private List<NoteEntity> mockEntityFindAll(int numberOfEntities) {
-        List<NoteEntity> noteEntityList = Stream.generate(NoteEntity::random)
-                .limit(numberOfEntities).collect(Collectors.toList());
-        when(repository.findAll()).thenReturn(noteEntityList);
-        return noteEntityList;
+    private List<PatientNotesDTO> mockEntityFindAllGroupedByPatientId() {
+        List<PatientNotesDTO> result = new ArrayList<>();
+        List<NoteEntity> allNotes = new ArrayList<>();
+        long patientId = nextInt(100, 200);
+        for (int branch=0; branch< nextInt(3, 15) ; branch++) {
+            List<NoteDTO> branchNotes = new ArrayList<>();
+            patientId += nextInt(1, 20);
+            for (int index=0; index < (branch + nextInt(2, 10)); index++) {
+                NoteEntity noteEntity = NoteEntity.random(patientId);
+                NoteDTO noteDTO = new NoteDTO(noteEntity);
+                allNotes.add(noteEntity);
+                branchNotes.add(noteDTO);
+            }
+            result.add(new PatientNotesDTO(patientId, branchNotes));
+        }
+        when(repository.findByOrOrderByPatIdAsc()).thenReturn(allNotes);
+        return result;
     }
 
     private NoteEntity mockEntityCreate()  {
@@ -138,16 +152,15 @@ public class NoteControllerIT {
     }
 
     @Test
-    public void givenNoPatientId_whenGetAll_thenReturnsCorrectNoteList() throws Exception {
+    public void givenNoPatientId_whenGetListGroupedByPatientId_thenReturnsCorrectNoteTree() throws Exception {
         // GIVEN
-        int numberOfEntities = 10;
-        mockEntityFindAll(numberOfEntities);
+        List<PatientNotesDTO> patientNotesDTOList = mockEntityFindAllGroupedByPatientId();
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(get( ENTITY_URL)).andReturn().getResponse();
-        List<NoteDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<NoteDTO>>() {});
+        List<PatientNotesDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<PatientNotesDTO>>() {});
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(numberOfEntities, result.size());
+        assertEquals(patientNotesDTOList.size(), result.size());
     }
 
     @Test

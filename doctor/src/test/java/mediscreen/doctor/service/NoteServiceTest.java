@@ -129,9 +129,11 @@ public class NoteServiceTest {
         List<PatientNotesDTO> result = service.getAllGroupedByPatientId();
         // THEN
         assertEquals(patientNotesDTOList.size(), result.size());
-        patientNotesDTOList.forEach(patientNotesDTO ->
-                assertNotNull(IterableUtils.find(result, resultPatientNotesDTO ->
-                        resultPatientNotesDTO.patId == patientNotesDTO.patId))
+        patientNotesDTOList.forEach(patientNotesDTO -> {
+                    PatientNotesDTO match = IterableUtils.find(result, current -> current.patId == patientNotesDTO.patId);
+                    assertNotNull(match);
+                    assertEquals(patientNotesDTO.noteDTOList.size(), match.noteDTOList.size());
+                }
         );
     }
 
