@@ -130,15 +130,15 @@ function NoteList({patientIdGiven, notes, setNotes, error, updateRequired, setUp
     if (notes.length === 0) return null;
 
     let notesTree = notes;
-    if (patientIdGiven >= 0) {
-        notesTree = [{patId : patientIdGiven, noteDTOList : notes}];
+    if ( notes.patId >= 0 ) {
+        notesTree = [notes];
     }
 
     return (
         <nav>
             <TreeView className="tree-view" expanded={expanded} onNodeToggle={handleToggle}>
                 {notesTree.map(branch => (
-                    <PatientNotes branch={branch} history={history}/>
+                    <PatientNotes key={branch.patId} branch={branch} history={history}/>
                 ))}
             </TreeView>
         </nav>
