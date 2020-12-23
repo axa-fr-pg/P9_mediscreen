@@ -4,7 +4,6 @@ import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.model.NoteEntity;
 import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
-import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import org.hamcrest.Matchers;
 
 import org.apache.commons.collections4.IterableUtils;
 
@@ -73,7 +71,7 @@ public class NoteServiceTest {
             }
             result.add(new PatientNotesDTO(patientId, branchNotes));
         }
-        when(repository.findByOrOrderByPatIdAsc()).thenReturn(allNotes);
+        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc()).thenReturn(allNotes);
         return result;
     }
 

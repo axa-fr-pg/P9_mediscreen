@@ -25,20 +25,18 @@ public class NoteEntity {
 
     String e;
 
-    public NoteEntity(long patientId, NoteDTO note) throws IllegalArgumentException {
+    public NoteEntity(long patientId, NoteDTO note) {
         this(note.noteId, patientId, note.e);
     }
 
     public static NoteEntity random() {
-        NoteEntity note = new NoteEntity();
-        note.noteId = UUID.randomUUID().toString();
-        note.patId = nextLong(1, 100);
-        note.e = randomAlphabetic(nextInt(20, 500));
-        return note;
+        return random(nextLong(1, 100));
     }
 
     public static NoteEntity random(long patientId) {
-        NoteEntity note = NoteEntity.random();
+        NoteEntity note = new NoteEntity();
+        note.noteId = UUID.randomUUID().toString();
+        note.e = randomAlphabetic(nextInt(20, 500));
         note.patId = patientId;
         return note;
     }

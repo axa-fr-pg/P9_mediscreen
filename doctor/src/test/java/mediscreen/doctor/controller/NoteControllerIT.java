@@ -79,7 +79,7 @@ public class NoteControllerIT {
             }
             result.add(new PatientNotesDTO(patientId, branchNotes));
         }
-        when(repository.findByOrOrderByPatIdAsc()).thenReturn(allNotes);
+        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc()).thenReturn(allNotes);
         return result;
     }
 

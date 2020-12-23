@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -42,7 +41,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public List<PatientNotesDTO> getAllGroupedByPatientId() {
         List<PatientNotesDTO> result = new ArrayList<>();
-        repository.findByOrOrderByPatIdAsc().stream()
+        repository.findAllByNoteIdNotNullOrderByPatIdAsc().stream()
                 .collect(Collectors.groupingBy((note) -> note.patId)).values().forEach(noteList -> {
                     result.add(new PatientNotesDTO(
                             noteList.get(0).patId,

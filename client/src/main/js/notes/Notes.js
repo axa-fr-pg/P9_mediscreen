@@ -100,11 +100,11 @@ function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
         });
 }
 
-function PatientNotes({notes, history}) {
+function PatientNotes({branch, history}) {
 
     return(
-        <TreeItem nodeId={notes.patId.toString()} label={"Patient " + notes.patId}>
-            {notes.noteDTOList.map(note => (
+        <TreeItem nodeId={branch.patId.toString()} label={"Patient " + branch.patId}>
+            {branch.noteDTOList.map(note => (
                 <TreeItem key={note.noteId} nodeId={note.noteId} label={note.e} onLabelClick={()=>history.push('/notes/'+note.noteId)}>
                     {note.e}
                 </TreeItem>
@@ -129,10 +129,17 @@ function NoteList({patientIdGiven, notes, setNotes, error, updateRequired, setUp
 
     if (notes.length === 0) return null;
 
+    let notesTree = notes;
+    if (patientIdGiven >= 0) {
+        notesTree = [{patId : patientIdGiven, noteDTOList : notes}];
+    }
+
     return (
         <nav>
             <TreeView className="tree-view" expanded={expanded} onNodeToggle={handleToggle}>
-                <PatientNotes notes={notes} history={history}/>
+                {notesTree.map(branch => (
+                    <PatientNotes branch={branch} history={history}/>
+                ))}
             </TreeView>
         </nav>
     );
