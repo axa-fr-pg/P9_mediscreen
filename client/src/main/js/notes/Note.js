@@ -4,7 +4,7 @@ import {notesApiUrl} from "../api/URLs";
 
 function Note() {
     const currentUrl = window.location.pathname.split("/");
-    const [note, setNote] = React.useState({noteId: currentUrl.pop(), patId: currentUrl.pop(), e: ''});
+    const [note, setNote] = useState({noteId: currentUrl.pop(), patId: currentUrl.pop(), e: ''});
     const [modify, setModify] = useState(window.location.href.includes('new'));
     const [input, setInput] = useState(true);
     const [error, setError] = useState('');
@@ -98,10 +98,6 @@ function Note() {
             {displayTitle()}
             <div hidden={!input}>
                 <form className="form-note">
-                    <div hidden={note.noteId === 'new'} className="form-note-element" key="note-id">
-                        <label className="form-note-label">Note Id</label>
-                        <input className="form-note-input" value={note.noteId} name="noteId" disabled={true}/>
-                    </div>
                     <div className="form-note-element" key="note-content">
                         <label className="form-note-label">Content</label>
                         <textarea className="form-note-input" value={note.e} name="e" onChange={onChange}

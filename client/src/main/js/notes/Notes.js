@@ -116,7 +116,7 @@ function PatientNotes({branch, history}) {
 
 function NoteList({patientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
 
-    const [expanded, setExpanded] = React.useState([patientIdGiven.toString()]);
+    const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
 
     const handleToggle = (event, nodeIds) => {
         setExpanded(nodeIds);
