@@ -57,11 +57,10 @@ public class NoteControllerIT {
         return note;
     }
 
-    private List<NoteEntity> mockEntityFindAllByPatId(long patientId, int numberOfEntities) {
+    private void mockEntityFindAllByPatId(long patientId, int numberOfEntities) {
         List<NoteEntity> noteEntityList = Stream.generate(() -> NoteEntity.random(patientId))
                 .limit(numberOfEntities).collect(Collectors.toList());
         when(repository.findAllByPatId(patientId)).thenReturn(noteEntityList);
-        return noteEntityList;
     }
 
     private List<PatientNotesDTO> mockEntityFindAllGroupedByPatientId() {
@@ -87,6 +86,21 @@ public class NoteControllerIT {
         NoteEntity note = NoteEntity.random();
         when(repository.save(any(NoteEntity.class))).thenReturn(note);
         return note;
+    }
+
+    private NoteEntity mockEntitySave(String noteId)  {
+        NoteEntity note = NoteEntity.random();
+        note.noteId = noteId;
+        when(repository.save(any(NoteEntity.class))).thenReturn(note);
+        return note;
+    }
+
+    private MockHttpServletRequestBuilder buildPutRequest(NoteEntity note) throws JsonProcessingException {
+        return MockMvcRequestBuilders
+                .put(ENTITY_URL + "/" + note.noteId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new NoteDTO(note)))
+                .accept(MediaType.APPLICATION_JSON);
     }
 
     private MockHttpServletRequestBuilder buildPostRequest(NoteEntity note) throws JsonProcessingException {
@@ -221,5 +235,36 @@ public class NoteControllerIT {
         // THEN
         assertEquals(HttpStatus.CREATED.value(), response.getStatus());
         assertEquals(expectedNumberOfNotes, result.size());
+    }
+
+    @Test
+    public void givenExistingNote_whenPut_thenReturnsCorrectNote() throws Exception {
+        // GIVEN
+        NoteEntity noteBefore = mockEntityFind(true);
+        NoteEntity noteAfter = mockEntitySave(noteBefore.noteId);
+        MockHttpServletRequestBuilder builder = buildPutRequest(noteAfter);
+        // WHEN
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        NoteDTO result = objectMapper.readValue(response.getContentAsString(), NoteDTO.class);
+        // THEN
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(noteAfter.noteId, result.noteId);
+        assertEquals(noteAfter.e, result.e);
+    }
+
+    @Test
+    public void givenExistingNote_whenPutWithEmptyContent_thenReturnsNoteBlankError() throws Exception {
+        // GIVEN
+        NoteEntity noteBefore = mockEntityFind(true);
+        NoteEntity noteAfter = mockEntitySave(noteBefore.noteId);
+        noteAfter.e = "";
+        MockHttpServletRequestBuilder builder = buildPutRequest(noteAfter);
+        // WHEN
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        List<String> errors = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<String>>() {});
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(1, errors.size());
+        assertEquals(NOTE_NOT_BLANK_ERROR, errors.get(0));
     }
 }

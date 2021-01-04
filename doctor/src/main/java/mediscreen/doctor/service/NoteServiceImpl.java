@@ -85,4 +85,14 @@ public class NoteServiceImpl implements NoteService {
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public NoteDTO put(NoteDTO note) throws NoteNotFoundException {
+        Optional<NoteEntity> optional = repository.findById(note.noteId);
+        if (optional.isPresent()) {
+            NoteEntity updatedNote = new NoteEntity(optional.get().patId, note);
+            return new NoteDTO(repository.save(updatedNote));
+        }
+        throw new NoteNotFoundException();
+    }
 }

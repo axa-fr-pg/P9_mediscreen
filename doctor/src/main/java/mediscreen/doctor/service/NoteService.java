@@ -11,4 +11,5 @@ public interface NoteService {
     NoteDTO get(String noteId) throws NoteNotFoundException;
     NoteDTO postNoteByPatientId(long patientId, NoteDTO note) throws CreateExistingNoteException;
     List<NoteDTO> post(long patientId, int numberOfRandomRows);
+    NoteDTO put(NoteDTO noteDTO) throws NoteNotFoundException;
 }

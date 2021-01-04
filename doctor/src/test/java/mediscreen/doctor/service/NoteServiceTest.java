@@ -4,6 +4,7 @@ import mediscreen.doctor.model.NoteDTO;
 import mediscreen.doctor.model.NoteEntity;
 import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
+import org.apache.commons.collections4.IterableUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-
-import org.apache.commons.collections4.IterableUtils;
-
-import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -80,7 +72,14 @@ public class NoteServiceTest {
         when(repository.save(any(NoteEntity.class))).thenReturn(note);
         return note;
     }
-    
+
+    private NoteEntity mockEntitySave(String noteId)  {
+        NoteEntity note = NoteEntity.random();
+        note.noteId = noteId;
+        when(repository.save(any(NoteEntity.class))).thenReturn(note);
+        return note;
+    }
+
     @BeforeEach
     public void init() {
         reset(repository);
@@ -158,6 +157,7 @@ public class NoteServiceTest {
         // THEN
         assertThrows(CreateExistingNoteException.class, () -> service.postNoteByPatientId(0, new NoteDTO(note)));
     }
+
     @Test
     public void givenRandomRequest_whenPost_thenReturnsListOfCorrectSize() {
         // GIVEN
@@ -168,5 +168,26 @@ public class NoteServiceTest {
         List<NoteDTO> result = service.post(patientId, expectedNumberOfNotes);
         // THEN
         assertEquals(expectedNumberOfNotes, result.size());
+    }
+
+    @Test
+    public void givenExistingNote_whenPut_thenReturnsCorrectNote() throws NoteNotFoundException {
+        // GIVEN
+        NoteDTO noteBefore = new NoteDTO(mockEntityFind(true));
+        NoteEntity noteAfter = mockEntitySave(noteBefore.noteId);
+        // WHEN
+        NoteDTO result = service.put(new NoteDTO(noteAfter));
+        // THEN
+        assertEquals(noteAfter.noteId, result.noteId);
+        assertEquals(noteAfter.e, result.e);
+    }
+
+    @Test
+    public void givenNoNote_whenPut_thenThrowsNoteNotFoundException() {
+        // GIVEN
+        NoteEntity note = mockEntityFind(false);
+        // WHEN
+        // THEN
+        assertThrows(NoteNotFoundException.class, () -> service.put(new NoteDTO(note)));
     }
 }

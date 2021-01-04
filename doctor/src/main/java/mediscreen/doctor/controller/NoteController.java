@@ -44,8 +44,8 @@ public class NoteController {
     }
 
     @PutMapping("/{noteId}")
-    public ResponseEntity<NoteDTO> putByNoteId(@PathVariable String noteId, @RequestBody @Valid NoteDTO e) {
-        return new ResponseEntity<>(new NoteDTO(), HttpStatus.OK);
+    public ResponseEntity<NoteDTO> putByNoteId(@PathVariable String noteId, @RequestBody @Valid NoteDTO note) throws NoteNotFoundException {
+        return new ResponseEntity<>(service.put(note), HttpStatus.OK);
     }
 
     @PostMapping("/patients/{patId}")
