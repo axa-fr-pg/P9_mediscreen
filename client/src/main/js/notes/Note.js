@@ -93,8 +93,6 @@ function Note() {
         setNote(newNote);
     }
 
-    console.log("input=", input);
-
     return (
         <div>
             {displayTitle()}

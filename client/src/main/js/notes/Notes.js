@@ -5,51 +5,22 @@ import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
 
-function generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientId,
-                             setUpdateRequired, setError) {
-    let url = notesApiUrl;
-    event.preventDefault();
-    if (!!inputFieldRandomVolume) {
-        inputFieldRandomVolume.blur();
-    }
-    if (!!inputFieldPatientId) {
-        inputFieldPatientId.blur();
-    }
-    setError("Processing request...");
+function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
 
-    if (patientIdGiven >= 0) {
-        url = url + "/patients/" + patientIdGiven;
+    function onChangePatientIdSwitch() {
+        setUpdateRequired(true);
+        if (patientIdGiven < 0) {
+            setPatientIdGiven(0);
+        } else {
+            setPatientIdGiven(-1);
+            history.push('/notes');
+        }
+        setError('');
     }
-
-    axios.post(url + "/random/" + randomVolume)
-        .then(response => {
-            setUpdateRequired(true);
-            setError(response.data.length + " random notes have been generated successfully !");
-        })
-        .catch(error => {
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it looks like the database is not ready !");
-            } else {
-                setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
-            }
-        });
-}
-
-function onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError) {
-    if (patientIdGiven < 0) {
-        setPatientIdGiven(0);
-    } else {
-        setPatientIdGiven(-1);
-    }
-    setError('');
-}
-
-function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError}) {
 
     return (
         <div key={"switch-patient-id"} className="switch-patient-id">
-            <Switch checked={patientIdGiven >= 0}
-                    onChange={() => onChangePatientIdGiven(patientIdGiven, setPatientIdGiven, setError)}
+            <Switch checked={patientIdGiven >= 0} onChange={onChangePatientIdSwitch}
                     checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={13}/>
         </div>
     );
@@ -59,6 +30,36 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
     const [randomVolume, setRandomVolume] = useState(5);
     const [inputFieldRandomVolume, setInputFieldRandomVolume] = useState(null);
 
+    function generateRandomNotes(event) {
+
+        let url = notesApiUrl;
+        event.preventDefault();
+        if (!!inputFieldRandomVolume) {
+            inputFieldRandomVolume.blur();
+        }
+        if (!!inputFieldPatientId) {
+            inputFieldPatientId.blur();
+        }
+        setError("Processing request...");
+
+        if (patientIdGiven >= 0) {
+            url = url + "/patients/" + patientIdGiven;
+        }
+
+        axios.post(url + "/random/" + randomVolume)
+            .then(response => {
+                setUpdateRequired(true);
+                setError(response.data.length + " random notes have been generated successfully !");
+            })
+            .catch(error => {
+                if (error.response) {
+                    setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it looks like the database is not ready !");
+                } else {
+                    setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                }
+            });
+    }
+
     function onChangeRandomVolume(field) {
         setRandomVolume(field.target.value);
         setInputFieldRandomVolume(field.target);
@@ -67,10 +68,7 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
     return (
         <form>
             <div className="div-random">
-                <button
-                    onClick={(event) => generateRandomNotes(event, patientIdGiven, inputFieldRandomVolume, randomVolume, inputFieldPatientId, setUpdateRequired, setError)}>
-                    Add
-                </button>
+                <button onClick={generateRandomNotes}>Add</button>
                 <input className="input-narrow" value={randomVolume} onChange={onChangeRandomVolume}/>
                 <label>
                     random note(s) to database
@@ -87,8 +85,8 @@ function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
     }
     axios.get(url)
         .then(response => {
-            setNotes(response.data);
             setUpdateRequired(false);
+            setNotes(response.data);
             if (response.data.length === 0) {
                 setError('It looks like the database is empty : please generate some random patients or ask your IT support.');
             }
@@ -116,7 +114,7 @@ function PatientNotes({branch, history}) {
     );
 }
 
-function NoteList({patientIdGiven, notes, setNotes, error, updateRequired, setUpdateRequired, setError, history}) {
+function NoteList({patientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
 
     const [expanded, setExpanded] = React.useState([patientIdGiven.toString()]);
 
@@ -126,6 +124,7 @@ function NoteList({patientIdGiven, notes, setNotes, error, updateRequired, setUp
 
     useEffect(() => {
         if (updateRequired) {
+            console.log("get notes effect");
             getNotes(patientIdGiven, setNotes, setUpdateRequired, setError);
         }
     });
@@ -133,13 +132,15 @@ function NoteList({patientIdGiven, notes, setNotes, error, updateRequired, setUp
     if (notes.length === 0) return null;
 
     let notesTree = notes;
+    let activeBranches = expanded;
     if (notes.patId >= 0) {
+        activeBranches = [notes.patId.toString()];
         notesTree = [notes];
     }
 
     return (
         <nav>
-            <TreeView className="tree-view" expanded={expanded} onNodeToggle={handleToggle}>
+            <TreeView className="tree-view" expanded={activeBranches} onNodeToggle={handleToggle}>
                 {notesTree.map(branch => (
                     <PatientNotes key={branch.patId} branch={branch} history={history}/>
                 ))}
@@ -158,23 +159,29 @@ function NotesError({error}) {
     );
 }
 
-function NotesPatientSelector({patientIdGiven, setPatientIdGiven, setInputFieldPatientId, setError}) {
+function NotesPatientSelector({patientIdGiven, setPatientIdGiven, setUpdateRequired, setInputFieldPatientId, setError, history}) {
 
-    function onChangePatientIdGiven(field) {
+    function onChangePatientIdGivenField(field) {
         setPatientIdGiven(field.target.value);
         setInputFieldPatientId(field.target);
+    }
+
+    function onSubmitPatientIdGivenField() {
+        setUpdateRequired(true);
+        history.push('/notes/patients/' + patientIdGiven);
     }
 
     return (
         <h1 className="title-note-list">Note list
             <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                             setError={setError}/>
+                             setError={setError} history={history} setUpdateRequired={setUpdateRequired}/>
             <div hidden={patientIdGiven >= 0}>
                 <label>for all patients</label>
             </div>
             <div hidden={patientIdGiven < 0}>
                 <label>for patient with id</label>
-                <input className="input-narrow input-with-parent-font" value={patientIdGiven} onChange={onChangePatientIdGiven}/>
+                <input className="input-narrow input-with-parent-font" value={patientIdGiven} onChange={onChangePatientIdGivenField} />
+                <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
             </div>
         </h1>
     );
@@ -190,17 +197,18 @@ function Notes() {
     const [inputFieldPatientId, setInputFieldPatientId] = useState(null);
     const history = useHistory();
 
+    function newNote() {
+        history.push('/notes/patients/' + patientIdGiven + '/new');
+    }
+
     return (
         <div>
 
-            <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                                  setInputFieldPatientId={setInputFieldPatientId} setError={setError}/>
-
+            <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setUpdateRequired={setUpdateRequired}
+                                  setInputFieldPatientId={setInputFieldPatientId} setError={setError} history={history}/>
             <NoteList patientIdGiven={patientIdGiven} notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <button hidden={patientIdGiven < 0} className="button-new"
-                    onClick={() => history.push('/notes/patients/' + patientIdGiven + '/new')}>Register new note
-            </button>
+            <button hidden={patientIdGiven < 0} className="button-new" onClick={newNote}>Register new note</button>
             <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId}
                          setUpdateRequired={setUpdateRequired} setError={setError}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
