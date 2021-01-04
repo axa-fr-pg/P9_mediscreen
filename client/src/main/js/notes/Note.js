@@ -1,6 +1,30 @@
 import React, {useState} from "react";
 import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
+import Switch from "react-switch";
+
+function NoteModifySwitch({input, modify, onChange}) {
+    if (!input || window.location.href.includes('new')) {
+        return null;
+    }
+    return(
+        <div key={"div-read-only"} className="div-read-only">
+            <label>View</label>
+            <div className="switch-read-only">
+                <Switch checked={modify} onChange={onChange} checkedIcon={false} uncheckedIcon={false}
+                        height={15} width={30} handleDiameter={13} />
+            </div>
+            <label>Edit</label>
+        </div>
+    );
+}
+
+function NoteSaveButton({input, modify, onClick}) {
+    if (!input || !modify) return null;
+    return(
+        <button className="button-save" onClick={onClick}>Save</button>
+    );
+}
 
 function Note() {
     const currentUrl = window.location.pathname.split("/");
@@ -58,7 +82,7 @@ function Note() {
             axios.put(notesApiUrl + "/" + note.noteId, body)
                 .then(response => {
                     setNote(response.data);
-                    setError('XXXXXXXX has been saved successfully !');
+                    setError('Note has been saved successfully !');
                 })
                 .catch(error => {
                     if (error.response) {
@@ -79,18 +103,16 @@ function Note() {
         );
     }
 
-    function displaySaveButton() {
-        if (!input || !modify) return null;
-        return (
-            <button className="button-save" onClick={onClickSave}>Save</button>
-        );
-    }
-
-    function onChange(field) {
+    function onChangeNote(field) {
         field.persist();
         const newNote = {...note};
         newNote[field.target.name] = field.target.value;
         setNote(newNote);
+    }
+
+    function onChangeSwitch() {
+        setModify(!modify);
+        setError('');
     }
 
     return (
@@ -100,10 +122,11 @@ function Note() {
                 <form className="form-note">
                     <div className="form-note-element" key="note-content">
                         <label className="form-note-label">Content</label>
-                        <textarea className="form-note-input" value={note.e} name="e" onChange={onChange}
+                        <textarea className="form-note-input" value={note.e} name="e" onChange={onChangeNote}
                                   disabled={modify === false}/>
                     </div>
-                    {displaySaveButton()}
+                    <NoteModifySwitch input={input} modify={modify} onChange={onChangeSwitch} />
+                    <NoteSaveButton input={input} modify={modify} onClick={onClickSave} />
                 </form>
             </div>
             <DisplayError/>
