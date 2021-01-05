@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     public final static String EXCEPTION_MANAGER_NOTE_NOT_FOUND = "No such note has been found. Please check your request or ask your IT support.";
-    public final static String EXCEPTION_MANAGER_CREATE_EXISTING_NOTE = "It looks like the note you wan't to save already exists in the database. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_CREATE_EXISTING_NOTE = "it seems that the note you wan't to save already exists in the database. Please check your request or ask your IT support.";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {

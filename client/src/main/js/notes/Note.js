@@ -53,7 +53,7 @@ function Note() {
                 if (error.response) {
                     setError(error.response.status + " " + error.response.data);
                 } else {
-                    setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                    setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                 }
             });
 
@@ -73,9 +73,9 @@ function Note() {
                 })
                 .catch(error => {
                     if (error.response) {
-                        setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it looks like the database is not ready !");
+                        setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
                 });
         } else {
@@ -88,7 +88,7 @@ function Note() {
                     if (error.response) {
                         setError(error.response.status + " " + error.response.data);
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
                 });
         }

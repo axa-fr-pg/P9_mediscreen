@@ -7,5 +7,12 @@ services :
       - "8081:8081"
     environment:
       - JASYPT_ENCRYPTOR_PASSWORD
-    expose:
-      - "3306"
+      - DATABASE_HOST=host.docker.internal
+  doctor:
+    container_name: doctor
+    image: doctor
+    ports:
+      - "8082:8082"
+    environment:
+      - JASYPT_ENCRYPTOR_PASSWORD
+      - DATABASE_HOST=host.docker.internal

@@ -47,7 +47,7 @@ function Patient() {
                     if (error.response) {
                         setError(error.response.status + " " + error.response.data);
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
                 });
         }
@@ -77,7 +77,7 @@ function Patient() {
                     if (error.response) {
                         setError(error.response.status + " " + error.response.data);
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
                 });
         } else
@@ -91,7 +91,7 @@ function Patient() {
                     if (error.response) {
                         setError(error.response.status + " " + error.response.data);
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
                 });
         }

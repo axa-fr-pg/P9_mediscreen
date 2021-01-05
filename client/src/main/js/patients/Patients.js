@@ -8,13 +8,13 @@ function getPatients(setPatients, setUpdateRequired, setError) {
         .then(response => {
             setPatients(response.data);
             setUpdateRequired(false);
-            if (response.data.length === 0) setError('It looks like the database is empty : please generate some random patients or ask your IT support.');
+            if (response.data.length === 0) setError('It seems that the database is empty : please generate some random patients or ask your IT support.');
         })
         .catch( error => {
             if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it looks like the database is not ready !");
+                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
-                setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
 }
@@ -74,9 +74,9 @@ function generateRandomPatients(event, inputField, randomVolume, setUpdateRequir
         })
         .catch(error => {
             if (error.response) {
-                setError(error.response.status + " " + error.response.data+ " ! Please ask your IT support : it looks like the database is not ready !");
+                setError(error.response.status + " " + error.response.data+ " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
-                setError(error.message + " ! Please ask your IT support : it looks like the server or the database is unavailable !");
+                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
 }
