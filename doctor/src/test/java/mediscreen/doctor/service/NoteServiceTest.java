@@ -21,6 +21,7 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
@@ -121,16 +122,18 @@ public class NoteServiceTest {
     @Test
     public void givenNoPatientId_whenGetAllGroupedByPatientId_thenReturnsCorrectTreeOfNotes() {
         // GIVEN
+        long sortingPatId = -1;
         List<PatientNotesDTO> patientNotesDTOList = mockEntityFindAllGroupedByPatientId();
         // WHEN
         List<PatientNotesDTO> result = service.getAllGroupedByPatientId();
         // THEN
         assertEquals(patientNotesDTOList.size(), result.size());
         patientNotesDTOList.forEach(patientNotesDTO -> {
-                    PatientNotesDTO match = IterableUtils.find(result, current -> current.patId == patientNotesDTO.patId);
-                    assertNotNull(match);
-                    assertEquals(patientNotesDTO.noteDTOList.size(), match.noteDTOList.size());
-                }
+                assertTrue(sortingPatId <= patientNotesDTO.patId);
+                PatientNotesDTO match = IterableUtils.find(result, current -> current.patId == patientNotesDTO.patId);
+                assertNotNull(match);
+                assertEquals(patientNotesDTO.noteDTOList.size(), match.noteDTOList.size());
+            }
         );
     }
 

@@ -9,9 +9,12 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import sun.awt.geom.AreaOp;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -42,11 +45,13 @@ public class NoteServiceImpl implements NoteService {
     public List<PatientNotesDTO> getAllGroupedByPatientId() {
         List<PatientNotesDTO> result = new ArrayList<>();
         repository.findAllByNoteIdNotNullOrderByPatIdAsc().stream()
-                .collect(Collectors.groupingBy((note) -> note.patId)).values().forEach(noteList -> {
+                .collect(Collectors.groupingBy((note) -> note.patId)).values()
+                .forEach(noteList -> {
                     result.add(new PatientNotesDTO(
                             noteList.get(0).patId,
                             noteList.stream().map(NoteDTO::new).collect(Collectors.toList())));
                 });
+        Collections.sort(result);
         return result;
     }
 
