@@ -1,13 +1,14 @@
-# Patient
-The patient module contains the dedicated API to manage patient personal data in mediscreen.
+# Doctor
+The doctor module contains the dedicated API to manage medical notes in mediscreen.
 
 # Endpoints
 The doctor API provides the following URIs :
-* GET /patients
-* GET /patients/{id}
-* PUT /patients/{id}
-* POST /patients/add
-* POST /patients/random/{expectedNumberOfPatients}
+* GET /notes
+* GET /notes/patients/{patId}
+* PUT /notes/{noteId}
+* POST /notes/patients/{patId}
+* POST /notes/random/{expectedNumberOfNotes}
+* POST /notes/patients/{patId}/random/{expectedNumberOfNotes}
 Please refer to specifications for further details.
 
 # Database configuration
@@ -23,3 +24,6 @@ To generate an encrypted password use the following command :
 mvn jasypt:encrypt-value -Djasypt.encryptor.password="Encryption key" 
     -Djasypt.plugin.value="Password to be encrypted"
     
+# Build
+To install the module, run the maven goal "install".
+This module can be installed directly from the parent project.
