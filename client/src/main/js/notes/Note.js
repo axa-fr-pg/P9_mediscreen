@@ -2,27 +2,31 @@ import React, {useState} from "react";
 import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
-
-function NoteModifySwitch({input, modify, onChange}) {
-    if (!input || window.location.href.includes('new')) {
-        return null;
-    }
-    return(
-        <div key={"div-read-only"} className="div-read-only">
-            <label>View</label>
-            <div className="switch-read-only">
-                <Switch checked={modify} onChange={onChange} checkedIcon={false} uncheckedIcon={false}
-                        height={15} width={30} handleDiameter={13} />
-            </div>
-            <label>Edit</label>
-        </div>
-    );
-}
+import ReactQuill from "react-quill";
 
 function NoteSaveButton({input, modify, onClick}) {
     if (!input || !modify) return null;
-    return(
+    return (
         <button className="button-save" onClick={onClick}>Save</button>
+    );
+}
+
+function NoteTitleWithModeSelector({note, input, modify, onChangeSwitch}) {
+    const view = modify ? 'edit' : 'view';
+    const title = note.noteId === 'new' ? 'creation' : view;
+    let switchHidden = false;
+    if (!input || window.location.href.includes('new')) {
+        switchHidden = true;
+    }
+    return (
+        <h1 className="title-note">Note {title}
+            <div hidden={switchHidden}>
+                &nbsp;
+                <Switch checked={modify} onChange={onChangeSwitch}
+                        checkedIcon={false} uncheckedIcon={false}
+                        height={15} width={30} handleDiameter={13}/>
+            </div>
+        </h1>
     );
 }
 
@@ -32,14 +36,6 @@ function Note() {
     const [modify, setModify] = useState(window.location.href.includes('new'));
     const [input, setInput] = useState(true);
     const [error, setError] = useState('');
-
-    function displayTitle() {
-        const view = modify ? 'edit' : 'view';
-        const title = note.noteId === 'new' ? 'creation' : view;
-        return (
-            <h1>Note {title}</h1>
-        );
-    }
 
     React.useEffect(() => {
         if (note.noteId === 'new') return;
@@ -96,17 +92,12 @@ function Note() {
 
     function DisplayError() {
         if (!error) return null;
-        return (
-            <footer>
-                {error}
-            </footer>
-        );
+        return (<h4>{error}</h4>);
     }
 
-    function onChangeNote(field) {
-        field.persist();
+    function onChangeNote(content) {
         const newNote = {...note};
-        newNote[field.target.name] = field.target.value;
+        newNote['e'] = content;
         setNote(newNote);
     }
 
@@ -117,19 +108,12 @@ function Note() {
 
     return (
         <div>
-            {displayTitle()}
-            <div hidden={!input}>
-                <form className="form-note">
-                    <div className="form-note-element" key="note-content">
-                        <label className="form-note-label">Content</label>
-                        <textarea className="form-note-input" value={note.e} name="e" onChange={onChangeNote}
-                                  disabled={modify === false}/>
-                    </div>
-                    <NoteModifySwitch input={input} modify={modify} onChange={onChangeSwitch} />
-                    <NoteSaveButton input={input} modify={modify} onClick={onClickSave} />
-                </form>
-            </div>
+            <NoteTitleWithModeSelector note={note} input={input} modify={modify} onChangeSwitch={onChangeSwitch}/>
+            <link rel="stylesheet" href="//cdn.quilljs.com/1.2.6/quill.snow.css"/>
             <DisplayError/>
+            <NoteSaveButton input={input} modify={modify} onClick={onClickSave}/>
+            <ReactQuill className="quill-note-element" key="note-content" value={note.e}
+                        readOnly={modify === false} onChange={onChangeNote}/>
         </div>
     );
 }

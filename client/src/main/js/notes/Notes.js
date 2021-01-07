@@ -159,7 +159,7 @@ function NotesError({error}) {
     );
 }
 
-function NotesPatientSelector({patientIdGiven, setPatientIdGiven, setUpdateRequired, setInputFieldPatientId, setError, history}) {
+function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, setUpdateRequired, setInputFieldPatientId, setError, history}) {
 
     function onChangePatientIdGivenField(field) {
         setPatientIdGiven(field.target.value);
@@ -203,8 +203,7 @@ function Notes() {
 
     return (
         <div>
-
-            <NotesPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setUpdateRequired={setUpdateRequired}
+            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setUpdateRequired={setUpdateRequired}
                                   setInputFieldPatientId={setInputFieldPatientId} setError={setError} history={history}/>
             <NoteList patientIdGiven={patientIdGiven} notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>

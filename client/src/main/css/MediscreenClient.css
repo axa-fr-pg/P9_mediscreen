@@ -56,6 +56,7 @@ footer {
 
 .button-save {
     width: 50px;
+    margin-bottom: 20px;
 }
 
 .button-submit {
@@ -68,7 +69,7 @@ footer {
     flex-direction: column;
 }
 
-.form-note-element {
+.form-note-element, .title-note  {
     display: flex;
     align-items: center;
 }
