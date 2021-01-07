@@ -112,7 +112,7 @@ function Note() {
             <link rel="stylesheet" href="//cdn.quilljs.com/1.2.6/quill.snow.css"/>
             <DisplayError/>
             <NoteSaveButton input={input} modify={modify} onClick={onClickSave}/>
-            <ReactQuill className="quill-note-element" key="note-content" value={note.e}
+            <ReactQuill className="quill-note-content" key={note.noteId} value={note.e}
                         readOnly={modify === false} onChange={onChangeNote}/>
         </div>
     );

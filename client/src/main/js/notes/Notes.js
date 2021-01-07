@@ -4,6 +4,7 @@ import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
+import ReactQuill from "react-quill";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
 
@@ -104,12 +105,14 @@ function PatientNotes({branch, history}) {
 
     return (
         <TreeItem nodeId={branch.patId.toString()} label={"Patient " + branch.patId}>
-            {branch.noteDTOList.map(note => (
-                <TreeItem key={note.noteId} nodeId={note.noteId} label={note.e}
-                          onLabelClick={() => history.push('/notes/' + note.noteId)}>
-                    {note.e}
-                </TreeItem>
-            ))}
+            <table className="table-patient-notes" key={branch.patId}>
+                {branch.noteDTOList.map(note => (
+                    <tr className="tr-note-overview" key={note.noteId}
+                        onClick={() => history.push('/notes/' + note.noteId)}>
+                        {note.e}
+                    </tr>
+                ))}
+            </table>
         </TreeItem>
     );
 }
@@ -140,6 +143,7 @@ function NoteList({patientIdGiven, notes, setNotes, updateRequired, setUpdateReq
 
     return (
         <nav>
+            <link rel="stylesheet" href="//cdn.quilljs.com/1.2.6/quill.snow.css"/>
             <TreeView className="tree-view" expanded={activeBranches} onNodeToggle={handleToggle}>
                 {notesTree.map(branch => (
                     <PatientNotes key={branch.patId} branch={branch} history={history}/>
@@ -180,7 +184,8 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, se
             </div>
             <div hidden={patientIdGiven < 0}>
                 <label>for patient with id</label>
-                <input className="input-narrow input-with-parent-font" value={patientIdGiven} onChange={onChangePatientIdGivenField} />
+                <input className="input-narrow input-with-parent-font" value={patientIdGiven}
+                       onChange={onChangePatientIdGivenField}/>
                 <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
             </div>
         </h1>
@@ -203,11 +208,13 @@ function Notes() {
 
     return (
         <div>
-            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} setUpdateRequired={setUpdateRequired}
-                                  setInputFieldPatientId={setInputFieldPatientId} setError={setError} history={history}/>
+            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
+                                              setUpdateRequired={setUpdateRequired}
+                                              setInputFieldPatientId={setInputFieldPatientId} setError={setError}
+                                              history={history}/>
+            <button hidden={patientIdGiven < 0} className="button-new" onClick={newNote}>Register new note</button>
             <NoteList patientIdGiven={patientIdGiven} notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <button hidden={patientIdGiven < 0} className="button-new" onClick={newNote}>Register new note</button>
             <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId}
                          setUpdateRequired={setUpdateRequired} setError={setError}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}

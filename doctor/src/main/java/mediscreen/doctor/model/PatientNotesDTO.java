@@ -13,11 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @FieldDefaults(level=AccessLevel.PUBLIC)
 public class PatientNotesDTO implements Comparable<PatientNotesDTO>{
-    long patId;
+    Long patId;
     List<NoteDTO> noteDTOList;
 
     @Override
     public int compareTo(PatientNotesDTO other) {
-        return ((Long)patId).compareTo(other.patId);
+        return patId.compareTo(other.patId);
     }
 }

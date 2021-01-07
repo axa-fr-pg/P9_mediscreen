@@ -51,7 +51,7 @@ footer {
 }
 
 .button-new {
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .button-save {
@@ -80,4 +80,13 @@ footer {
 
 .form-note-input {
     width: 80%;
+}
+
+.table-patient-notes {
+    margin-left: 20px;
+}
+
+.tr-note-overview {
+    padding-top: 10px;
+    height: 10px;
 }
