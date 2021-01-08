@@ -4,7 +4,6 @@ import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
-import ReactQuill from "react-quill";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
 
@@ -103,16 +102,20 @@ function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
 
 function PatientNotes({branch, history}) {
 
+    function stripHtml(html){
+        const temporaryElement = document.createElement("div");
+        temporaryElement.innerHTML = html;
+        return temporaryElement.textContent || temporaryElement.innerText || "";
+    }
+
     return (
         <TreeItem nodeId={branch.patId.toString()} label={"Patient " + branch.patId}>
-            <table className="table-patient-notes" key={branch.patId}>
-                {branch.noteDTOList.map(note => (
-                    <tr className="tr-note-overview" key={note.noteId}
-                        onClick={() => history.push('/notes/' + note.noteId)}>
-                        {note.e}
-                    </tr>
-                ))}
-            </table>
+            {branch.noteDTOList.map(note => (
+                <textarea className="text-note-overview" key={note.noteId} disabled="true"
+                          onClick={() => history.push('/notes/' + note.noteId)}>
+                        {stripHtml(note.e)}
+                </textarea>
+            ))}
         </TreeItem>
     );
 }
@@ -143,7 +146,6 @@ function NoteList({patientIdGiven, notes, setNotes, updateRequired, setUpdateReq
 
     return (
         <nav>
-            <link rel="stylesheet" href="//cdn.quilljs.com/1.2.6/quill.snow.css"/>
             <TreeView className="tree-view" expanded={activeBranches} onNodeToggle={handleToggle}>
                 {notesTree.map(branch => (
                     <PatientNotes key={branch.patId} branch={branch} history={history}/>

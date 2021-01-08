@@ -82,11 +82,14 @@ footer {
     width: 80%;
 }
 
-.table-patient-notes {
+.text-note-overview {
     margin-left: 20px;
+    height: 12px;
+    width: 95%;
+    resize: none;
+    overflow: hidden;
 }
 
-.tr-note-overview {
-    padding-top: 10px;
-    height: 10px;
+.text-note-overview:hover {
+    background-color: lightgrey;
 }
