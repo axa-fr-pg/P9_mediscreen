@@ -4,6 +4,8 @@ import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
 
@@ -100,37 +102,46 @@ function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
         });
 }
 
-function PatientNotes({branch, history}) {
+function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired, setPatientIdGiven}) {
 
-    function stripHtml(html){
+    function stripHtml(html) {
         const temporaryElement = document.createElement("div");
         temporaryElement.innerHTML = html;
         return temporaryElement.textContent || temporaryElement.innerText || "";
     }
 
+    const handleSelect = () => {
+        setPatientIdGiven(branch.patId);
+        setUpdateRequired(true);
+        history.push('/notes/patients/' + branch.patId);
+    };
+
+    const handleToggle = () => {
+        const patId = branch.patId.toString();
+        if (expanded.includes(patId)) {
+            setExpanded([]);
+        } else {
+            setExpanded([patId]);
+        }
+    };
+
     return (
-        <TreeItem nodeId={branch.patId.toString()} label={"Patient " + branch.patId}>
+        <TreeItem nodeId={branch.patId.toString()} label={"Patient " + branch.patId}
+                  onLabelClick={handleSelect} onIconClick={handleToggle}>
             {branch.noteDTOList.map(note => (
-                <textarea className="text-note-overview" key={note.noteId} disabled="true"
-                          onClick={() => history.push('/notes/' + note.noteId)}>
-                        {stripHtml(note.e)}
-                </textarea>
+                <textarea className="text-note-overview" key={note.noteId} readOnly={true}
+                          onClick={() => history.push('/notes/' + note.noteId)} value={stripHtml(note.e)}/>
             ))}
         </TreeItem>
     );
 }
 
-function NoteList({patientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
+function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
 
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
 
-    const handleToggle = (event, nodeIds) => {
-        setExpanded(nodeIds);
-    };
-
     useEffect(() => {
         if (updateRequired) {
-            console.log("get notes effect");
             getNotes(patientIdGiven, setNotes, setUpdateRequired, setError);
         }
     });
@@ -146,9 +157,11 @@ function NoteList({patientIdGiven, notes, setNotes, updateRequired, setUpdateReq
 
     return (
         <nav>
-            <TreeView className="tree-view" expanded={activeBranches} onNodeToggle={handleToggle}>
+            <TreeView className="tree-view" expanded={activeBranches}
+                      defaultCollapseIcon={<ExpandMoreIcon/>} defaultExpandIcon={<ChevronRightIcon/>}>
                 {notesTree.map(branch => (
-                    <PatientNotes key={branch.patId} branch={branch} history={history}/>
+                    <PatientNotes key={branch.patId} branch={branch} history={history} setPatientIdGiven={setPatientIdGiven}
+                                  expanded={expanded} setExpanded={setExpanded} setUpdateRequired={setUpdateRequired}/>
                 ))}
             </TreeView>
         </nav>
@@ -194,15 +207,20 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, se
     );
 }
 
+const getPatIdFromUrl = (url) => url.includes('patients') ? url.split("/").pop() : -1;
+
 function Notes() {
     const [notes, setNotes] = useState([]);
-    const [updateRequired, setUpdateRequired] = useState('false');
+    const [updateRequired, setUpdateRequired] = useState(false);
     const [error, setError] = useState('');
-    const [patientIdGiven, setPatientIdGiven] = useState(
-        window.location.href.includes('patient') ?
-            window.location.pathname.split("/").pop() : -1);
+    const [patientIdGiven, setPatientIdGiven] = useState(getPatIdFromUrl(window.location.href));
     const [inputFieldPatientId, setInputFieldPatientId] = useState(null);
     const history = useHistory();
+
+    useEffect(() => {
+        setPatientIdGiven(getPatIdFromUrl(window.location.href));
+        setUpdateRequired(true);
+    }, [history.location.pathname]);
 
     function newNote() {
         history.push('/notes/patients/' + patientIdGiven + '/new');
@@ -211,11 +229,11 @@ function Notes() {
     return (
         <div>
             <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                                              setUpdateRequired={setUpdateRequired}
-                                              setInputFieldPatientId={setInputFieldPatientId} setError={setError}
-                                              history={history}/>
+                                              setUpdateRequired={setUpdateRequired} history={history}
+                                              setInputFieldPatientId={setInputFieldPatientId} setError={setError}/>
             <button hidden={patientIdGiven < 0} className="button-new" onClick={newNote}>Register new note</button>
-            <NoteList patientIdGiven={patientIdGiven} notes={notes} setNotes={setNotes} updateRequired={updateRequired}
+            <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
+                      notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId}
                          setUpdateRequired={setUpdateRequired} setError={setError}/>
