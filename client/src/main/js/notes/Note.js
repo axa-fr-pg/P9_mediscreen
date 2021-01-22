@@ -113,7 +113,8 @@ function Note() {
             <DisplayError/>
             <NoteSaveButton input={input} modify={modify} onClick={onClickSave}/>
             <ReactQuill className="quill-note-content" key={note.noteId} value={note.e}
-                        readOnly={modify === false} onChange={onChangeNote}/>
+                        readOnly={modify === false} onChange={onChangeNote}
+                        modules={{toolbar: modify}}/>
         </div>
     );
 }
