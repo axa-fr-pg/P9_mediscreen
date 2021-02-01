@@ -9,7 +9,7 @@ function getPatients(pageNumber, setPatients, setUpdateRequired, setError) {
             setPatients(response.data);
             setUpdateRequired(false);
             if (response.data.numberOfElements === 0) {
-                setError('It seems that the database is empty : please generate some random patients or ask your IT support.');
+                setError('It seems that the database is empty : please add some patients or ask your IT support.');
             }
         })
         .catch(error => {
