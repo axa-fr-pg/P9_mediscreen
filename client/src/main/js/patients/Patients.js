@@ -3,14 +3,16 @@ import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
 
-function getPatients(setPatients, setUpdateRequired, setError) {
-    axios.get(patientsApiUrl)
+function getPatients(pageNumber, setPatients, setUpdateRequired, setError) {
+    axios.get(patientsApiUrl + "/pages/" + pageNumber)
         .then(response => {
             setPatients(response.data);
             setUpdateRequired(false);
-            if (response.data.length === 0) setError('It seems that the database is empty : please generate some random patients or ask your IT support.');
+            if (response.data.numberOfElements === 0) {
+                setError('It seems that the database is empty : please generate some random patients or ask your IT support.');
+            }
         })
-        .catch( error => {
+        .catch(error => {
             if (error.response) {
                 setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
@@ -21,9 +23,21 @@ function getPatients(setPatients, setUpdateRequired, setError) {
 
 function PatientList({patients, setPatients, error, updateRequired, setUpdateRequired, setError, history}) {
 
+    const [pageNumber, setPage] = useState(0);
+
     useEffect(() => {
-        if (updateRequired) getPatients(setPatients, setUpdateRequired, setError);
+        if (updateRequired) getPatients(pageNumber, setPatients, setUpdateRequired, setError);
     });
+
+    function onclickBack() {
+        setPage(pageNumber-1);
+        setUpdateRequired(true);
+    }
+
+    function onclickNext() {
+        setPage(pageNumber+1);
+        setUpdateRequired(true);
+    }
 
     if (patients.length === 0) return null;
     return (
@@ -37,8 +51,8 @@ function PatientList({patients, setPatients, error, updateRequired, setUpdateReq
                 </tr>
                 </thead>
                 <tbody>
-                {patients.map(patient => (
-                    <tr key={patient.id} onClick={()=>history.push("/patients/"+patient.id)}>
+                {patients.content.map(patient => (
+                    <tr key={patient.id} onClick={() => history.push("/patients/" + patient.id)}>
                         <td>{patient.id}</td>
                         <td>{patient.family}</td>
                         <td>{patient.dob}</td>
@@ -46,13 +60,18 @@ function PatientList({patients, setPatients, error, updateRequired, setUpdateReq
                 ))}
                 </tbody>
             </table>
+            <nav className="nav-paging">
+                <button disabled={pageNumber===0} onClick={onclickBack}>Back</button>
+                Page {pageNumber+1} of {patients.totalPages}
+                <button disabled={pageNumber===patients.totalPages-1} onClick={onclickNext}>Next</button>
+            </nav>
         </nav>
     );
 }
 
 function PatientsError({error}) {
 
-    if (! error) return null;
+    if (!error) return null;
     return (
         <footer>
             {error}
@@ -67,14 +86,14 @@ function generateRandomPatients(event, inputField, randomVolume, setUpdateRequir
     }
     setError("Processing request...");
 
-    axios.post(patientsApiUrl+"/random/"+randomVolume)
+    axios.post(patientsApiUrl + "/random/" + randomVolume)
         .then(response => {
             setUpdateRequired(true);
             setError(response.data.length + " random patients have been generated successfully !");
         })
         .catch(error => {
             if (error.response) {
-                setError(error.response.status + " " + error.response.data+ " ! Please ask your IT support : it seems that the database is not ready !");
+                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
                 setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
@@ -85,7 +104,7 @@ function PatientsRandom({setUpdateRequired, setError}) {
     const [randomVolume, setRandomVolume] = useState(5);
     const [inputField, setInputField] = useState(null);
 
-    function onChange (field) {
+    function onChange(field) {
         setRandomVolume(field.target.value);
         setInputField(field.target);
     }
@@ -93,8 +112,10 @@ function PatientsRandom({setUpdateRequired, setError}) {
     return (
         <form>
             <div className="div-random">
-                <button onClick={(event) => generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError)}>Add</button>
-                <input className="input-narrow" value={randomVolume} onChange={onChange} />
+                <button
+                    onClick={(event) => generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError)}>Add
+                </button>
+                <input className="input-narrow" value={randomVolume} onChange={onChange}/>
                 <label>
                     random patient(s) to database
                 </label>
@@ -113,10 +134,10 @@ function Patients() {
         <div>
             <h1>Patient list</h1>
             <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
-                          setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
+                         setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
-            <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError} />
-            <PatientsError error={error} />
+            <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError}/>
+            <PatientsError error={error}/>
         </div>
     );
 }
