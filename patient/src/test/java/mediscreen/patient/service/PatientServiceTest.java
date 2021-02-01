@@ -8,7 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +45,16 @@ public class PatientServiceTest {
         Optional<PatientEntity> optional = exists ? Optional.of(patient) : Optional.empty();
         when(repository.findById(id)).thenReturn(optional);
         return patient;
+    }
+
+    private PageImpl<PatientEntity> mockEntityFindAll(int pageNumber)  {
+        PatientEntity patient1 = PatientEntity.random();
+        PatientEntity patient2 = PatientEntity.random();
+        PageImpl<PatientEntity> page = new PageImpl<>(Arrays.asList(patient1, patient2));
+        List<PatientEntity> list = new ArrayList(Arrays.asList(patient1, patient2));
+        when(repository.findAll(any(PageRequest.class))).thenReturn(page);
+        when(repository.findAll()).thenReturn(list);
+        return page;
     }
 
     private PatientEntity mockEntitySave(Long patientId)  {
@@ -151,5 +166,26 @@ public class PatientServiceTest {
         List<PatientDTO> result = service.post(expectedNumberOfPatients);
         // THEN
         assertEquals(expectedNumberOfPatients, result.size());
+    }
+    @Test
+    public void givenList_whenGetList_thenReturnsCorrectList() {
+        // GIVEN
+        Page<PatientEntity> givenPage = mockEntityFindAll(0);
+        // WHEN
+        List<PatientDTO> result = service.getList();
+        // THEN
+        assertEquals(givenPage.toList().size(), result.size());
+    }
+
+    @Test
+    public void givenPage_whenGetPageSortById_thenReturnsCorrectPage() {
+        // GIVEN
+        int pageNumber = 2;
+        Page<PatientEntity> givenPage = mockEntityFindAll(pageNumber);
+        // WHEN
+        Page<PatientDTO> result = service.getPageSortById(pageNumber);
+        // THEN
+        assertEquals(givenPage.getNumber(), result.getNumber());
+        assertEquals(givenPage.toList().size(), result.toList().size());
     }
 }
