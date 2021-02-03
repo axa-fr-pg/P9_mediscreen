@@ -60,10 +60,10 @@ function PatientList({patients, setPatients, error, updateRequired, setUpdateReq
                 ))}
                 </tbody>
             </table>
-            <nav className="nav-paging">
+            <nav className="nav-paging-patients">
                 <button disabled={pageNumber===0} onClick={onclickBack}>Back</button>
                 Page {pageNumber+1} of {patients.totalPages}
-                <button disabled={pageNumber===patients.totalPages-1} onClick={onclickNext}>Next</button>
+                <button disabled={pageNumber>=patients.totalPages-1} onClick={onclickNext}>Next</button>
             </nav>
         </nav>
     );

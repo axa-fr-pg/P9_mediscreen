@@ -6,6 +6,8 @@ import mediscreen.doctor.service.CreateExistingNoteException;
 import mediscreen.doctor.service.NoteNotFoundException;
 import mediscreen.doctor.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -29,8 +32,8 @@ public class NoteController {
     NoteService service;
 
     @GetMapping("")
-    public ResponseEntity<List<PatientNotesDTO>> getListGroupedByPatientId() {
-        return new ResponseEntity<>(service.getAllGroupedByPatientId(), HttpStatus.OK);
+    public ResponseEntity<Page<PatientNotesDTO>> getPageGroupedByPatientId(Pageable pageRequest) {
+        return new ResponseEntity<>(service.getPageSortByPatientId(pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/patients/{patId}")

@@ -80,10 +80,12 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
     );
 }
 
-function getNotes(patientIdGiven, setNotes, setUpdateRequired, setError) {
+function getNotes(pageNumber, patientIdGiven, setNotes, setUpdateRequired, setError) {
     let url = notesApiUrl;
     if (patientIdGiven >= 0) {
         url = url + "/patients/" + patientIdGiven;
+    } else {
+        url = url + "?page=" + pageNumber;
     }
     axios.get(url)
         .then(response => {
@@ -138,21 +140,36 @@ function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired
 
 function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
 
+    const [pageNumber, setPage] = useState(0);
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
 
     useEffect(() => {
         if (updateRequired) {
-            getNotes(patientIdGiven, setNotes, setUpdateRequired, setError);
+            getNotes(pageNumber, patientIdGiven, setNotes, setUpdateRequired, setError);
         }
     });
 
     if (notes.length === 0) return null;
 
-    let notesTree = notes;
-    let activeBranches = expanded;
-    if (notes.patId >= 0) {
+    let notesTree, activeBranches, pagingStyle;
+    if (!!notes.content) {
+        notesTree = notes.content;
+        activeBranches = expanded;
+        pagingStyle = {};
+    } else {
+        notesTree =  [notes];
         activeBranches = [notes.patId.toString()];
-        notesTree = [notes];
+        pagingStyle = {display:'none'};
+    }
+
+    function onclickBack() {
+        setPage(pageNumber-1);
+        setUpdateRequired(true);
+    }
+
+    function onclickNext() {
+        setPage(pageNumber+1);
+        setUpdateRequired(true);
     }
 
     return (
@@ -164,6 +181,11 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
                                   expanded={expanded} setExpanded={setExpanded} setUpdateRequired={setUpdateRequired}/>
                 ))}
             </TreeView>
+            <div style={pagingStyle} className="div-paging-notes">
+                <button disabled={pageNumber===0} onClick={onclickBack}>Back</button>
+                Page {pageNumber+1} of {notes.totalPages}
+                <button disabled={pageNumber>=notes.totalPages-1} onClick={onclickNext}>Next</button>
+            </div>
         </nav>
     );
 }

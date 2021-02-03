@@ -10,8 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +40,7 @@ public class NoteServiceTest {
     @Autowired
     NoteService service;
 
-    private NoteEntity mockEntityFind(boolean exists)  {
+    private NoteEntity mockEntityFind(boolean exists) {
         NoteEntity note = NoteEntity.random();
         Optional<NoteEntity> optional = exists ? Optional.of(note) : Optional.empty();
         when(repository.findById(note.noteId)).thenReturn(optional);
@@ -49,32 +54,51 @@ public class NoteServiceTest {
         return noteEntityList;
     }
 
-    private List<PatientNotesDTO> mockEntityFindAllGroupedByPatientId() {
-        List<PatientNotesDTO> result = new ArrayList<>();
-        List<NoteEntity> allNotes = new ArrayList<>();
-        long patientId = nextInt(100, 200);
-        for (int branch=0; branch< nextInt(3, 15) ; branch++) {
-            List<NoteDTO> branchNotes = new ArrayList<>();
-            patientId += nextInt(1, 20);
-            for (int index=0; index < (branch + nextInt(2, 10)); index++) {
-                NoteEntity noteEntity = NoteEntity.random(patientId);
-                NoteDTO noteDTO = new NoteDTO(noteEntity);
-                allNotes.add(noteEntity);
-                branchNotes.add(noteDTO);
-            }
-            result.add(new PatientNotesDTO(patientId, branchNotes));
-        }
-        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc()).thenReturn(allNotes);
-        return result;
+    private List<NoteEntity> generateRandomNotesForOnePatient(long patientId) {
+        return Stream.generate(() -> NoteEntity.random(patientId))
+                .limit(nextInt(2, 5))
+                .collect(Collectors.toList());
     }
 
-    private NoteEntity mockEntityCreate()  {
+    private List<NoteEntity> generateRandomNotesForSeveralPatients(int numberOfPatients) {
+        List<NoteEntity> allNotes = new ArrayList<>();
+        for (int patient=0; patient<numberOfPatients; patient++) {
+            allNotes.addAll(generateRandomNotesForOnePatient(nextInt(100,200)));
+        }
+        return allNotes;
+    }
+
+    private List<PatientNotesDTO> mockEntityFindAllGroupedByPatientId() {
+        List<NoteEntity> patientNotes1 = generateRandomNotesForOnePatient(1);
+        List<NoteEntity> patientNotes2 = generateRandomNotesForOnePatient(2);
+        List<NoteEntity> patientNotes3 = generateRandomNotesForOnePatient(3);
+        List<NoteEntity> allNotes = new ArrayList<>();
+        allNotes.addAll(patientNotes1);
+        allNotes.addAll(patientNotes2);
+        allNotes.addAll(patientNotes3);
+        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc()).thenReturn(allNotes);
+        return Arrays.asList(
+                new PatientNotesDTO(1L, patientNotes1.stream().map(NoteDTO::new).collect(Collectors.toList())),
+                new PatientNotesDTO(2L, patientNotes2.stream().map(NoteDTO::new).collect(Collectors.toList())),
+                new PatientNotesDTO(3L, patientNotes3.stream().map(NoteDTO::new).collect(Collectors.toList()))
+        );
+    }
+
+    private Page<NoteEntity> mockEntityFindAllByNoteIdNotNullOrderByPatIdAsc(int pageNumber, int numberOfPatients) {
+        List<NoteEntity> noteEntityList = generateRandomNotesForSeveralPatients(numberOfPatients);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageNumber+100, Sort.by("patId").ascending());
+        Page<NoteEntity> page = new PageImpl<>(noteEntityList, pageRequest, noteEntityList.size());
+        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc(any(PageRequest.class))).thenReturn(page);
+        return page;
+    }
+
+    private NoteEntity mockEntityCreate() {
         NoteEntity note = NoteEntity.random();
         when(repository.save(any(NoteEntity.class))).thenReturn(note);
         return note;
     }
 
-    private NoteEntity mockEntitySave(String noteId)  {
+    private NoteEntity mockEntitySave(String noteId) {
         NoteEntity note = NoteEntity.random();
         note.noteId = noteId;
         when(repository.save(any(NoteEntity.class))).thenReturn(note);
@@ -129,11 +153,11 @@ public class NoteServiceTest {
         // THEN
         assertEquals(patientNotesDTOList.size(), result.size());
         patientNotesDTOList.forEach(patientNotesDTO -> {
-                assertTrue(sortingPatId <= patientNotesDTO.patId);
-                PatientNotesDTO match = IterableUtils.find(result, current -> current.patId == patientNotesDTO.patId);
-                assertNotNull(match);
-                assertEquals(patientNotesDTO.noteDTOList.size(), match.noteDTOList.size());
-            }
+                    assertTrue(sortingPatId <= patientNotesDTO.patId);
+                    PatientNotesDTO match = IterableUtils.find(result, current -> current.patId.equals(patientNotesDTO.patId));
+                    assertNotNull(match);
+                    assertEquals(patientNotesDTO.noteDTOList.size(), match.noteDTOList.size());
+                }
         );
     }
 
@@ -192,5 +216,19 @@ public class NoteServiceTest {
         // WHEN
         // THEN
         assertThrows(NoteNotFoundException.class, () -> service.put(new NoteDTO(note)));
+    }
+
+    @Test
+    public void givenPage_whenGetPageSortByPatientId_thenReturnsCorrectPage() {
+        // GIVEN
+        final int pageNumber = 12;
+        final int numberOfPatients = 4;
+        mockEntityFindAllByNoteIdNotNullOrderByPatIdAsc(pageNumber, numberOfPatients);
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageNumber+100, Sort.by("patId").ascending());
+        // WHEN
+        Page<PatientNotesDTO> result = service.getPageSortByPatientId(pageRequest);
+        // THEN
+        assertEquals(pageNumber, result.getNumber());
+        assertEquals(numberOfPatients, result.toList().size());
     }
 }

@@ -94,7 +94,16 @@ footer {
     background-color: lightgrey;
 }
 
-.nav-paging {
+.nav-paging-patients {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 280px;
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+.div-paging-notes {
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -32,6 +32,8 @@ public class PatientController {
         return new ResponseEntity<>(service.getList(), HttpStatus.OK);
     }
 
+//    REQUEST PARAM ?page=xx&size=yy
+
     @GetMapping("/pages/{pageNumber}")
     public ResponseEntity<Page<PatientDTO>> getPage(@PathVariable int pageNumber) {
         return new ResponseEntity<>(service.getPageSortById(pageNumber), HttpStatus.OK);
