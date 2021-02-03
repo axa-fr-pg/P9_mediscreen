@@ -3,9 +3,11 @@ import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
 import TablePagination from "@material-ui/core/TablePagination";
+import TableSortLabel from '@material-ui/core/TableSortLabel';
 
-function getPatients(pageNumber, rowsPerPage, setPatients, setUpdateRequired, setError) {
-    axios.get(patientsApiUrl + "?page=" + pageNumber + "&size=" + rowsPerPage)
+function getPatients(pageNumber, rowsPerPage, orderField, orderDirection, setPatients, setUpdateRequired, setError) {
+    axios.get(patientsApiUrl + "?page=" + pageNumber + "&size=" + rowsPerPage
+        + "&sort=" + orderField + "," + orderDirection)
         .then(response => {
             setPatients(response.data);
             setUpdateRequired(false);
@@ -26,9 +28,12 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
 
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [orderField, setOrderField] = React.useState('id');
+    const [orderDirection, setOrderDirection] = React.useState('asc');
 
     useEffect(() => {
-        if (updateRequired) getPatients(pageNumber, rowsPerPage, setPatients, setUpdateRequired, setError);
+        if (updateRequired) getPatients(pageNumber, rowsPerPage, orderField,
+            orderDirection, setPatients, setUpdateRequired, setError);
     });
 
     function onChangePageNumber(event, pageIndex) {
@@ -36,9 +41,30 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setUpdateRequired(true);
     }
 
+    const handleSortById = (event) => {
+        const isAsc = orderField === 'id' && orderDirection === 'asc';
+        setOrderDirection(isAsc ? 'desc' : 'asc');
+        setOrderField('id');
+        setUpdateRequired(true);
+    };
+
+    const handleSortByFamily = (event) => {
+        const isAsc = orderField === 'family' && orderDirection === 'asc';
+        setOrderDirection(isAsc ? 'desc' : 'asc');
+        setOrderField('family');
+        setUpdateRequired(true);
+    };
+
+    const handleSortByDob = (event) => {
+        const isAsc = orderField === 'dob' && orderDirection === 'asc';
+        setOrderDirection(isAsc ? 'desc' : 'asc');
+        setOrderField('dob');
+        setUpdateRequired(true);
+    };
+
     function onChangeRowsPerPage(event) {
         const pageSize = event.target.value;
-        setPageNumber(Math.floor(rowsPerPage*pageNumber/pageSize));
+        setPageNumber(Math.floor(rowsPerPage * pageNumber / pageSize));
         setRowsPerPage(pageSize);
         setUpdateRequired(true);
     }
@@ -50,9 +76,30 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
             <table>
                 <thead>
                 <tr>
-                    <th>Patient id</th>
-                    <th>Family name</th>
-                    <th>Date of birth</th>
+                    <th>
+                        <TableSortLabel
+                            active={orderField === 'id'}
+                            direction={orderDirection}
+                            onClick={handleSortById}>
+                            Patient id
+                        </TableSortLabel>
+                    </th>
+                    <th>
+                        <TableSortLabel
+                            active={orderField === 'family'}
+                            direction={orderDirection}
+                            onClick={handleSortByFamily}>
+                            Family name
+                        </TableSortLabel>
+                    </th>
+                    <th>
+                        <TableSortLabel
+                            active={orderField === 'dob'}
+                            direction={orderDirection}
+                            onClick={handleSortByDob}>
+                            Date of birth
+                        </TableSortLabel>
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -64,7 +111,7 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                     </tr>
                 ))}
                 </tbody>
-                <tfoot className="table-footer-patients">
+                <tfoot>
                 <tr>
                     <TablePagination
                         page={pageNumber}
