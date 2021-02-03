@@ -47,7 +47,7 @@ public class PatientServiceTest {
         return patient;
     }
 
-    private PageImpl<PatientEntity> mockEntityFindAll(int pageNumber)  {
+    private PageImpl<PatientEntity> mockEntityFindAll()  {
         PatientEntity patient1 = PatientEntity.random();
         PatientEntity patient2 = PatientEntity.random();
         PageImpl<PatientEntity> page = new PageImpl<>(Arrays.asList(patient1, patient2));
@@ -170,7 +170,7 @@ public class PatientServiceTest {
     @Test
     public void givenList_whenGetList_thenReturnsCorrectList() {
         // GIVEN
-        Page<PatientEntity> givenPage = mockEntityFindAll(0);
+        Page<PatientEntity> givenPage = mockEntityFindAll();
         // WHEN
         List<PatientDTO> result = service.getList();
         // THEN
@@ -181,9 +181,9 @@ public class PatientServiceTest {
     public void givenPage_whenGetPageSortById_thenReturnsCorrectPage() {
         // GIVEN
         int pageNumber = 2;
-        Page<PatientEntity> givenPage = mockEntityFindAll(pageNumber);
+        Page<PatientEntity> givenPage = mockEntityFindAll();
         // WHEN
-        Page<PatientDTO> result = service.getPageSortById(pageNumber);
+        Page<PatientDTO> result = service.getPage(PageRequest.of(0,100));
         // THEN
         assertEquals(givenPage.getNumber(), result.getNumber());
         assertEquals(givenPage.toList().size(), result.toList().size());

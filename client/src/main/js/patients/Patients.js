@@ -2,9 +2,10 @@ import React, {useState, useEffect} from 'react';
 import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
+import TablePagination from "@material-ui/core/TablePagination";
 
-function getPatients(pageNumber, setPatients, setUpdateRequired, setError) {
-    axios.get(patientsApiUrl + "/pages/" + pageNumber)
+function getPatients(pageNumber, rowsPerPage, setPatients, setUpdateRequired, setError) {
+    axios.get(patientsApiUrl + "?page=" + pageNumber + "&size=" + rowsPerPage)
         .then(response => {
             setPatients(response.data);
             setUpdateRequired(false);
@@ -21,25 +22,29 @@ function getPatients(pageNumber, setPatients, setUpdateRequired, setError) {
         });
 }
 
-function PatientList({patients, setPatients, error, updateRequired, setUpdateRequired, setError, history}) {
+function PatientList({patients, setPatients, updateRequired, setUpdateRequired, setError, history}) {
 
-    const [pageNumber, setPage] = useState(0);
+    const [pageNumber, setPageNumber] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     useEffect(() => {
-        if (updateRequired) getPatients(pageNumber, setPatients, setUpdateRequired, setError);
+        if (updateRequired) getPatients(pageNumber, rowsPerPage, setPatients, setUpdateRequired, setError);
     });
 
-    function onclickBack() {
-        setPage(pageNumber-1);
+    function onChangePageNumber(event, pageIndex) {
+        setPageNumber(pageIndex);
         setUpdateRequired(true);
     }
 
-    function onclickNext() {
-        setPage(pageNumber+1);
+    function onChangeRowsPerPage(event) {
+        const pageSize = event.target.value;
+        setPageNumber(Math.floor(rowsPerPage*pageNumber/pageSize));
+        setRowsPerPage(pageSize);
         setUpdateRequired(true);
     }
 
     if (patients.length === 0) return null;
+
     return (
         <nav>
             <table>
@@ -59,12 +64,19 @@ function PatientList({patients, setPatients, error, updateRequired, setUpdateReq
                     </tr>
                 ))}
                 </tbody>
+                <tfoot className="table-footer-patients">
+                <tr>
+                    <TablePagination
+                        page={pageNumber}
+                        rowsPerPage={patients.pageable.pageSize}
+                        count={patients.totalElements}
+                        onChangePage={onChangePageNumber}
+                        onChangeRowsPerPage={onChangeRowsPerPage}
+                        labelRowsPerPage="Patients per page"
+                    />
+                </tr>
+                </tfoot>
             </table>
-            <nav className="nav-paging-patients">
-                <button disabled={pageNumber===0} onClick={onclickBack}>Back</button>
-                Page {pageNumber+1} of {patients.totalPages}
-                <button disabled={pageNumber>=patients.totalPages-1} onClick={onclickNext}>Next</button>
-            </nav>
         </nav>
     );
 }

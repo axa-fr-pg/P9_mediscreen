@@ -6,6 +6,7 @@ import mediscreen.patient.service.PatientNotFoundException;
 import mediscreen.patient.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,15 +29,8 @@ public class PatientController {
     PatientService service;
 
     @GetMapping("")
-    public ResponseEntity<List<PatientDTO>> getList() {
-        return new ResponseEntity<>(service.getList(), HttpStatus.OK);
-    }
-
-//    REQUEST PARAM ?page=xx&size=yy
-
-    @GetMapping("/pages/{pageNumber}")
-    public ResponseEntity<Page<PatientDTO>> getPage(@PathVariable int pageNumber) {
-        return new ResponseEntity<>(service.getPageSortById(pageNumber), HttpStatus.OK);
+    public ResponseEntity<Page<PatientDTO>> getPage(Pageable pageRequest) {
+        return new ResponseEntity<>(service.getPage(pageRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{patientId}")

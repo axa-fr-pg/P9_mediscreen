@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -20,19 +21,14 @@ public class PatientServiceImpl implements PatientService {
     @Autowired
     PatientRepository patientRepository;
 
-    @Value("${patient.page.size}")
-    private int patientPageSize;
-
     @Override
     public List<PatientDTO> getList() {
         return patientRepository.findAll().stream().map(PatientDTO::new).collect(Collectors.toList());
     }
 
     @Override
-    public Page<PatientDTO> getPageSortById(int pageNumber) {
-        return patientRepository
-                .findAll(PageRequest.of(pageNumber, patientPageSize, Sort.by("id").ascending()))
-                .map(PatientDTO::new);
+    public Page<PatientDTO> getPage(Pageable pageRequest) {
+        return patientRepository.findAll(pageRequest).map(PatientDTO::new);
     }
 
     @Override
