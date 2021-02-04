@@ -4,11 +4,9 @@ import mediscreen.patient.model.PatientDTO;
 import mediscreen.patient.model.PatientEntity;
 import mediscreen.patient.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,8 +25,12 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Page<PatientDTO> getPage(Pageable pageRequest) {
-        return patientRepository.findAll(pageRequest).map(PatientDTO::new);
+    public Page<PatientDTO> getPage(Pageable pageRequest, String patientId, String family, String dob) {
+        Specification<PatientEntity> specification = Specification
+                .where(new PatientWithIdEqual(patientId))
+                .and(new PatientWithFamilyLike(family))
+                .and(new PatientWithDobEqual(dob));
+        return patientRepository.findAll(specification, pageRequest).map(PatientDTO::new);
     }
 
     @Override

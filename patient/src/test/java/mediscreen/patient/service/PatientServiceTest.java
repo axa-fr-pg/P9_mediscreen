@@ -183,7 +183,7 @@ public class PatientServiceTest {
         int pageNumber = 2;
         Page<PatientEntity> givenPage = mockEntityFindAll();
         // WHEN
-        Page<PatientDTO> result = service.getPage(PageRequest.of(0,100));
+        Page<PatientDTO> result = service.getPage(PageRequest.of(0,100), null, null, null);
         // THEN
         assertEquals(givenPage.getNumber(), result.getNumber());
         assertEquals(givenPage.toList().size(), result.toList().size());

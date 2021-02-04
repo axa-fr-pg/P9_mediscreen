@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface PatientService {
     List<PatientDTO> getList();
-    Page<PatientDTO> getPage(Pageable pageRequest);
+    Page<PatientDTO> getPage(Pageable pageRequest, String patientId, String family, String dob);
     PatientDTO get(long patientId) throws PatientNotFoundException;
     PatientDTO put(PatientDTO patient) throws PatientNotFoundException;
     PatientDTO post(PatientDTO patient) throws CreateExistingPatientException;

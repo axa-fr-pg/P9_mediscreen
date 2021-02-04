@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -29,8 +30,11 @@ public class PatientController {
     PatientService service;
 
     @GetMapping("")
-    public ResponseEntity<Page<PatientDTO>> getPage(Pageable pageRequest) {
-        return new ResponseEntity<>(service.getPage(pageRequest), HttpStatus.OK);
+    public ResponseEntity<Page<PatientDTO>> getPage(Pageable pageRequest,
+                                                    @RequestParam(required = false) String id,
+                                                    @RequestParam(required = false) String family,
+                                                    @RequestParam(required = false) String dob) {
+        return new ResponseEntity<>(service.getPage(pageRequest, id, family, dob), HttpStatus.OK);
     }
 
     @GetMapping("/{patientId}")

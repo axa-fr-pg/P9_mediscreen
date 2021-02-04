@@ -5,14 +5,29 @@ import {useHistory} from "react-router";
 import TablePagination from "@material-ui/core/TablePagination";
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 
-function getPatients(pageNumber, rowsPerPage, orderField, orderDirection, setPatients, setUpdateRequired, setError) {
-    axios.get(patientsApiUrl + "?page=" + pageNumber + "&size=" + rowsPerPage
-        + "&sort=" + orderField + "," + orderDirection)
+function getPatients(inputData) {
+    const {
+        pageNumber, rowsPerPage, orderField, orderDirection,
+        filterId, filterFamily, filterDob,
+        setPatients, setUpdateRequired, setError
+    } = inputData;
+    let url = patientsApiUrl
+        + "?page=" + pageNumber + "&size=" + rowsPerPage
+        + "&sort=" + orderField + "," + orderDirection;
+    if (filterId !== '') {
+        url = url + "&id=" + filterId;
+    }
+    if (filterFamily !== '') {
+        url = url + "&family=" + filterFamily;
+    }
+    if (filterDob !== '') {
+        url = url + "&dob=" + filterDob;
+    }
+    axios.get(url)
         .then(response => {
             setPatients(response.data);
-            setUpdateRequired(false);
             if (response.data.numberOfElements === 0) {
-                setError('It seems that the database is empty : please add some patients or ask your IT support.');
+                setError('Your selection criteria match no patient (or the database is empty).');
             }
         })
         .catch(error => {
@@ -22,6 +37,7 @@ function getPatients(pageNumber, rowsPerPage, orderField, orderDirection, setPat
                 setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
+    setUpdateRequired(false);
 }
 
 function PatientList({patients, setPatients, updateRequired, setUpdateRequired, setError, history}) {
@@ -30,11 +46,22 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [orderField, setOrderField] = React.useState('id');
     const [orderDirection, setOrderDirection] = React.useState('asc');
+    const [filterId, setFilterId] = React.useState('');
+    const [filterFamily, setFilterFamily] = React.useState('');
+    const [filterDob, setFilterDob] = React.useState('');
 
     useEffect(() => {
-        if (updateRequired) getPatients(pageNumber, rowsPerPage, orderField,
-            orderDirection, setPatients, setUpdateRequired, setError);
+        if (updateRequired) {
+            const inputData = {
+                pageNumber, rowsPerPage, orderField, orderDirection,
+                filterId, filterFamily, filterDob,
+                setPatients, setUpdateRequired, setError
+            };
+            getPatients(inputData);
+        }
     });
+
+    if (patients.length === 0) return null;
 
     function onChangePageNumber(event, pageIndex) {
         setPageNumber(pageIndex);
@@ -69,7 +96,25 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setUpdateRequired(true);
     }
 
-    if (patients.length === 0) return null;
+    function submitFilterId(event) {
+        event.preventDefault();
+        const inputField = document.getElementById('input-filter-id');
+        const expectedId = inputField.value;
+        setFilterId(expectedId);
+        setUpdateRequired(true);
+    }
+
+    function submitFilterFamily(event) {
+        event.preventDefault();
+        setFilterFamily(document.getElementById('input-filter-family').value);
+        setUpdateRequired(true);
+    }
+
+    function submitFilterDob(event) {
+        event.preventDefault();
+        setFilterDob(document.getElementById('input-filter-dob').value);
+        setUpdateRequired(true);
+    }
 
     return (
         <nav>
@@ -99,6 +144,29 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                             onClick={handleSortByDob}>
                             Date of birth
                         </TableSortLabel>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <form className="form-filter" onSubmit={submitFilterId}>
+                            <label>&nbsp;∇&nbsp;&nbsp;</label>
+                            <input className="filter-input" id="input-filter-id" type="text"
+                                   onBlur={submitFilterId}/>
+                        </form>
+                    </th>
+                    <th>
+                        <form className="form-filter" onSubmit={submitFilterFamily}>
+                            <label>&nbsp;∇&nbsp;&nbsp;</label>
+                            <input className="filter-input" id="input-filter-family" type="text"
+                                   onBlur={submitFilterFamily}/>
+                        </form>
+                    </th>
+                    <th>
+                        <form className="form-filter" onSubmit={submitFilterDob}>
+                            <label>&nbsp;∇&nbsp;&nbsp;</label>
+                            <input className="filter-input" id="input-filter-dob" type="text"
+                                   onBlur={submitFilterDob}/>
+                        </form>
                     </th>
                 </tr>
                 </thead>
@@ -138,11 +206,11 @@ function PatientsError({error}) {
     );
 }
 
-function generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError) {
+function generateRandomPatients(event, setUpdateRequired, setError) {
     event.preventDefault();
-    if (!!inputField) {
-        inputField.blur();
-    }
+    const inputField = document.getElementById('input-expected-number-of-patients');
+    inputField.blur();
+    const randomVolume = inputField.value;
     setError("Processing request...");
 
     axios.post(patientsApiUrl + "/random/" + randomVolume)
@@ -160,21 +228,13 @@ function generateRandomPatients(event, inputField, randomVolume, setUpdateRequir
 }
 
 function PatientsRandom({setUpdateRequired, setError}) {
-    const [randomVolume, setRandomVolume] = useState(5);
-    const [inputField, setInputField] = useState(null);
-
-    function onChange(field) {
-        setRandomVolume(field.target.value);
-        setInputField(field.target);
-    }
-
     return (
         <form>
             <div className="div-random">
                 <button
-                    onClick={(event) => generateRandomPatients(event, inputField, randomVolume, setUpdateRequired, setError)}>Add
+                    onClick={(event) => generateRandomPatients(event, setUpdateRequired, setError)}>Add
                 </button>
-                <input className="input-narrow" value={randomVolume} onChange={onChange}/>
+                <input id="input-expected-number-of-patients" className="input-narrow" defaultValue={5}/>
                 <label>
                     random patient(s) to database
                 </label>

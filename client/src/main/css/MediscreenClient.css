@@ -22,12 +22,24 @@ tr:hover {
     background-color: lightgrey;
 }
 
-a {
-    margin-right: 20px;
+.form-filter {
+    display: flex;
 }
 
-input {
-    width: 500px;
+.filter-input {
+    background-color: lightgrey;
+}
+
+#input-filter-id {
+    width: 50px;
+}
+
+#input-filter-dob {
+    width: 70px;
+}
+
+a {
+    margin-right: 20px;
 }
 
 footer {
