@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +53,7 @@ public class PatientServiceTest {
         PatientEntity patient2 = PatientEntity.random();
         PageImpl<PatientEntity> page = new PageImpl<>(Arrays.asList(patient1, patient2));
         List<PatientEntity> list = new ArrayList(Arrays.asList(patient1, patient2));
-        when(repository.findAll(any(PageRequest.class))).thenReturn(page);
+        when(repository.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
         when(repository.findAll()).thenReturn(list);
         return page;
     }
