@@ -101,18 +101,21 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         const inputField = document.getElementById('input-filter-id');
         const expectedId = inputField.value;
         setFilterId(expectedId);
+        setPageNumber(0);
         setUpdateRequired(true);
     }
 
     function submitFilterFamily(event) {
         event.preventDefault();
         setFilterFamily(document.getElementById('input-filter-family').value);
+        setPageNumber(0);
         setUpdateRequired(true);
     }
 
     function submitFilterDob(event) {
         event.preventDefault();
         setFilterDob(document.getElementById('input-filter-dob').value);
+        setPageNumber(0);
         setUpdateRequired(true);
     }
 
