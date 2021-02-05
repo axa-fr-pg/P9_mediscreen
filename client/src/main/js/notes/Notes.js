@@ -6,6 +6,11 @@ import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import {Paging} from '@axa-fr/react-toolkit-table';
+import '@axa-fr/react-toolkit-form-input-select/dist/select.scss';
+import '@axa-fr/react-toolkit-table/dist/Pager/pager.scss';
+import '@axa-fr/react-toolkit-table/dist/Paging/paging.scss';
+import TablePagination from "@material-ui/core/TablePagination";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
 
@@ -80,12 +85,13 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
     );
 }
 
-function getNotes(pageNumber, filter, patientIdGiven, setNotes, setUpdateRequired, setError) {
+function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setUpdateRequired, setError) {
     let url = notesApiUrl;
     if (patientIdGiven >= 0) {
         url = url + "/patients/" + patientIdGiven;
     } else {
         url = url + "?page=" + pageNumber;
+        url = url + "&size=" + rowsPerPage;
         url = url + "&e=" + filter;
     }
     axios.get(url)
@@ -142,12 +148,13 @@ function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired
 function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filter, setFilter] = useState('');
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
 
     useEffect(() => {
         if (updateRequired) {
-            getNotes(pageNumber, filter, patientIdGiven, setNotes, setUpdateRequired, setError);
+            getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setUpdateRequired, setError);
         }
     });
 
@@ -159,18 +166,18 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
         activeBranches = expanded;
         pagingStyle = {};
     } else {
-        notesTree =  [notes];
+        notesTree = [notes];
         activeBranches = [notes.patId.toString()];
-        pagingStyle = {display:'none'};
+        pagingStyle = {display: 'none'};
     }
 
     function onclickBack() {
-        setPageNumber(pageNumber-1);
+        setPageNumber(pageNumber - 1);
         setUpdateRequired(true);
     }
 
     function onclickNext() {
-        setPageNumber(pageNumber+1);
+        setPageNumber(pageNumber + 1);
         setUpdateRequired(true);
     }
 
@@ -181,8 +188,31 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
         setUpdateRequired(true);
     }
 
+    function onChange(event) {
+        const {numberItems, pageIndex} = event;
+        setPageNumber(pageIndex);
+        setRowsPerPage(numberItems);
+        setUpdateRequired(true);
+        console.log("onChange ", event)
+    }
+
+
+    function onChangePageNumber(event, pageIndex) {
+        setPageNumber(pageIndex);
+        setUpdateRequired(true);
+        console.log("onChangePageNumber")
+    }
+
+    function onChangeRowsPerPage(event) {
+        const pageSize = event.target.value;
+        setPageNumber(Math.floor(rowsPerPage * pageNumber / pageSize));
+        setRowsPerPage(pageSize);
+        setUpdateRequired(true);
+        console.log("onChangeRowsPerPage")
+    }
+
     return (
-        <nav>
+        <div>
             <form className="form-filter" onSubmit={submitFilter}>
                 <label>Expected note content :&nbsp;</label>
                 <input className="filter-input" id="input-filter" type="text"
@@ -192,16 +222,42 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
             <TreeView className="tree-view" expanded={activeBranches}
                       defaultCollapseIcon={<ExpandMoreIcon/>} defaultExpandIcon={<ChevronRightIcon/>}>
                 {notesTree.map(branch => (
-                    <PatientNotes key={branch.patId} branch={branch} history={history} setPatientIdGiven={setPatientIdGiven}
+                    <PatientNotes key={branch.patId} branch={branch} history={history}
+                                  setPatientIdGiven={setPatientIdGiven}
                                   expanded={expanded} setExpanded={setExpanded} setUpdateRequired={setUpdateRequired}/>
                 ))}
             </TreeView>
+            <p/>
+            <Paging
+                currentPage={pageNumber}
+                numberPages={notes.totalPages}
+                numberItems={notes.totalElements}
+                displayLabel=""
+                elementsLabel="notes per page"
+                previousLabel="« Previous"
+                nextLabel="Next »"
+                onChange={onChange}
+            />
             <div style={pagingStyle} className="div-paging-notes">
-                <button disabled={pageNumber===0} onClick={onclickBack}>Back</button>
-                Page {pageNumber+1} of {notes.totalPages}
-                <button disabled={pageNumber>=notes.totalPages-1} onClick={onclickNext}>Next</button>
+                <button disabled={pageNumber === 0} onClick={onclickBack}>Back</button>
+                Page {pageNumber + 1} of {notes.totalPages}
+                <button disabled={pageNumber >= notes.totalPages - 1} onClick={onclickNext}>Next</button>
             </div>
-        </nav>
+            <table>
+                <tfoot>
+                <tr>
+                    <TablePagination
+                        page={pageNumber}
+                        rowsPerPage={notes.pageable.pageSize}
+                        count={notes.totalElements}
+                        onChangePage={onChangePageNumber}
+                        onChangeRowsPerPage={onChangeRowsPerPage}
+                        labelRowsPerPage="Notes per page"
+                    />
+                </tr>
+                </tfoot>
+            </table>
+        </div>
     );
 }
 
