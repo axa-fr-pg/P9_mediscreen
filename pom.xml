@@ -100,6 +100,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
+                    <argLine>${surefire.jacoco.args}</argLine>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*IT.java</include>

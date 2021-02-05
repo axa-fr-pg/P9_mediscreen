@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -30,7 +33,9 @@ import static mediscreen.doctor.controller.ExceptionManager.EXCEPTION_MANAGER_NO
 import static mediscreen.doctor.model.NoteDTO.NOTE_NOT_BLANK_ERROR;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -63,7 +68,7 @@ public class NoteControllerIT {
         when(repository.findAllByPatId(patientId)).thenReturn(noteEntityList);
     }
 
-    private List<PatientNotesDTO> mockEntityFindAllGroupedByPatientId() {
+    private List<PatientNotesDTO> mockEntityFindAllWithPaging() {
         List<PatientNotesDTO> result = new ArrayList<>();
         List<NoteEntity> allNotes = new ArrayList<>();
         long patientId = nextInt(100, 200);
@@ -78,7 +83,8 @@ public class NoteControllerIT {
             }
             result.add(new PatientNotesDTO(patientId, branchNotes));
         }
-        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc()).thenReturn(allNotes);
+        Page<NoteEntity> page = new PageImpl<>(allNotes);
+        when(repository.findByELikeOrderByPatIdAsc(any(PageRequest.class), anyString())).thenReturn(page);
         return result;
     }
 
@@ -168,13 +174,18 @@ public class NoteControllerIT {
     @Test
     public void givenNoPatientId_whenGetListGroupedByPatientId_thenReturnsCorrectNoteTree() throws Exception {
         // GIVEN
-        List<PatientNotesDTO> patientNotesDTOList = mockEntityFindAllGroupedByPatientId();
+        List<PatientNotesDTO> patientNotesDTOList = mockEntityFindAllWithPaging();
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(get( ENTITY_URL)).andReturn().getResponse();
-        List<PatientNotesDTO> result = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<PatientNotesDTO>>() {});
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        assertEquals(patientNotesDTOList.size(), result.size());
+        String result = response.getContentAsString();
+        patientNotesDTOList.forEach( patientNotesDTO -> {
+            assertTrue(result.contains("\"patId\":" + patientNotesDTO.patId));
+            patientNotesDTO.noteDTOList.forEach(note -> {
+                assertTrue(result.contains("\"e\":\"" + note.e + "\""));
+            });
+        });
     }
 
     @Test

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface NoteService {
     List<PatientNotesDTO> getAllGroupedByPatientId();
-    Page<PatientNotesDTO> getPageSortByPatientId(Pageable pageRequest);
+    Page<PatientNotesDTO> getPageSortByPatientId(Pageable pageRequest, String e);
     PatientNotesDTO getAllByPatientId(long patientId);
     NoteDTO get(String noteId) throws NoteNotFoundException;
     NoteDTO postNoteByPatientId(long patientId, NoteDTO note) throws CreateExistingNoteException;

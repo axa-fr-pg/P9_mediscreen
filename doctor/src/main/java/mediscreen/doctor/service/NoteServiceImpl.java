@@ -5,21 +5,16 @@ import mediscreen.doctor.model.NoteEntity;
 import mediscreen.doctor.model.PatientNotesDTO;
 import mediscreen.doctor.repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import sun.awt.geom.AreaOp;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +29,6 @@ import static org.apache.commons.lang3.RandomUtils.nextInt;
 public class NoteServiceImpl implements NoteService {
     @Autowired
     private NoteRepository repository;
-
-    @Value("${doctor.page.size}")
-    private int doctorPageSize;
 
     private final List<String> glossary;
 
@@ -65,14 +57,9 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<PatientNotesDTO> getPageSortByPatientId(Pageable pageRequest) {
+    public Page<PatientNotesDTO> getPageSortByPatientId(Pageable pageRequest, String e) {
         List<PatientNotesDTO> patientNotesDTOList = new ArrayList<>();
-        if (pageRequest==null) {
-            pageRequest = PageRequest.of(0, Integer.MAX_VALUE/2-1, Sort.by("patId").ascending());
-        } else {
-            pageRequest = PageRequest.of(pageRequest.getPageNumber(), doctorPageSize, Sort.by("patId").ascending());
-        }
-        Page<NoteEntity> noteEntityPage = repository.findAllByNoteIdNotNullOrderByPatIdAsc(pageRequest);
+        Page<NoteEntity> noteEntityPage = repository.findByELikeOrderByPatIdAsc(pageRequest, e);
         noteEntityPage.stream().collect(Collectors.groupingBy((note) -> note.patId)).values()
                 .forEach(noteList -> {
                     patientNotesDTOList.add(new PatientNotesDTO(

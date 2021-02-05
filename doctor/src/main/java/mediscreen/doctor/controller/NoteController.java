@@ -32,8 +32,10 @@ public class NoteController {
     NoteService service;
 
     @GetMapping("")
-    public ResponseEntity<Page<PatientNotesDTO>> getPageGroupedByPatientId(Pageable pageRequest) {
-        return new ResponseEntity<>(service.getPageSortByPatientId(pageRequest), HttpStatus.OK);
+    public ResponseEntity<Page<PatientNotesDTO>> getPageGroupedByPatientId(
+            Pageable pageRequest,
+            @RequestParam(required = false) String e) {
+        return new ResponseEntity<>(service.getPageSortByPatientId(pageRequest, e), HttpStatus.OK);
     }
 
     @GetMapping("/patients/{patId}")

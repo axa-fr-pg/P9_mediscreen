@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NoteRepository extends MongoRepository<NoteEntity, String> {
-    public List<NoteEntity> findAllByPatId(long patId);
-    public List<NoteEntity> findAllByNoteIdNotNullOrderByPatIdAsc();
-    public Page<NoteEntity> findAllByNoteIdNotNullOrderByPatIdAsc(Pageable pageRequest);
+    List<NoteEntity> findAllByPatId(long patId);
+    List<NoteEntity> findAllByNoteIdNotNullOrderByPatIdAsc();
+    Page<NoteEntity> findByELikeOrderByPatIdAsc(Pageable pageRequest, String e);
 }

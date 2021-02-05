@@ -80,12 +80,13 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
     );
 }
 
-function getNotes(pageNumber, patientIdGiven, setNotes, setUpdateRequired, setError) {
+function getNotes(pageNumber, filter, patientIdGiven, setNotes, setUpdateRequired, setError) {
     let url = notesApiUrl;
     if (patientIdGiven >= 0) {
         url = url + "/patients/" + patientIdGiven;
     } else {
         url = url + "?page=" + pageNumber;
+        url = url + "&e=" + filter;
     }
     axios.get(url)
         .then(response => {
@@ -140,12 +141,13 @@ function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired
 
 function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
 
-    const [pageNumber, setPage] = useState(0);
+    const [pageNumber, setPageNumber] = useState(0);
+    const [filter, setFilter] = useState('');
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
 
     useEffect(() => {
         if (updateRequired) {
-            getNotes(pageNumber, patientIdGiven, setNotes, setUpdateRequired, setError);
+            getNotes(pageNumber, filter, patientIdGiven, setNotes, setUpdateRequired, setError);
         }
     });
 
@@ -163,17 +165,30 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
     }
 
     function onclickBack() {
-        setPage(pageNumber-1);
+        setPageNumber(pageNumber-1);
         setUpdateRequired(true);
     }
 
     function onclickNext() {
-        setPage(pageNumber+1);
+        setPageNumber(pageNumber+1);
+        setUpdateRequired(true);
+    }
+
+    function submitFilter(event) {
+        event.preventDefault();
+        setFilter(document.getElementById('input-filter').value);
+        setPageNumber(0);
         setUpdateRequired(true);
     }
 
     return (
         <nav>
+            <form className="form-filter" onSubmit={submitFilter}>
+                <label>Expected note content :&nbsp;</label>
+                <input className="filter-input" id="input-filter" type="text"
+                       onBlur={submitFilter}/>
+            </form>
+            <p/>
             <TreeView className="tree-view" expanded={activeBranches}
                       defaultCollapseIcon={<ExpandMoreIcon/>} defaultExpandIcon={<ChevronRightIcon/>}>
                 {notesTree.map(branch => (

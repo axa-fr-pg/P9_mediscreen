@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
@@ -84,11 +85,11 @@ public class NoteServiceTest {
         );
     }
 
-    private Page<NoteEntity> mockEntityFindAllByNoteIdNotNullOrderByPatIdAsc(int pageNumber, int numberOfPatients) {
+    private Page<NoteEntity> mockEntityFindAllWithPaging(int pageNumber, int numberOfPatients) {
         List<NoteEntity> noteEntityList = generateRandomNotesForSeveralPatients(numberOfPatients);
         PageRequest pageRequest = PageRequest.of(pageNumber, pageNumber+100, Sort.by("patId").ascending());
         Page<NoteEntity> page = new PageImpl<>(noteEntityList, pageRequest, noteEntityList.size());
-        when(repository.findAllByNoteIdNotNullOrderByPatIdAsc(any(PageRequest.class))).thenReturn(page);
+        when(repository.findByELikeOrderByPatIdAsc(any(PageRequest.class), anyString())).thenReturn(page);
         return page;
     }
 
@@ -223,10 +224,10 @@ public class NoteServiceTest {
         // GIVEN
         final int pageNumber = 12;
         final int numberOfPatients = 4;
-        mockEntityFindAllByNoteIdNotNullOrderByPatIdAsc(pageNumber, numberOfPatients);
+        mockEntityFindAllWithPaging(pageNumber, numberOfPatients);
         PageRequest pageRequest = PageRequest.of(pageNumber, pageNumber+100, Sort.by("patId").ascending());
         // WHEN
-        Page<PatientNotesDTO> result = service.getPageSortByPatientId(pageRequest);
+        Page<PatientNotesDTO> result = service.getPageSortByPatientId(pageRequest, "");
         // THEN
         assertEquals(pageNumber, result.getNumber());
         assertEquals(numberOfPatients, result.toList().size());
