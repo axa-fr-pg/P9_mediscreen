@@ -160,25 +160,13 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
 
     if (notes.length === 0) return null;
 
-    let notesTree, activeBranches, pagingStyle;
+    let notesTree, activeBranches;
     if (!!notes.content) {
         notesTree = notes.content;
         activeBranches = expanded;
-        pagingStyle = {};
     } else {
         notesTree = [notes];
         activeBranches = [notes.patId.toString()];
-        pagingStyle = {display: 'none'};
-    }
-
-    function onclickBack() {
-        setPageNumber(pageNumber - 1);
-        setUpdateRequired(true);
-    }
-
-    function onclickNext() {
-        setPageNumber(pageNumber + 1);
-        setUpdateRequired(true);
     }
 
     function submitFilter(event) {
@@ -189,26 +177,14 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
     }
 
     function onChange(event) {
-        const {numberItems, pageIndex} = event;
-        setPageNumber(pageIndex);
+        const {numberItems, page} = event;
+        setPageNumber(page-1);
+        if (page > (notes.totalElements/numberItems)) {
+            setPageNumber(Math.floor(notes.totalElements/numberItems));
+        }
         setRowsPerPage(numberItems);
         setUpdateRequired(true);
         console.log("onChange ", event)
-    }
-
-
-    function onChangePageNumber(event, pageIndex) {
-        setPageNumber(pageIndex);
-        setUpdateRequired(true);
-        console.log("onChangePageNumber")
-    }
-
-    function onChangeRowsPerPage(event) {
-        const pageSize = event.target.value;
-        setPageNumber(Math.floor(rowsPerPage * pageNumber / pageSize));
-        setRowsPerPage(pageSize);
-        setUpdateRequired(true);
-        console.log("onChangeRowsPerPage")
     }
 
     return (
@@ -229,34 +205,15 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
             </TreeView>
             <p/>
             <Paging
-                currentPage={pageNumber}
+                currentPage={pageNumber+1}
                 numberPages={notes.totalPages}
-                numberItems={notes.totalElements}
+                numberItems={rowsPerPage}
                 displayLabel=""
                 elementsLabel="notes per page"
                 previousLabel="« Previous"
                 nextLabel="Next »"
                 onChange={onChange}
             />
-            <div style={pagingStyle} className="div-paging-notes">
-                <button disabled={pageNumber === 0} onClick={onclickBack}>Back</button>
-                Page {pageNumber + 1} of {notes.totalPages}
-                <button disabled={pageNumber >= notes.totalPages - 1} onClick={onclickNext}>Next</button>
-            </div>
-            <table>
-                <tfoot>
-                <tr>
-                    <TablePagination
-                        page={pageNumber}
-                        rowsPerPage={notes.pageable.pageSize}
-                        count={notes.totalElements}
-                        onChangePage={onChangePageNumber}
-                        onChangeRowsPerPage={onChangeRowsPerPage}
-                        labelRowsPerPage="Notes per page"
-                    />
-                </tr>
-                </tfoot>
-            </table>
         </div>
     );
 }

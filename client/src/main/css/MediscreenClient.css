@@ -116,12 +116,3 @@ footer {
 .text-note-overview:hover {
     background-color: lightgrey;
 }
-
-.div-paging-notes {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 280px;
-    margin-top: 10px;
-    margin-bottom: 40px;
-}
