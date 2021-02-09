@@ -5,6 +5,16 @@ table, td, th {
 
 table {
     margin-bottom: 40px;
+    width: 80%;
+}
+
+.div-note-list {
+    border: 1px solid black;
+    width: 90%;
+}
+
+.af-paging {
+    margin-left: 10px;
 }
 
 th {

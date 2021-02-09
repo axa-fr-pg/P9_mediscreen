@@ -2,8 +2,8 @@ import React, {useState, useEffect} from 'react';
 import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
-import TablePagination from "@material-ui/core/TablePagination";
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import {Paging} from "@axa-fr/react-toolkit-table";
 
 function getPatients(inputData) {
     const {
@@ -63,11 +63,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
 
     if (patients.length === 0) return null;
 
-    function onChangePageNumber(event, pageIndex) {
-        setPageNumber(pageIndex);
-        setUpdateRequired(true);
-    }
-
     const handleSortById = (event) => {
         const isAsc = orderField === 'id' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
@@ -89,13 +84,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setUpdateRequired(true);
     };
 
-    function onChangeRowsPerPage(event) {
-        const pageSize = event.target.value;
-        setPageNumber(Math.floor(rowsPerPage * pageNumber / pageSize));
-        setRowsPerPage(pageSize);
-        setUpdateRequired(true);
-    }
-
     function submitFilterId(event) {
         event.preventDefault();
         const inputField = document.getElementById('input-filter-id');
@@ -116,6 +104,16 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         event.preventDefault();
         setFilterDob(document.getElementById('input-filter-dob').value);
         setPageNumber(0);
+        setUpdateRequired(true);
+    }
+
+    function onChange(event) {
+        const {numberItems, page} = event;
+        setPageNumber(page - 1);
+        if (page > (patients.totalElements / numberItems)) {
+            setPageNumber(Math.floor(patients.totalElements / numberItems));
+        }
+        setRowsPerPage(numberItems);
         setUpdateRequired(true);
     }
 
@@ -184,14 +182,18 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                 </tbody>
                 <tfoot>
                 <tr>
-                    <TablePagination
-                        page={pageNumber}
-                        rowsPerPage={patients.pageable.pageSize}
-                        count={patients.totalElements}
-                        onChangePage={onChangePageNumber}
-                        onChangeRowsPerPage={onChangeRowsPerPage}
-                        labelRowsPerPage="Patients per page"
-                    />
+                    <td colSpan={3}>
+                        <Paging
+                            currentPage={pageNumber + 1}
+                            numberPages={patients.totalPages}
+                            numberItems={rowsPerPage}
+                            displayLabel=""
+                            elementsLabel=" patients per page"
+                            previousLabel="« Previous"
+                            nextLabel="Next »"
+                            onChange={onChange}
+                        />
+                    </td>
                 </tr>
                 </tfoot>
             </table>

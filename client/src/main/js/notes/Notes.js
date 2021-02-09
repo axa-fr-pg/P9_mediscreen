@@ -184,11 +184,10 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
         }
         setRowsPerPage(numberItems);
         setUpdateRequired(true);
-        console.log("onChange ", event)
     }
 
     return (
-        <div>
+        <div className="div-note-list">
             <form className="form-filter" onSubmit={submitFilter}>
                 <label>Expected note content :&nbsp;</label>
                 <input className="filter-input" id="input-filter" type="text"
@@ -209,7 +208,7 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
                 numberPages={notes.totalPages}
                 numberItems={rowsPerPage}
                 displayLabel=""
-                elementsLabel="notes per page"
+                elementsLabel=" notes per page"
                 previousLabel="« Previous"
                 nextLabel="Next »"
                 onChange={onChange}
