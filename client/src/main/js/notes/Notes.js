@@ -10,7 +10,6 @@ import {Paging} from '@axa-fr/react-toolkit-table';
 import '@axa-fr/react-toolkit-form-input-select/dist/select.scss';
 import '@axa-fr/react-toolkit-table/dist/Pager/pager.scss';
 import '@axa-fr/react-toolkit-table/dist/Paging/paging.scss';
-import TablePagination from "@material-ui/core/TablePagination";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
 
@@ -33,7 +32,7 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, 
     );
 }
 
-function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, setError}) {
+function NotesRandom({patientIdGiven, setUpdateRequired, setError}) {
     const [randomVolume, setRandomVolume] = useState(5);
     const [inputFieldRandomVolume, setInputFieldRandomVolume] = useState(null);
 
@@ -44,9 +43,8 @@ function NotesRandom({patientIdGiven, inputFieldPatientId, setUpdateRequired, se
         if (!!inputFieldRandomVolume) {
             inputFieldRandomVolume.blur();
         }
-        if (!!inputFieldPatientId) {
-            inputFieldPatientId.blur();
-        }
+        const inputFieldPatientId = document.getElementById('input-patient-id-given');
+        inputFieldPatientId.blur();
         setError("Processing request...");
 
         if (patientIdGiven >= 0) {
@@ -227,16 +225,13 @@ function NotesError({error}) {
     );
 }
 
-function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, setUpdateRequired, setInputFieldPatientId, setError, history}) {
-
-    function onChangePatientIdGivenField(field) {
-        setPatientIdGiven(field.target.value);
-        setInputFieldPatientId(field.target);
-    }
+function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, setUpdateRequired, setError, history}) {
 
     function onSubmitPatientIdGivenField() {
+        const inputFieldPatientId = document.getElementById('input-patient-id-given');
+        history.push('/notes/patients/' + inputFieldPatientId.value);
+        setPatientIdGiven(inputFieldPatientId.value);
         setUpdateRequired(true);
-        history.push('/notes/patients/' + patientIdGiven);
     }
 
     return (
@@ -247,23 +242,27 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, se
                 <label>for all patients</label>
             </div>
             <div hidden={patientIdGiven < 0}>
-                <label>for patient with id</label>
-                <input className="input-narrow input-with-parent-font" value={patientIdGiven}
-                       onChange={onChangePatientIdGivenField}/>
-                <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
+                <form>
+                    <label>for patient with id</label>
+                    <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
+                           defaultValue={patientIdGiven>=0 ? patientIdGiven : 0}/>
+                    <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
+                </form>
             </div>
         </h1>
     );
 }
 
-const getPatIdFromUrl = (url) => url.includes('patients') ? url.split("/").pop() : -1;
+function getPatIdFromUrl(rawUrl) {
+    const url = rawUrl.split("?").shift();
+    return url.includes('patients') ? url.split("/").pop() : -1;
+}
 
 function Notes() {
     const [notes, setNotes] = useState([]);
     const [updateRequired, setUpdateRequired] = useState(false);
     const [error, setError] = useState('');
     const [patientIdGiven, setPatientIdGiven] = useState(getPatIdFromUrl(window.location.href));
-    const [inputFieldPatientId, setInputFieldPatientId] = useState(null);
     const history = useHistory();
 
     useEffect(() => {
@@ -278,16 +277,13 @@ function Notes() {
     return (
         <div>
             <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                                              setUpdateRequired={setUpdateRequired} history={history}
-                                              setInputFieldPatientId={setInputFieldPatientId} setError={setError}/>
+                                              setUpdateRequired={setUpdateRequired} history={history} setError={setError}/>
             <button hidden={patientIdGiven < 0} className="button-new" onClick={newNote}>Register new note</button>
             <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
                       notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} inputFieldPatientId={inputFieldPatientId}
-                         setUpdateRequired={setUpdateRequired} setError={setError}/>
-            <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                        setInputFieldPatientId={setInputFieldPatientId} error={error}/>
+            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError}/>
+            <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
         </div>
     );
 }
