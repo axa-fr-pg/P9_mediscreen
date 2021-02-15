@@ -33,16 +33,12 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, 
 }
 
 function NotesRandom({patientIdGiven, setUpdateRequired, setError}) {
-    const [randomVolume, setRandomVolume] = useState(5);
-    const [inputFieldRandomVolume, setInputFieldRandomVolume] = useState(null);
 
     function generateRandomNotes(event) {
-
         let url = notesApiUrl;
         event.preventDefault();
-        if (!!inputFieldRandomVolume) {
-            inputFieldRandomVolume.blur();
-        }
+        const inputFieldRandomVolume = document.getElementById('input-random-volume');
+        inputFieldRandomVolume.blur();
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
         inputFieldPatientId.blur();
         setError("Processing request...");
@@ -51,7 +47,7 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setError}) {
             url = url + "/patients/" + patientIdGiven;
         }
 
-        axios.post(url + "/random/" + randomVolume)
+        axios.post(url + "/random/" + inputFieldRandomVolume.value)
             .then(response => {
                 setUpdateRequired(true);
                 setError(response.data.length + " random notes have been generated successfully !");
@@ -65,16 +61,11 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setError}) {
             });
     }
 
-    function onChangeRandomVolume(field) {
-        setRandomVolume(field.target.value);
-        setInputFieldRandomVolume(field.target);
-    }
-
     return (
         <form>
             <div className="div-random">
                 <button onClick={generateRandomNotes}>Add</button>
-                <input className="input-narrow" value={randomVolume} onChange={onChangeRandomVolume}/>
+                <input id="input-random-volume" className="input-narrow" defaultValue={5}/>
                 <label>
                     random note(s) to database
                 </label>
