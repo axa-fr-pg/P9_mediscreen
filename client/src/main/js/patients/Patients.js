@@ -150,21 +150,18 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                 <tr>
                     <th>
                         <form className="form-filter" onSubmit={submitFilterId}>
-                            <label>&nbsp;∇&nbsp;&nbsp;</label>
                             <input className="filter-input" id="input-filter-id" type="text"
                                    onBlur={submitFilterId}/>
                         </form>
                     </th>
                     <th>
                         <form className="form-filter" onSubmit={submitFilterFamily}>
-                            <label>&nbsp;∇&nbsp;&nbsp;</label>
                             <input className="filter-input" id="input-filter-family" type="text"
                                    onBlur={submitFilterFamily}/>
                         </form>
                     </th>
                     <th>
                         <form className="form-filter" onSubmit={submitFilterDob}>
-                            <label>&nbsp;∇&nbsp;&nbsp;</label>
                             <input className="filter-input" id="input-filter-dob" type="text"
                                    onBlur={submitFilterDob}/>
                         </form>
