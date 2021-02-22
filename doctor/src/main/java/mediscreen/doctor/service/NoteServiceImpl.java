@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +58,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public Page<PatientNotesDTO> getPageSortByPatientId(Pageable pageRequest, String e) {
+    public Page<PatientNotesDTO> getPageSortByPatientId(Pageable pageRequest, @NotNull String e) {
         List<PatientNotesDTO> patientNotesDTOList = new ArrayList<>();
         Page<NoteEntity> noteEntityPage = repository.findByELikeOrderByPatIdAsc(pageRequest, e);
         noteEntityPage.stream().collect(Collectors.groupingBy((note) -> note.patId)).values()

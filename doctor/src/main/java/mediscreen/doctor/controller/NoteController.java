@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @RestController
 @RequestMapping("/notes")
 @CrossOrigin
@@ -35,7 +37,7 @@ public class NoteController {
     public ResponseEntity<Page<PatientNotesDTO>> getPageGroupedByPatientId(
             Pageable pageRequest,
             @RequestParam(required = false) String e) {
-        return new ResponseEntity<>(service.getPageSortByPatientId(pageRequest, e), HttpStatus.OK);
+        return new ResponseEntity<>(service.getPageSortByPatientId(pageRequest, isNull(e) ? "" : e), HttpStatus.OK);
     }
 
     @GetMapping("/patients/{patId}")
