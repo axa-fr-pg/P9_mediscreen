@@ -225,6 +225,11 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, se
         setUpdateRequired(true);
     }
 
+    function onChangePatientIdGiven() {
+        const inputFieldPatientId = document.getElementById('input-patient-id-given');
+        setPatientIdGiven(inputFieldPatientId.value);
+    }
+
     return (
         <h1 className="title-note-list">Note list
             <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
@@ -236,7 +241,8 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, se
                 <form>
                     <label>for patient with id</label>
                     <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
-                           defaultValue={patientIdGiven>=0 ? patientIdGiven : 0}/>
+                           value={patientIdGiven>=0 ? patientIdGiven : 0}
+                            onChange={onChangePatientIdGiven}/>
                     <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
                 </form>
             </div>
