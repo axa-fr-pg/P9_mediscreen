@@ -102,7 +102,7 @@ public class PatientControllerTest {
     }
 
     @Test
-    public void givenNoPatient_whenPut_thenReturnsNotFound() throws PatientNotFoundException {
+    public void givenNoPatient_whenPut_thenThrowsNotFound() throws PatientNotFoundException {
         // GIVEN
         PatientDTO patient = mockServicePut(154, false);
         // WHEN & THEN
@@ -110,7 +110,7 @@ public class PatientControllerTest {
     }
 
     @Test
-    public void givenPatientSameFamilyAndDob_whenPost_thenReturnsCreateExistingPatientError() throws CreateExistingPatientException {
+    public void givenPatientSameFamilyAndDob_whenPost_thenThrowsCreateExistingPatientError() throws CreateExistingPatientException {
         // GIVEN
         PatientDTO patient = mockServicePost(true);
         // WHEN & THEN

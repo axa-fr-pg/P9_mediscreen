@@ -182,9 +182,7 @@ public class NoteControllerIT {
         String result = response.getContentAsString();
         patientNotesDTOList.forEach( patientNotesDTO -> {
             assertTrue(result.contains("\"patId\":" + patientNotesDTO.patId));
-            patientNotesDTO.noteDTOList.forEach(note -> {
-                assertTrue(result.contains("\"e\":\"" + note.e + "\""));
-            });
+            patientNotesDTO.noteDTOList.forEach(note -> assertTrue(result.contains("\"e\":\"" + note.e + "\"")));
         });
     }
 
