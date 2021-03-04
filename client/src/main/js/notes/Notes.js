@@ -192,16 +192,18 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
                 ))}
             </TreeView>
             <p/>
-            <Paging
-                currentPage={pageNumber+1}
-                numberPages={notes.totalPages}
-                numberItems={rowsPerPage}
-                displayLabel=""
-                elementsLabel=" notes per page"
-                previousLabel="« Previous"
-                nextLabel="Next »"
-                onChange={onChange}
-            />
+            <div hidden={patientIdGiven>=0}>
+                <Paging
+                    currentPage={pageNumber+1}
+                    numberPages={notes.totalPages}
+                    numberItems={rowsPerPage}
+                    displayLabel=""
+                    elementsLabel=" notes per page"
+                    previousLabel="« Previous"
+                    nextLabel="Next »"
+                    onChange={onChange}
+                />
+            </div>
         </div>
     );
 }
