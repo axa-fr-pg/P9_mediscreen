@@ -2,6 +2,7 @@ package mediscreen.patient.controller;
 
 import mediscreen.patient.service.CreateExistingPatientException;
 import mediscreen.patient.service.PatientNotFoundException;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     public final static String EXCEPTION_MANAGER_PATIENT_NOT_FOUND = "No such patient has been found. Please check your request or ask your IT support.";
     public final static String EXCEPTION_MANAGER_CREATE_EXISTING_PATIENT = "it seems that the patient you wan't to save already exists in the database. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_TYPE = "Your request has not the right format. Please check your request or ask your IT support.";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -35,8 +37,8 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_REQUEST_PARAM_TYPE, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value=PatientNotFoundException.class)
