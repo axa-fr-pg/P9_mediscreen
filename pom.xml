@@ -20,7 +20,9 @@
         <module>client</module>
         <module>patient</module>
         <module>doctor</module>
+        <module>report</module>
         <module>docker</module>
+        <module>report</module>
     </modules>
     <dependencies>
         <dependency>

@@ -16,3 +16,8 @@ services :
     environment:
       - JASYPT_ENCRYPTOR_PASSWORD
       - DATABASE_HOST=host.docker.internal
+  report:
+    container_name: report
+    image: report
+    ports:
+      - "8083:8083"
