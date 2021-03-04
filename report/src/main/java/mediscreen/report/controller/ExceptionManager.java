@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ExceptionManager extends ResponseEntityExceptionHandler {
 
-    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT = "You must choose between requesting a report by patient id or by family name. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT = "You must choose between requesting a report by patient id or by patient family name. Please check your request or ask your IT support.";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -36,6 +36,6 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value=RequestParamConflictException.class)
     public ResponseEntity<Object> handleRequestParamConflict(RequestParamConflictException ex, WebRequest request) {
-        return new ResponseEntity<>(EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT, HttpStatus.CONFLICT);
     }
 }
