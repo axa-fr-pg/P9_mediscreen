@@ -1,5 +1,6 @@
 package mediscreen.report.controller;
 
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     public final static String EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT = "You must choose between requesting a report by patient id or by patient family name. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_TYPE = "Your request has not the right format. Please check your request or ask your IT support.";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -30,8 +32,8 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
     }
 
     @Override
-    public ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_REQUEST_PARAM_TYPE, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value=RequestParamConflictException.class)

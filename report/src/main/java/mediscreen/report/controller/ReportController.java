@@ -1,5 +1,6 @@
 package mediscreen.report.controller;
 
+import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientRiskDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -32,12 +33,12 @@ public class ReportController {
         }
         if (! isNull(id)) {
             return new ResponseEntity<>(
-                    "Sample response by id : Patient: Test TestNone (age 52) diabetes assessment is: None",
+                    new PatientAssessmentDTO("Sample response by id : Patient: Test TestNone (age 52) diabetes assessment is: None"),
                     HttpStatus.OK);
         }
         if (! isNull(family)) {
             return new ResponseEntity<>(
-                    "Sample response by family : Patient: Test TestNone (age 52) diabetes assessment is: None",
+                    new PatientAssessmentDTO("Sample response by family : Patient: Test TestNone (age 52) diabetes assessment is: None"),
                     HttpStatus.OK);
         }
         return new ResponseEntity<>(
