@@ -173,7 +173,7 @@ public class PatientControllerIT {
         // GIVEN
         PatientEntity patientBefore = mockEntityFind(146, true);
         PatientEntity patientAfter = mockEntitySave(patientBefore.id);
-        patientAfter.dob = LocalDate.of(9000, 12, 01);
+        patientAfter.dob = LocalDate.of(9000, 12, 1);
         MockHttpServletRequestBuilder builder = buildPutRequest(patientAfter);
         // WHEN
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
