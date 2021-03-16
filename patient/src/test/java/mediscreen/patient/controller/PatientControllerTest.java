@@ -110,7 +110,7 @@ public class PatientControllerTest {
     }
 
     @Test
-    public void givenPatientSameFamilyAndDob_whenPost_thenThrowsCreateExistingPatientError() throws CreateExistingPatientException {
+    public void givenPatientSameFamilyAndDob_whenPost_thenThrowsCreateExistingPatient() throws CreateExistingPatientException {
         // GIVEN
         PatientDTO patient = mockServicePost(true);
         // WHEN & THEN

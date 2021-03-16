@@ -88,7 +88,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void givenNoPatient_whenGet_thenThrowsNotFound() throws NoteNotFoundException {
+    public void givenNoNote_whenGet_thenThrowsNotFound() throws NoteNotFoundException {
         // GIVEN
         NoteDTO note = mockServiceGet("85", false);
         // WHEN & THEN
@@ -96,7 +96,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void givenExistingPatient_whenPut_thenReturnsCorrectPatient() throws NoteNotFoundException {
+    public void givenExistingNote_whenPut_thenReturnsCorrectNote() throws NoteNotFoundException {
         // GIVEN
         NoteDTO note = mockServicePut("126", true);
         // WHEN
@@ -108,7 +108,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void givenNoPatient_whenPut_thenThrowsNotFound() throws NoteNotFoundException {
+    public void givenNoNote_whenPut_thenThrowsNotFound() throws NoteNotFoundException {
         // GIVEN
         NoteDTO note = mockServicePut("154", false);
         // WHEN & THEN
@@ -116,7 +116,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void givenPatientSameFamilyAndDob_whenPost_thenThrowsCreateExistingPatientError() throws CreateExistingNoteException {
+    public void givenExistingNote_whenPost_thenThrowsCreateExistingNote() throws CreateExistingNoteException {
         // GIVEN
         NoteDTO note = mockServicePost(true);
         // WHEN & THEN
@@ -124,7 +124,7 @@ public class NoteControllerTest {
     }
 
     @Test
-    public void givenNewPatient_whenPost_thenReturnsCorrectPatient() throws CreateExistingNoteException {
+    public void givenNewNote_whenPost_thenReturnsCorrectNote() throws CreateExistingNoteException {
         // GIVEN
         NoteDTO note = mockServicePost(false);
         // WHEN
