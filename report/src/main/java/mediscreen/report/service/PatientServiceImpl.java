@@ -27,7 +27,10 @@ public class PatientServiceImpl implements PatientService {
         if (response.status() == HttpStatus.OK.value()) {
             return objectMapper.readValue(response.body().toString(), PatientData.class);
         }
-        throw new PatientNotFoundException();
+        throw new PatientNotFoundException(
+                "Could not find patient with id " + patientId +
+                " : received return code " + response.status() + " from API."
+        );
     }
 
     @Override
@@ -40,11 +43,17 @@ public class PatientServiceImpl implements PatientService {
         int size = patientDataPage.getSize();
         switch (size) {
             case 0:
-                throw new PatientNotFoundException();
+                throw new PatientNotFoundException(
+                        "Could not find patient with name " + family +
+                        " : received empty page as response from API."
+                );
             case 1:
                 return patientDataPage.getContent().get(0);
             default:
-                throw new PatientNotUniqueException();
+                throw new PatientNotUniqueException(
+                        "Could not find patient with name " + family +
+                        " : received " + size + " matches from API."
+                );
         }
     }
 }

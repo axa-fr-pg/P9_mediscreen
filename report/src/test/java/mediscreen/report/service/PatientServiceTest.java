@@ -6,6 +6,7 @@ import feign.Request;
 import feign.Response;
 import mediscreen.report.client.PatientClient;
 import mediscreen.report.model.PatientData;
+import org.apiguardian.api.API;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,8 +24,10 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -74,8 +77,16 @@ public class PatientServiceTest {
         long patientId = 123456;
         Response response = buildResponse(HttpStatus.NOT_FOUND);
         when(client.get(patientId)).thenReturn(response);
-        // WHEN & THEN
-        assertThrows(PatientNotFoundException.class, () -> service.getByPatientId(patientId));
+        String message = "test failed";
+        // WHEN
+        try {
+            service.getByPatientId(patientId);
+        } catch (PatientNotFoundException e) {
+            message = e.getMessage();
+        }
+        // THEN
+        assertEquals("Could not find patient with id " + patientId +
+                " : received return code 404 from API.", message);
     }
 
     @Test
@@ -97,7 +108,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void test_getByFamily_notFound() {
+    public void test_getByFamily_notFound() throws PatientNotUniqueException {
         // GIVEN
         String family = "family-name";
         Page<PatientData> page = new PageImpl<>(Collections.emptyList());
@@ -107,12 +118,20 @@ public class PatientServiceTest {
                 eq(family),
                 anyString()))
                 .thenReturn(page);
-        // WHEN & THEN
-        assertThrows(PatientNotFoundException.class, () -> service.getByFamily(family));
+        String message = "test failed";
+        // WHEN
+        try {
+            service.getByFamily(family);
+        } catch (PatientNotFoundException e) {
+            message = e.getMessage();
+        }
+        // THEN
+        assertEquals("Could not find patient with name " + family +
+                " : received empty page as response from API.", message);
     }
 
     @Test
-    public void test_getByFamily_notUnique() {
+    public void test_getByFamily_notUnique() throws PatientNotFoundException {
         // GIVEN
         String family = "family-name";
         PatientData patientData = new PatientData();
@@ -123,7 +142,15 @@ public class PatientServiceTest {
                 eq(family),
                 anyString()))
                 .thenReturn(page);
-        // WHEN & THEN
-        assertThrows(PatientNotUniqueException.class, () -> service.getByFamily(family));
+        String message = "test failed";
+        // WHEN
+        try {
+            service.getByFamily(family);
+        } catch (PatientNotUniqueException e) {
+            message = e.getMessage();
+        }
+        // THEN
+        assertEquals("Could not find patient with name " + family +
+                " : received 2 matches from API.", message);
     }
 }
