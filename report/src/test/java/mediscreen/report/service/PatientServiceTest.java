@@ -6,7 +6,6 @@ import feign.Request;
 import feign.Response;
 import mediscreen.report.client.PatientClient;
 import mediscreen.report.model.PatientData;
-import org.apiguardian.api.API;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,11 +22,9 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.booleanThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -85,8 +82,8 @@ public class PatientServiceTest {
             message = e.getMessage();
         }
         // THEN
-        assertEquals("Could not find patient with id " + patientId +
-                " : received return code 404 from API.", message);
+        assertTrue(message.contains("Could not find patient with id"));
+        assertTrue(message.contains("received return code 404 from API"));
     }
 
     @Test
@@ -126,8 +123,8 @@ public class PatientServiceTest {
             message = e.getMessage();
         }
         // THEN
-        assertEquals("Could not find patient with name " + family +
-                " : received empty page as response from API.", message);
+        assertTrue(message.contains("Could not find patient with name"));
+        assertTrue(message.contains("received empty page as response from API"));
     }
 
     @Test
@@ -150,7 +147,7 @@ public class PatientServiceTest {
             message = e.getMessage();
         }
         // THEN
-        assertEquals("Could not find patient with name " + family +
-                " : received 2 matches from API.", message);
+        assertTrue(message.contains("Could not find patient with name"));
+        assertTrue(message.contains("received 2 matches from API"));
     }
 }
