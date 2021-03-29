@@ -18,4 +18,8 @@ public class PatientData {
     String sex;
     String address;
     String phone;
+
+    public long getId() {
+        return id;
+    }
 }

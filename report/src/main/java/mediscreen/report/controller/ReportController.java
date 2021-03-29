@@ -1,7 +1,13 @@
 package mediscreen.report.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientRiskDTO;
+import mediscreen.report.service.AssessmentService;
+import mediscreen.report.service.DoctorUnavailableException;
+import mediscreen.report.service.PatientNotFoundException;
+import mediscreen.report.service.PatientNotUniqueException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -23,26 +29,24 @@ import static java.util.Objects.isNull;
 @CrossOrigin
 public class ReportController {
 
+    @Autowired
+    AssessmentService assessmentService;
+
     @GetMapping("/patients")
     public ResponseEntity<Object> get(
             @RequestParam(required = false) Long patientId,
             @RequestParam(required = false) String family,
-            Pageable pageRequest) throws RequestParamConflictException {
+            Pageable pageRequest)
+            throws Throwable {
         if (! isNull(patientId) && ! isNull(family)) {
-            throw new RequestParamConflictException();
+            throw new RequestParamConflictException("You cannot assess at the same time by patient id and by family");
         }
         if (! isNull(patientId)) {
-            return new ResponseEntity<>(
-                    new PatientAssessmentDTO("Sample response by id : Patient: Test TestNone (age 52) diabetes assessment is: None"),
-                    HttpStatus.OK);
+            return new ResponseEntity<>(assessmentService.get(patientId), HttpStatus.OK);
         }
         if (! isNull(family)) {
-            return new ResponseEntity<>(
-                    new PatientAssessmentDTO("Sample response by family : Patient: Test TestNone (age 52) diabetes assessment is: None"),
-                    HttpStatus.OK);
+            return new ResponseEntity<>(assessmentService.get(family), HttpStatus.OK);
         }
-        return new ResponseEntity<>(
-                new PageImpl<>(Collections.singletonList(new PatientRiskDTO()), pageRequest, 0),
-                HttpStatus.OK);
+        return new ResponseEntity<>(assessmentService.get(pageRequest), HttpStatus.OK);
     }
 }

@@ -7,9 +7,13 @@ import mediscreen.report.client.PatientClient;
 import mediscreen.report.model.PatientData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -55,5 +59,15 @@ public class PatientServiceImpl implements PatientService {
                         " : received " + size + " matches from API."
                 );
         }
+    }
+
+    @Override
+    public Page<Long> getAllId(Pageable pageRequest) {
+        Page<PatientData> patientDataPage = client.getPage(pageRequest, null, null, null);
+        Page<Long> pagePatientId = new PageImpl<>(
+                patientDataPage.stream().map(PatientData::getId).collect(Collectors.toList()),
+                pageRequest, patientDataPage.getTotalElements()
+        );
+        return pagePatientId;
     }
 }
