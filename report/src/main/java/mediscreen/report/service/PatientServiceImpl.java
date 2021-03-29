@@ -21,7 +21,7 @@ public class PatientServiceImpl implements PatientService {
     ObjectMapper objectMapper;
 
     @Override
-    public PatientData getByPatientId(long patientId)
+    public PatientData get(long patientId)
             throws JsonProcessingException, PatientNotFoundException {
         Response response = client.get(patientId);
         if (response.status() == HttpStatus.OK.value()) {
@@ -34,7 +34,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public PatientData getByFamily(String family) throws PatientNotFoundException, PatientNotUniqueException {
+    public PatientData get(String family) throws PatientNotFoundException, PatientNotUniqueException {
         Page<PatientData> patientDataPage = client.getPage(
                 PageRequest.of(0,10),
                 "",

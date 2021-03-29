@@ -38,9 +38,9 @@ public class PatientServiceTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    PatientClient client;
+    PatientClient patientClient;
 
-    private Response buildResponse(HttpStatus httpStatus) throws JsonProcessingException {
+    private Response buildPatientResponse(HttpStatus httpStatus) throws JsonProcessingException {
         PatientData patientData = new PatientData(1, "2", "3",
                 LocalDate.of(2004,5,6), "7", "8", "9");
         Request request = Request.create(
@@ -60,10 +60,10 @@ public class PatientServiceTest {
     public void test_getByPatientId_ok() throws JsonProcessingException, PatientNotFoundException {
         // GIVEN
         long patientId = 123456;
-        Response response = buildResponse(HttpStatus.OK);
-        when(client.get(patientId)).thenReturn(response);
+        Response response = buildPatientResponse(HttpStatus.OK);
+        when(patientClient.get(patientId)).thenReturn(response);
         // WHEN
-        String result = objectMapper.writeValueAsString(service.getByPatientId(patientId));
+        String result = objectMapper.writeValueAsString(service.get(patientId));
         // THEN
         assertEquals(response.body().toString(), result);
     }
@@ -72,12 +72,12 @@ public class PatientServiceTest {
     public void test_getByPatientId_notFound() throws JsonProcessingException {
         // GIVEN
         long patientId = 123456;
-        Response response = buildResponse(HttpStatus.NOT_FOUND);
-        when(client.get(patientId)).thenReturn(response);
+        Response response = buildPatientResponse(HttpStatus.NOT_FOUND);
+        when(patientClient.get(patientId)).thenReturn(response);
         String message = "test failed";
         // WHEN
         try {
-            service.getByPatientId(patientId);
+            service.get(patientId);
         } catch (PatientNotFoundException e) {
             message = e.getMessage();
         }
@@ -92,14 +92,14 @@ public class PatientServiceTest {
         String family = "family-name";
         PatientData patientData = new PatientData();
         Page<PatientData> page = new PageImpl<>(Collections.singletonList(patientData));
-        when(client.getPage(
+        when(patientClient.getPage(
                 any(Pageable.class),
                 anyString(),
                 eq(family),
                 anyString()))
                 .thenReturn(page);
         // WHEN
-        PatientData result = service.getByFamily(family);
+        PatientData result = service.get(family);
         // THEN
         assertSame(patientData, result);
     }
@@ -109,7 +109,7 @@ public class PatientServiceTest {
         // GIVEN
         String family = "family-name";
         Page<PatientData> page = new PageImpl<>(Collections.emptyList());
-        when(client.getPage(
+        when(patientClient.getPage(
                 any(Pageable.class),
                 anyString(),
                 eq(family),
@@ -118,7 +118,7 @@ public class PatientServiceTest {
         String message = "test failed";
         // WHEN
         try {
-            service.getByFamily(family);
+            service.get(family);
         } catch (PatientNotFoundException e) {
             message = e.getMessage();
         }
@@ -133,7 +133,7 @@ public class PatientServiceTest {
         String family = "family-name";
         PatientData patientData = new PatientData();
         Page<PatientData> page = new PageImpl<>(Arrays.asList(patientData, patientData));
-        when(client.getPage(
+        when(patientClient.getPage(
                 any(Pageable.class),
                 anyString(),
                 eq(family),
@@ -142,7 +142,7 @@ public class PatientServiceTest {
         String message = "test failed";
         // WHEN
         try {
-            service.getByFamily(family);
+            service.get(family);
         } catch (PatientNotUniqueException e) {
             message = e.getMessage();
         }

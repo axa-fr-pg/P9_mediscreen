@@ -2,24 +2,17 @@ package mediscreen.report.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Request;
-import feign.Response;
-import mediscreen.report.client.NoteClient;
-import mediscreen.report.model.NoteData;
 import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
-import mediscreen.report.model.PatientNotesData;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -30,61 +23,72 @@ public class AssessmentServiceTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    NoteClient client;
+    PatientService patientService;
+
+    @MockBean
+    NoteService noteService;
 
     @Autowired
     AssessmentService service;
 
-    private Response buildDoctorResponse(HttpStatus httpStatus, long patientId, List<NoteData> noteDataList) throws JsonProcessingException {
-        Request request = Request.create(
-                Request.HttpMethod.GET,
-                "",
-                Collections.emptyMap(),
-                null,
-                null);
-        PatientNotesData patientNotesData = new PatientNotesData(patientId, noteDataList);
-        return Response.builder()
-                .request(request)
-                .status(httpStatus.value())
-                .body(objectMapper.writeValueAsString(patientNotesData), StandardCharsets.UTF_8)
-                .build();
-    }
+    final private PatientData patientData = new PatientData(1, "2", "3",
+            LocalDate.of(2004, 5, 6),
+            "7", "8", "9");
 
     @Test
     public void test_getByPatient_ok() throws JsonProcessingException, DoctorUnavailableException {
         // GIVEN
         int age = 27;
         int birthYear = LocalDate.now().getYear() - age;
-        PatientData patientData = new PatientData(1, "2", "3",
-                LocalDate.of(birthYear,5,6), "7", "8", "9");
-        Response response = buildDoctorResponse(HttpStatus.OK, patientData.id, Collections.emptyList());
-        when(client.getPatientNotes(patientData.id)).thenReturn(response);
+        patientData.dob = patientData.dob.withYear(birthYear);
+        when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
         // WHEN
-        PatientAssessmentDTO patientAssessmentDTO = service.getByPatient(patientData);
+        PatientAssessmentDTO patientAssessmentDTO = service.get(patientData);
         // THEN
-        assertTrue(patientAssessmentDTO.assessment.contains("Patient:"));
-        assertTrue(patientAssessmentDTO.assessment.contains("diabetes assessment is:"));
-        assertTrue(patientAssessmentDTO.assessment.contains("None"));
+        assertTrue(patientAssessmentDTO.assessment.contains(Integer.toString(age)));
         assertTrue(patientAssessmentDTO.assessment.contains(patientData.family));
         assertTrue(patientAssessmentDTO.assessment.contains(patientData.given));
-        assertTrue(patientAssessmentDTO.assessment.contains("(age " + age));
+        assertTrue(patientAssessmentDTO.assessment.contains("None"));
     }
 
     @Test
-    public void test_getByPatient_serverError() throws JsonProcessingException {
+    public void test_assessment_hasCorrectStringContent() {
         // GIVEN
-        PatientData patientData = new PatientData();
-        Response response = buildDoctorResponse(HttpStatus.INTERNAL_SERVER_ERROR, patientData.id, null);
-        when(client.getPatientNotes(patientData.id)).thenReturn(response);
-        String message = "test failed";
+        int age = 43;
+        int birthYear = LocalDate.now().getYear() - age;
+        patientData.dob = patientData.dob.withYear(birthYear);
+        String expectedAssessment = "Patient: " + patientData.family +
+                " " + patientData.given + " (age " + age + ") diabetes assessment is: None";
         // WHEN
-        try {
-            service.getByPatient(patientData);
-        } catch (DoctorUnavailableException e) {
-            message = e.getMessage();
-        }
+        PatientAssessmentDTO patientAssessmentDTO = AssessmentServiceImpl
+                .assessment(patientData, Collections.emptyList());
         // THEN
-        assertTrue(message.contains("Could not check notes for patient with id"));
-        assertTrue(message.contains("received return code 500 from API"));
+        assertEquals(expectedAssessment, patientAssessmentDTO.assessment);
     }
+
+    @Test
+    public void test_getByPatientId_ok() throws JsonProcessingException, DoctorUnavailableException, PatientNotFoundException {
+        // GIVEN
+        when(patientService.get(patientData.id)).thenReturn(patientData);
+        when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
+        // WHEN
+        PatientAssessmentDTO patientAssessmentDTO = service.get(patientData.id);
+        // THEN
+        assertTrue(patientAssessmentDTO.assessment.contains(patientData.family));
+        assertTrue(patientAssessmentDTO.assessment.contains(patientData.given));
+    }
+
+    @Test
+    public void test_getByFamily_ok() throws JsonProcessingException, DoctorUnavailableException,
+            PatientNotFoundException, PatientNotUniqueException {
+        // GIVEN
+        when(patientService.get(patientData.family)).thenReturn(patientData);
+        when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
+        // WHEN
+        PatientAssessmentDTO patientAssessmentDTO = service.get(patientData.family);
+        // THEN
+        assertTrue(patientAssessmentDTO.assessment.contains(patientData.family));
+        assertTrue(patientAssessmentDTO.assessment.contains(patientData.given));
+    }
+
 }
