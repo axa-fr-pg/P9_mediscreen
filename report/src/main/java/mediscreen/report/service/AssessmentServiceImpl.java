@@ -1,20 +1,14 @@
 package mediscreen.report.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.Response;
-import mediscreen.report.client.NoteClient;
 import mediscreen.report.model.NoteData;
 import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
-import mediscreen.report.model.PatientNotesData;
 import mediscreen.report.model.PatientRiskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import feign.Response;
-import mediscreen.report.client.NoteClient;
+import mediscreen.report.client.DoctorClient;
 import mediscreen.report.model.NoteData;
 import mediscreen.report.model.PatientNotesData;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class NoteServiceTest {
     NoteService service;
 
     @MockBean
-    NoteClient noteClient;
+    DoctorClient doctorClient;
 
     private Response buildDoctorResponse(HttpStatus httpStatus, long patientId, List<NoteData> noteDataList) throws JsonProcessingException {
         Request request = Request.create(
@@ -59,7 +59,7 @@ public class NoteServiceTest {
         NoteData noteData3 = new NoteData("id-3", "content 3");
         List<NoteData> noteDataList = Arrays.asList(noteData1, noteData2, noteData3);
         Response response = buildDoctorResponse(HttpStatus.OK, patientId, noteDataList);
-        when(noteClient.getPatientNotes(patientId)).thenReturn(response);
+        when(doctorClient.getPatientNotes(patientId)).thenReturn(response);
         // WHEN
         List<NoteData> result = service.getList(patientId);
         // THEN
@@ -71,7 +71,7 @@ public class NoteServiceTest {
         // GIVEN
         long patientId = 62;
         Response response = buildDoctorResponse(HttpStatus.INTERNAL_SERVER_ERROR, patientId, null);
-        when(noteClient.getPatientNotes(patientId)).thenReturn(response);
+        when(doctorClient.getPatientNotes(patientId)).thenReturn(response);
         String message = "test failed";
         // WHEN
         try {

@@ -1,5 +1,8 @@
 package mediscreen.report.controller;
 
+import mediscreen.report.service.DoctorUnavailableException;
+import mediscreen.report.service.PatientNotFoundException;
+import mediscreen.report.service.PatientNotUniqueException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +22,10 @@ import java.util.stream.Collectors;
 public class ExceptionManager extends ResponseEntityExceptionHandler {
 
     public final static String EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT = "You must choose between requesting a report by patient id or by patient family name. Please check your request or ask your IT support.";
-    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_TYPE = "Your request has not the right format. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_TYPE = "Your request has not the right format. Please check or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_PATIENT_NOT_FOUND = "No report has been found for this patient. Please check your request or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_PATIENT_NOT_UNIQUE = "Several patients match your report request. Please check or ask your IT support.";
+    public final static String EXCEPTION_MANAGER_DOCTOR_UNAVAILABLE = "Notes are currently unavailable. Please ask your IT support.";
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -39,5 +45,20 @@ public class ExceptionManager extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value=RequestParamConflictException.class)
     public ResponseEntity<Object> handleRequestParamConflict(RequestParamConflictException ex, WebRequest request) {
         return new ResponseEntity<>(EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(value= PatientNotFoundException.class)
+    public ResponseEntity<Object> handlePatientNotFound(PatientNotFoundException ex, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value= DoctorUnavailableException.class)
+    public ResponseEntity<Object> handleDoctorUnavailable(DoctorUnavailableException ex, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_DOCTOR_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(value= PatientNotUniqueException.class)
+    public ResponseEntity<Object> handlePatientNotUnique(PatientNotUniqueException ex, WebRequest request) {
+        return new ResponseEntity<>(EXCEPTION_MANAGER_PATIENT_NOT_UNIQUE, HttpStatus.CONFLICT);
     }
 }

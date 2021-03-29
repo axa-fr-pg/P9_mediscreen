@@ -3,9 +3,8 @@ package mediscreen.report.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Response;
-import mediscreen.report.client.NoteClient;
+import mediscreen.report.client.DoctorClient;
 import mediscreen.report.model.NoteData;
-import mediscreen.report.model.PatientData;
 import mediscreen.report.model.PatientNotesData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ import java.util.List;
 public class NoteServiceImpl implements NoteService {
 
     @Autowired
-    NoteClient noteClient;
+    DoctorClient doctorClient;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -25,7 +24,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public List<NoteData> getList(long patientId) throws DoctorUnavailableException, JsonProcessingException {
-        Response response = noteClient.getPatientNotes(patientId);
+        Response response = doctorClient.getPatientNotes(patientId);
         if (response.status() == HttpStatus.OK.value()) {
             PatientNotesData patientNotesData = objectMapper.readValue(response.body().toString(), PatientNotesData.class);
             return patientNotesData.noteDTOList;
