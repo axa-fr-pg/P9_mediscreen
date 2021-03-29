@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name="patient", url="http://patient:8081")
+@FeignClient(name="patient", url="http://patient:8081/patients")
 public interface PatientClient {
 
     @GetMapping("/{patientId}")

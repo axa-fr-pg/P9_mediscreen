@@ -24,14 +24,14 @@ import static java.util.Objects.isNull;
 public class ReportController {
 
     @GetMapping("/patients")
-    public ResponseEntity<Object> getPatientOrPage(
-            @RequestParam(required = false) Long id,
+    public ResponseEntity<Object> get(
+            @RequestParam(required = false) Long patientId,
             @RequestParam(required = false) String family,
             Pageable pageRequest) throws RequestParamConflictException {
-        if (! isNull(id) && ! isNull(family)) {
+        if (! isNull(patientId) && ! isNull(family)) {
             throw new RequestParamConflictException();
         }
-        if (! isNull(id)) {
+        if (! isNull(patientId)) {
             return new ResponseEntity<>(
                     new PatientAssessmentDTO("Sample response by id : Patient: Test TestNone (age 52) diabetes assessment is: None"),
                     HttpStatus.OK);
