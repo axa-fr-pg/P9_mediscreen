@@ -7,3 +7,4 @@ target/
 *.log.txt*gz
 *.jar
 node_modules/
+*.tmp
