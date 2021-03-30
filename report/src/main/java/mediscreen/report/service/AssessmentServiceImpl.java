@@ -62,22 +62,16 @@ public class AssessmentServiceImpl implements AssessmentService {
         Page<PatientData> patientDataPage = patientService.getPage(pageRequest);
         Page<PatientRiskDTO> patientRiskDTOPage;
         patientRiskDTOPage = new PageImpl<>(
-                    convertPatientDataListToPatientRiskDTOList(patientDataPage.toList()),
-                    pageRequest, patientDataPage.getTotalElements());
+                convertPatientDataListToPatientRiskDTOList(patientDataPage.toList()),
+                pageRequest, patientDataPage.getTotalElements());
         return patientRiskDTOPage;
     }
 
     // This method is public for testing purpose but no exposure in the interface is required
     public PatientAssessmentDTO assessment(PatientData patientData, List<NoteData> noteDTOList) {
         int age = Period.between(patientData.dob, LocalDate.now()).getYears();
-        return(new PatientAssessmentDTO(
-                "Patient: " +
-                patientData.family + " " +
-                        patientData.given +
-                        " (age " + age +
-                        ") diabetes assessment is: " +
-                        risk(patientData, noteDTOList)
-        ));
+        return (new PatientAssessmentDTO( "Patient: " + patientData.family + " " + patientData.given +
+                        " (age " + age + ") diabetes assessment is: " + risk(patientData, noteDTOList)));
     }
 
     // This method is public for testing purpose but no exposure in the interface is required
