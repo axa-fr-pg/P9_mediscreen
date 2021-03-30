@@ -62,12 +62,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Page<Long> getAllId(Pageable pageRequest) {
-        Page<PatientData> patientDataPage = client.getPage(pageRequest, null, null, null);
-        Page<Long> pagePatientId = new PageImpl<>(
-                patientDataPage.stream().map(PatientData::getId).collect(Collectors.toList()),
-                pageRequest, patientDataPage.getTotalElements()
-        );
-        return pagePatientId;
+    public Page<PatientData> getPage(Pageable pageRequest) {
+        return client.getPage(pageRequest, null, null, null);
     }
 }

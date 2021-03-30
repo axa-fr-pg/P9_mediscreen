@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,45 +46,30 @@ public class AssessmentServiceImpl implements AssessmentService {
         return get(patientData);
     }
 
-    private List<PatientRiskDTO> convertPatientIdListToPatientRiskDtoList(List<Long> patientIdList) {
+    private List<PatientRiskDTO> convertPatientDataListToPatientRiskDTOList(List<PatientData> patientDataList)
+            throws JsonProcessingException, DoctorUnavailableException {
         List<PatientRiskDTO> patientRiskDTOList = new ArrayList<>();
-        patientIdList.forEach( patientId -> {
-            PatientData patientData;
-            try {
-                patientData = patientService.get(patientId);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            List<NoteData> noteDataList;
-            try {
-                noteDataList = noteService.getList(patientId);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        for (PatientData patientData : patientDataList) {
+            List<NoteData> noteDataList = noteService.getList(patientData.id);
             String risk = risk(patientData, noteDataList);
-            patientRiskDTOList.add(new PatientRiskDTO(patientId, patientData.family, risk));
-        });
+            patientRiskDTOList.add(new PatientRiskDTO(patientData.id, patientData.family, risk));
+        }
         return patientRiskDTOList;
     }
 
     @Override
-    public Page<PatientRiskDTO> get(Pageable pageRequest) throws Throwable {
-        Page<Long> pagePatientId = patientService.getAllId(pageRequest);
+    public Page<PatientRiskDTO> get(Pageable pageRequest) throws JsonProcessingException, DoctorUnavailableException {
+        Page<PatientData> patientDataPage = patientService.getPage(pageRequest);
         Page<PatientRiskDTO> patientRiskDTOPage;
-        try {
-            patientRiskDTOPage = new PageImpl<>(
-                    convertPatientIdListToPatientRiskDtoList(pagePatientId.toList()),
-                    pageRequest, pagePatientId.getTotalElements());
-        } catch (RuntimeException e) {
-            throw e.getCause();
-        }
+        patientRiskDTOPage = new PageImpl<>(
+                    convertPatientDataListToPatientRiskDTOList(patientDataPage.toList()),
+                    pageRequest, patientDataPage.getTotalElements());
         return patientRiskDTOPage;
     }
 
     // This method is public for testing purpose but no exposure in the interface is required
-    public static PatientAssessmentDTO assessment(PatientData patientData, List<NoteData> noteDTOList) {
-        // Sample = Patient: Test TestNone (age 52) diabetes assessment is: None
-        int age = LocalDate.now().getYear() - patientData.dob.getYear();
+    public PatientAssessmentDTO assessment(PatientData patientData, List<NoteData> noteDTOList) {
+        int age = Period.between(patientData.dob, LocalDate.now()).getYears();
         return(new PatientAssessmentDTO(
                 "Patient: " +
                 patientData.family + " " +
@@ -95,7 +81,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     // This method is public for testing purpose but no exposure in the interface is required
-    private static String risk(PatientData patientData, List<NoteData> noteDTOList) {
+    private String risk(PatientData patientData, List<NoteData> noteDTOList) {
         return RISK_NONE;
     }
 }

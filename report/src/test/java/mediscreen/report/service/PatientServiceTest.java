@@ -161,7 +161,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void test_getAllId_ok() {
+    public void test_getPage_ok() {
         // GIVEN
         PageRequest pageRequest = PageRequest.of(1, 2);
         PatientData patientData1 = new PatientData();
@@ -171,8 +171,8 @@ public class PatientServiceTest {
         Page<PatientData> patientDataPage = new PageImpl<>(patientDataList, pageRequest, patientDataList.size());
         when(patientClient.getPage(pageRequest, null, null, null)).thenReturn(patientDataPage);
         // WHEN
-        Page<Long> patientIdList = service.getAllId(pageRequest);
+        Page<PatientData> result = service.getPage(pageRequest);
         // THEN
-        assertEquals(patientDataPage.getTotalElements(), patientIdList.getTotalElements());
+        assertEquals(patientDataPage.getTotalElements(), result.getTotalElements());
     }
 }

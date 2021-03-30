@@ -13,5 +13,5 @@ public interface AssessmentService {
     PatientAssessmentDTO get(PatientData patientData) throws DoctorUnavailableException, JsonProcessingException;
     PatientAssessmentDTO get(long patientId) throws JsonProcessingException, PatientNotFoundException, DoctorUnavailableException;
     PatientAssessmentDTO get(String family) throws PatientNotUniqueException, PatientNotFoundException, JsonProcessingException, DoctorUnavailableException;
-    Page<PatientRiskDTO> get(Pageable pageRequest) throws Throwable;
+    Page<PatientRiskDTO> get(Pageable pageRequest) throws JsonProcessingException, DoctorUnavailableException;
 }

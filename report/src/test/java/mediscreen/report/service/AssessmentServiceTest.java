@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,7 @@ public class AssessmentServiceTest {
 
     @Autowired
     AssessmentService service;
+    AssessmentServiceImpl serviceImpl = new AssessmentServiceImpl();
 
     final private PatientData patientData = new PatientData(1, "2", "3",
             LocalDate.of(2004, 5, 6),
@@ -54,9 +56,7 @@ public class AssessmentServiceTest {
     @Test
     public void test_getByPatient_ok() throws JsonProcessingException, DoctorUnavailableException {
         // GIVEN
-        int age = 27;
-        int birthYear = LocalDate.now().getYear() - age;
-        patientData.dob = patientData.dob.withYear(birthYear);
+        int age = Period.between(patientData.dob, LocalDate.now()).getYears();
         when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
         // WHEN
         PatientAssessmentDTO patientAssessmentDTO = service.get(patientData);
@@ -70,14 +70,11 @@ public class AssessmentServiceTest {
     @Test
     public void test_assessment_hasCorrectStringContent() {
         // GIVEN
-        int age = 43;
-        int birthYear = LocalDate.now().getYear() - age;
-        patientData.dob = patientData.dob.withYear(birthYear);
+        int age = Period.between(patientData.dob, LocalDate.now()).getYears();
         String expectedAssessment = "Patient: " + patientData.family +
                 " " + patientData.given + " (age " + age + ") diabetes assessment is: None";
         // WHEN
-        PatientAssessmentDTO patientAssessmentDTO = AssessmentServiceImpl
-                .assessment(patientData, Collections.emptyList());
+        PatientAssessmentDTO patientAssessmentDTO = serviceImpl.assessment(patientData, Collections.emptyList());
         // THEN
         assertEquals(expectedAssessment, patientAssessmentDTO.assessment);
     }
@@ -108,16 +105,16 @@ public class AssessmentServiceTest {
     }
 
     @Test
-    public void test_getAll_ok() throws Throwable {
+    public void test_getAll_ok() throws JsonProcessingException, DoctorUnavailableException {
         // GIVEN
         PageRequest pageRequest = PageRequest.of(1, 2);
-        List<Long> patientIdList = Arrays.asList(111L, 112L, 113L);
-        Page<Long> pagePatientId = new PageImpl<>(patientIdList, pageRequest, patientIdList.size());
-        when(patientService.getAllId(pageRequest)).thenReturn(pagePatientId);
-        patientIdList.forEach(patientId -> {
+        List<PatientData> patientDataList = Arrays.asList(patientData, patientData, patientData);
+        Page<PatientData> pagePatientData = new PageImpl<>(patientDataList, pageRequest, patientDataList.size());
+        when(patientService.getPage(pageRequest)).thenReturn(pagePatientData);
+        patientDataList.forEach(patientData -> {
             try {
-                when(patientService.get(patientId)).thenReturn(new PatientData());
-                when(noteService.getList(patientId)).thenReturn(Collections.emptyList());
+                when(patientService.get(patientData.id)).thenReturn(new PatientData());
+                when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -126,24 +123,18 @@ public class AssessmentServiceTest {
         Page<PatientRiskDTO> page = service.get(pageRequest);
         // THEN
         assertNotNull(page);
-        assertEquals(pagePatientId.getTotalElements(), page.getTotalElements());
+        assertEquals(pagePatientData.getTotalElements(), page.getTotalElements());
     }
 
     @Test
-    public void test_getAll_patientNotFound() throws Throwable {
+    public void test_getAll_doctorUnavailable() throws JsonProcessingException, DoctorUnavailableException {
         // GIVEN
         PageRequest pageRequest = PageRequest.of(1, 2);
-        Page<Long> pagePatientId = new PageImpl<>(Arrays.asList(111L, 112L, 113L));
-        when(patientService.getAllId(pageRequest)).thenReturn(pagePatientId);
-        pagePatientId.forEach(patientId -> {
-            try {
-                when(patientService.get(patientId)).thenThrow(new PatientNotFoundException(""));
-                when(noteService.getList(patientId)).thenReturn(Collections.emptyList());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+        List<PatientData> patientDataList = Arrays.asList(patientData, patientData, patientData);
+        Page<PatientData> pagePatientData = new PageImpl<>(patientDataList, pageRequest, patientDataList.size());
+        when(patientService.getPage(pageRequest)).thenReturn(pagePatientData);
+        when(noteService.getList(patientData.id)).thenThrow(DoctorUnavailableException.class);
         // WHEN & THEN
-        assertThrows(PatientNotFoundException.class, () -> service.get(pageRequest));
+        assertThrows(DoctorUnavailableException.class, () -> service.get(pageRequest));
     }
 }
