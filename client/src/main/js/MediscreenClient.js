@@ -5,6 +5,7 @@ import Patient from "./patients/Patient";
 import "../css/MediscreenClient.css";
 import Notes from "./notes/Notes";
 import Note from "./notes/Note";
+import Reports from "./reports/Reports";
 
 const Home = () => (
     <div>
@@ -24,6 +25,9 @@ const MediscreenMenu = () => {
             </NavLink>
             <NavLink className="mediscreen-link" to="/notes">
                 Notes
+            </NavLink>
+            <NavLink className="mediscreen-link" to="/reports">
+                Reports
             </NavLink>
         </nav>
     );
@@ -58,6 +62,9 @@ function MediscreenClient() {
                     </Route>
                     <Route path="/notes">
                         <Note />
+                    </Route>
+                    <Route exact path="/reports">
+                        <Reports />
                     </Route>
                 </Switch>
             </div>
