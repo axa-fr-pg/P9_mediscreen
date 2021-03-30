@@ -8,9 +8,11 @@ import feign.Response;
 import mediscreen.report.client.DoctorClient;
 import mediscreen.report.client.PatientClient;
 import mediscreen.report.model.NoteData;
+import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
 import mediscreen.report.model.PatientNotesData;
 import mediscreen.report.model.PatientRiskDTO;
+import mediscreen.report.service.PatientNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,10 +38,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static mediscreen.report.controller.ExceptionManager.EXCEPTION_MANAGER_PATIENT_NOT_FOUND;
+import static mediscreen.report.controller.ExceptionManager.EXCEPTION_MANAGER_PATIENT_NOT_UNIQUE;
+import static mediscreen.report.controller.ExceptionManager.EXCEPTION_MANAGER_REQUEST_PARAM_TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.longThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -68,6 +76,7 @@ public class ReportControllerIT {
     @BeforeEach
     public void init() {
         reset(patientClient);
+        reset(doctorClient);
         request = Request.create(Request.HttpMethod.GET,"",
                 Collections.emptyMap(),null,null);
         patientData = new PatientData(1, "2", "3",
@@ -92,9 +101,11 @@ public class ReportControllerIT {
     }
 
     private Page<PatientData> buildPatientPage(int numberOfElements) throws JsonProcessingException {
-        PageRequest pageRequest = PageRequest.of(0, 2);
+        PageRequest pageRequest = PageRequest.of(0, numberOfElements);
         ArrayList<PatientData> patientDataList = new ArrayList<>();
-        Stream.generate(PatientData::new).limit(numberOfElements).forEach(patientDataList::add);
+        for (int i=0; i<numberOfElements; i++) {
+            patientDataList.add(patientData);
+        }
         return new PageImpl<>(patientDataList, pageRequest, 0) ;
     }
 
@@ -103,7 +114,7 @@ public class ReportControllerIT {
         // GIVEN
         int numberOfElements = 9;
         Page<PatientData> patientDataPage = buildPatientPage(numberOfElements);
-        when(patientClient.get(0L)).thenReturn(buildPatientResponse(HttpStatus.OK));
+        when(patientClient.get(patientData.id)).thenReturn(buildPatientResponse(HttpStatus.OK));
         when(patientClient.getPage(any(Pageable.class), eq(null), eq(null), eq(null))).thenReturn(patientDataPage);
         when(doctorClient.getPatientNotes(anyLong()))
                 .thenReturn(buildDoctorResponse(HttpStatus.OK, 0, Collections.emptyList()));
@@ -112,5 +123,94 @@ public class ReportControllerIT {
         // THEN
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         assertEquals(numberOfElements, StringUtils.countMatches(response.getContentAsString(),"family"));
+    }
+
+    @Test
+    public void test_getByPatientId_ok() throws Exception {
+        // GIVEN
+        when(patientClient.get(patientData.id)).thenReturn(buildPatientResponse(HttpStatus.OK));
+        when(doctorClient.getPatientNotes(patientData.id))
+                .thenReturn(buildDoctorResponse(HttpStatus.OK, 0, Collections.emptyList()));
+        // WHEN
+        MockHttpServletResponse response = mockMvc
+                .perform(get(ENTITY_URL + "?id=" + patientData.id))
+                .andReturn().getResponse();
+        PatientAssessmentDTO result = objectMapper.readValue(response.getContentAsString(), PatientAssessmentDTO.class);
+        // THEN
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertTrue(result.assessment.contains("None"));
+        assertTrue(result.assessment.contains(patientData.family));
+        assertTrue(result.assessment.contains(patientData.given));
+    }
+
+    @Test
+    public void test_getByFamily_ok() throws Exception {
+        // GIVEN
+        int numberOfElements = 1;
+        Page<PatientData> patientDataPage = buildPatientPage(numberOfElements);
+        when(patientClient.getPage(any(Pageable.class), anyString(), eq(patientData.family), anyString()))
+                .thenReturn(patientDataPage);
+        when(doctorClient.getPatientNotes(patientData.id))
+                .thenReturn(buildDoctorResponse(HttpStatus.OK, 0, Collections.emptyList()));
+        // WHEN
+        MockHttpServletResponse response = mockMvc
+                .perform(get(ENTITY_URL + "?family=" + patientData.family))
+                .andReturn().getResponse();
+        PatientAssessmentDTO result = objectMapper.readValue(response.getContentAsString(), PatientAssessmentDTO.class);
+        // THEN
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertTrue(result.assessment.contains("None"));
+        assertTrue(result.assessment.contains(patientData.family));
+        assertTrue(result.assessment.contains(patientData.given));
+    }
+
+    @Test
+    public void test_getByFamily_notUnique() throws Exception {
+        // GIVEN
+        int numberOfElements = 2;
+        Page<PatientData> patientDataPage = buildPatientPage(numberOfElements);
+        when(patientClient.getPage(any(Pageable.class), anyString(), eq(patientData.family), anyString()))
+                .thenReturn(patientDataPage);
+        when(doctorClient.getPatientNotes(patientData.id))
+                .thenReturn(buildDoctorResponse(HttpStatus.OK, 0, Collections.emptyList()));
+        // WHEN
+        MockHttpServletResponse response = mockMvc
+                .perform(get(ENTITY_URL + "?family=" + patientData.family))
+                .andReturn().getResponse();
+        // THEN
+        assertEquals(HttpStatus.CONFLICT.value(), response.getStatus());
+        assertEquals(EXCEPTION_MANAGER_PATIENT_NOT_UNIQUE, response.getContentAsString());
+    }
+
+    @Test
+    public void test_getByPatientId_badRequest() throws Exception {
+        // GIVEN
+        String patientIdErroneousContent = "any-alphabetic-chars";
+        // WHEN
+        MockHttpServletResponse response = mockMvc
+                .perform(get(ENTITY_URL + "?id=" + patientIdErroneousContent))
+                .andReturn().getResponse();
+        // THEN
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(EXCEPTION_MANAGER_REQUEST_PARAM_TYPE, response.getContentAsString());
+    }
+
+    @Test
+    public void test_getByPatientId_not_Found() throws Exception {
+        // GIVEN
+        Response notFoundResponse = Response.builder()
+                .request(request)
+                .status(HttpStatus.NOT_FOUND.value())
+                .body("any message", StandardCharsets.UTF_8)
+                .build();
+        when(patientClient.get(anyLong())).thenReturn(notFoundResponse);
+        long patientIdWrong = 289;
+        // WHEN
+        MockHttpServletResponse response = mockMvc
+                .perform(get(ENTITY_URL + "?id=" + patientIdWrong))
+                .andReturn().getResponse();
+        // THEN
+        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+        assertEquals(EXCEPTION_MANAGER_PATIENT_NOT_FOUND, response.getContentAsString());
     }
 }

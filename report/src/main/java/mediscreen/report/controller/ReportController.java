@@ -34,15 +34,15 @@ public class ReportController {
 
     @GetMapping("/patients")
     public ResponseEntity<Object> get(
-            @RequestParam(required = false) Long patientId,
+            @RequestParam(required = false) Long id,
             @RequestParam(required = false) String family,
             Pageable pageRequest)
             throws Throwable {
-        if (! isNull(patientId) && ! isNull(family)) {
+        if (! isNull(id) && ! isNull(family)) {
             throw new RequestParamConflictException("You cannot assess at the same time by patient id and by family");
         }
-        if (! isNull(patientId)) {
-            return new ResponseEntity<>(assessmentService.get(patientId), HttpStatus.OK);
+        if (! isNull(id)) {
+            return new ResponseEntity<>(assessmentService.get(id), HttpStatus.OK);
         }
         if (! isNull(family)) {
             return new ResponseEntity<>(assessmentService.get(family), HttpStatus.OK);
