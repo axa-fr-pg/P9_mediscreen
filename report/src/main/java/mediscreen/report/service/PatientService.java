@@ -9,4 +9,5 @@ public interface PatientService {
     PatientData get(long patientId) throws JsonProcessingException, PatientNotFoundException;
     PatientData get(String family) throws PatientNotFoundException, PatientNotUniqueException;
     Page<PatientData> getPage(Pageable pageRequest);
+    Page<PatientData> getPage(Pageable pageRequest, String filterId, String filterFamily);
 }

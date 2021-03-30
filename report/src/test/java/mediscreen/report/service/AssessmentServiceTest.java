@@ -1,6 +1,5 @@
 package mediscreen.report.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
@@ -111,7 +110,7 @@ public class AssessmentServiceTest {
         PageRequest pageRequest = PageRequest.of(1, 2);
         List<PatientData> patientDataList = Arrays.asList(patientData, patientData, patientData);
         Page<PatientData> pagePatientData = new PageImpl<>(patientDataList, pageRequest, patientDataList.size());
-        when(patientService.getPage(pageRequest)).thenReturn(pagePatientData);
+        when(patientService.getPage(pageRequest, null, null)).thenReturn(pagePatientData);
         patientDataList.forEach(patientData -> {
             try {
                 when(patientService.get(patientData.id)).thenReturn(new PatientData());
@@ -133,7 +132,7 @@ public class AssessmentServiceTest {
         PageRequest pageRequest = PageRequest.of(1, 2);
         List<PatientData> patientDataList = Arrays.asList(patientData, patientData, patientData);
         Page<PatientData> pagePatientData = new PageImpl<>(patientDataList, pageRequest, patientDataList.size());
-        when(patientService.getPage(pageRequest)).thenReturn(pagePatientData);
+        when(patientService.getPage(pageRequest, null, null)).thenReturn(pagePatientData);
         when(noteService.getList(patientData.id)).thenThrow(DoctorUnavailableException.class);
         // WHEN & THEN
         assertThrows(DoctorUnavailableException.class, () -> service.get(pageRequest));

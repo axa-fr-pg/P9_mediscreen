@@ -42,7 +42,7 @@ public class ReportControllerTest {
         String assessment = "test-assessment";
         when(service.get(patientId)).thenReturn(new PatientAssessmentDTO(assessment));
         // WHEN
-        ResponseEntity<Object>  result = controller.get(patientId, null, null);
+        ResponseEntity<Object>  result = controller.get(patientId, null, null, null, null);
         // THEN
         assertNotNull(result);
         PatientAssessmentDTO patientAssessmentDTO = (PatientAssessmentDTO) result.getBody();
@@ -57,7 +57,7 @@ public class ReportControllerTest {
         String assessment = "test-assessment";
         when(service.get(family)).thenReturn(new PatientAssessmentDTO(assessment));
         // WHEN
-        ResponseEntity<Object>  result = controller.get(null, family, null);
+        ResponseEntity<Object>  result = controller.get(null, family, null, null, null);
         // THEN
         assertNotNull(result);
         PatientAssessmentDTO patientAssessmentDTO = (PatientAssessmentDTO) result.getBody();
@@ -73,7 +73,7 @@ public class ReportControllerTest {
         // WHEN
         String message = "test failed";
         try {
-            controller.get(patientId, family, null);
+            controller.get(patientId, family, null, null, null);
         } catch (RequestParamConflictException e) {
             message = e.getMessage();
         }
@@ -91,9 +91,9 @@ public class ReportControllerTest {
         Page<PatientRiskDTO> patientRiskDTOPage = new PageImpl<>(
                 Arrays.asList(patientRiskDTO1, patientRiskDTO2, patientRiskDTO3),
                 pageRequest, 0) ;
-        when(service.get(pageRequest)).thenReturn(patientRiskDTOPage);
+        when(service.get(pageRequest, null, null)).thenReturn(patientRiskDTOPage);
         // WHEN
-        ResponseEntity<Object>  result = controller.get(null, null, pageRequest);
+        ResponseEntity<Object>  result = controller.get(null, null, null, null, pageRequest);
         // THEN
         assertNotNull(result);
         Page<PatientRiskDTO> page = (Page<PatientRiskDTO>) result.getBody();

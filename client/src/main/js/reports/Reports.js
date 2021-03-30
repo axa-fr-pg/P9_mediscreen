@@ -8,20 +8,17 @@ import axios from "axios";
 function getPatients(inputData) {
     const {
         pageNumber, rowsPerPage, orderField, orderDirection,
-        filterId, filterFamily, filterDob,
+        filterId, filterFamily,
         setPatients, setUpdateRequired, setError
     } = inputData;
     let url = reportsApiUrl + "/patients"
         + "?page=" + pageNumber + "&size=" + rowsPerPage
         + "&sort=" + orderField + "," + orderDirection;
     if (filterId !== '') {
-        url = url + "&id=" + filterId;
+        url = url + "&filterId=" + filterId;
     }
     if (filterFamily !== '') {
-        url = url + "&family=" + filterFamily;
-    }
-    if (filterDob !== '') {
-        url = url + "&dob=" + filterDob;
+        url = url + "&filterFamily=" + filterFamily;
     }
     axios.get(url)
         .then(response => {
@@ -77,11 +74,11 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setUpdateRequired(true);
     };
 
-    const handleSortByDob = (event) => {
-        const isAsc = orderField === 'dob' && orderDirection === 'asc';
+    const handleSortByRisk = (event) => {
+        /* const isAsc = orderField === 'risk' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
-        setOrderField('dob');
-        setUpdateRequired(true);
+        setOrderField('risk');
+        setUpdateRequired(true); */
     };
 
     function submitFilterId(event) {
@@ -101,10 +98,10 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
     }
 
     function submitFilterDob(event) {
-        event.preventDefault();
+/*        event.preventDefault();
         setFilterDob(document.getElementById('input-filter-dob').value);
         setPageNumber(0);
-        setUpdateRequired(true);
+        setUpdateRequired(true);*/
     }
 
     function onChange(event) {
@@ -140,9 +137,9 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                     </th>
                     <th>
                         <TableSortLabel
-                            active={orderField === 'dob'}
+                            active={orderField === 'risk'}
                             direction={orderDirection}
-                            onClick={handleSortByDob}>
+                            onClick={handleSortByRisk}>
                             Risk level
                         </TableSortLabel>
                     </th>
@@ -162,7 +159,7 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                     </th>
                     <th>
                         <form className="form-filter" onSubmit={submitFilterDob}>
-                            <input className="filter-input" id="input-filter-dob" type="text"
+                            <input className="filter-input" id="input-filter-risk" type="text"
                                    onBlur={submitFilterDob}/>
                         </form>
                     </th>

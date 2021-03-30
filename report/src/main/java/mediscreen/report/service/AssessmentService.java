@@ -16,4 +16,5 @@ public interface AssessmentService {
     PatientAssessmentDTO get(long patientId) throws IOException, PatientNotFoundException, DoctorUnavailableException;
     PatientAssessmentDTO get(String family) throws PatientNotUniqueException, PatientNotFoundException, IOException, DoctorUnavailableException;
     Page<PatientRiskDTO> get(Pageable pageRequest) throws IOException, DoctorUnavailableException;
+    Page<PatientRiskDTO> get(Pageable pageRequest, String filterId, String filterFamily) throws IOException, DoctorUnavailableException;
 }

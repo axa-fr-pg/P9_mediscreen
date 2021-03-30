@@ -1,6 +1,5 @@
 package mediscreen.report.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import mediscreen.report.model.NoteData;
 import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
@@ -62,9 +61,14 @@ public class AssessmentServiceImpl implements AssessmentService {
 
     @Override
     public Page<PatientRiskDTO> get(Pageable pageRequest) throws IOException, DoctorUnavailableException {
-        Page<PatientData> patientDataPage = patientService.getPage(pageRequest);
-        Page<PatientRiskDTO> patientRiskDTOPage;
-        patientRiskDTOPage = new PageImpl<>(
+        return get(pageRequest, null, null);
+    }
+
+    @Override
+    public Page<PatientRiskDTO> get(Pageable pageRequest, String filterId, String filterFamily)
+            throws IOException, DoctorUnavailableException {
+        Page<PatientData> patientDataPage = patientService.getPage(pageRequest, filterId, filterFamily);
+        Page<PatientRiskDTO> patientRiskDTOPage = new PageImpl<>(
                 convertPatientDataListToPatientRiskDTOList(patientDataPage.toList()),
                 pageRequest, patientDataPage.getTotalElements());
         return patientRiskDTOPage;

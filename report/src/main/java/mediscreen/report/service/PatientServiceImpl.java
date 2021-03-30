@@ -62,4 +62,9 @@ public class PatientServiceImpl implements PatientService {
     public Page<PatientData> getPage(Pageable pageRequest) {
         return client.getPage(pageRequest, null, null, null);
     }
+
+    @Override
+    public Page<PatientData> getPage(Pageable pageRequest, String filterId, String filterFamily) {
+        return client.getPage(pageRequest, filterId, filterFamily, null);
+    }
 }
