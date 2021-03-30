@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Arrays;
@@ -54,7 +55,7 @@ public class AssessmentServiceTest {
     }
 
     @Test
-    public void test_getByPatient_ok() throws JsonProcessingException, DoctorUnavailableException {
+    public void test_getByPatient_ok() throws IOException, DoctorUnavailableException {
         // GIVEN
         int age = Period.between(patientData.dob, LocalDate.now()).getYears();
         when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
@@ -80,7 +81,7 @@ public class AssessmentServiceTest {
     }
 
     @Test
-    public void test_getByPatientId_ok() throws JsonProcessingException, DoctorUnavailableException, PatientNotFoundException {
+    public void test_getByPatientId_ok() throws IOException, DoctorUnavailableException, PatientNotFoundException {
         // GIVEN
         when(patientService.get(patientData.id)).thenReturn(patientData);
         when(noteService.getList(patientData.id)).thenReturn(Collections.emptyList());
@@ -92,7 +93,7 @@ public class AssessmentServiceTest {
     }
 
     @Test
-    public void test_getByFamily_ok() throws JsonProcessingException, DoctorUnavailableException,
+    public void test_getByFamily_ok() throws IOException, DoctorUnavailableException,
             PatientNotFoundException, PatientNotUniqueException {
         // GIVEN
         when(patientService.get(patientData.family)).thenReturn(patientData);
@@ -105,7 +106,7 @@ public class AssessmentServiceTest {
     }
 
     @Test
-    public void test_getAll_ok() throws JsonProcessingException, DoctorUnavailableException {
+    public void test_getAll_ok() throws IOException, DoctorUnavailableException {
         // GIVEN
         PageRequest pageRequest = PageRequest.of(1, 2);
         List<PatientData> patientDataList = Arrays.asList(patientData, patientData, patientData);
@@ -127,7 +128,7 @@ public class AssessmentServiceTest {
     }
 
     @Test
-    public void test_getAll_doctorUnavailable() throws JsonProcessingException, DoctorUnavailableException {
+    public void test_getAll_doctorUnavailable() throws IOException, DoctorUnavailableException {
         // GIVEN
         PageRequest pageRequest = PageRequest.of(1, 2);
         List<PatientData> patientDataList = Arrays.asList(patientData, patientData, patientData);

@@ -51,12 +51,14 @@ public class NoteController {
     }
 
     @PutMapping("/{noteId}")
-    public ResponseEntity<NoteDTO> put(@PathVariable String noteId, @RequestBody @Valid NoteDTO note) throws NoteNotFoundException {
+    public ResponseEntity<NoteDTO> put(@PathVariable String noteId, @RequestBody @Valid NoteDTO note)
+            throws NoteNotFoundException {
         return new ResponseEntity<>(service.put(note), HttpStatus.OK);
     }
 
     @PostMapping("/patients/{patId}")
-    public ResponseEntity<NoteDTO> postByPatientId(@PathVariable Long patId, @RequestBody @Valid NoteDTO e) throws CreateExistingNoteException {
+    public ResponseEntity<NoteDTO> postByPatientId(@PathVariable Long patId, @RequestBody @Valid NoteDTO e)
+            throws CreateExistingNoteException {
         return new ResponseEntity<>(service.postNoteByPatientId(patId, e), HttpStatus.CREATED);
     }
 

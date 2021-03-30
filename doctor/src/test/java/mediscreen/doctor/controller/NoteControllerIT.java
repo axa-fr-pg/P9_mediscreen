@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static mediscreen.doctor.controller.ExceptionManager.EXCEPTION_MANAGER_NOTE_NOT_FOUND;
-import static mediscreen.doctor.model.NoteDTO.NOTE_NOT_BLANK_ERROR;
+import static mediscreen.doctor.model.NoteValidation.NOTE_NOT_BLANK_ERROR;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

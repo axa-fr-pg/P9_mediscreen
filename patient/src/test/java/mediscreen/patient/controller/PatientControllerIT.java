@@ -28,10 +28,10 @@ import java.util.Random;
 
 import static mediscreen.patient.controller.ExceptionManager.EXCEPTION_MANAGER_CREATE_EXISTING_PATIENT;
 import static mediscreen.patient.controller.ExceptionManager.EXCEPTION_MANAGER_PATIENT_NOT_FOUND;
-import static mediscreen.patient.model.PatientDTO.ADDRESS_NOT_BLANK_ERROR;
-import static mediscreen.patient.model.PatientDTO.DOB_PAST_ERROR;
-import static mediscreen.patient.model.PatientDTO.FAMILY_NOT_BLANK_ERROR;
-import static mediscreen.patient.model.PatientDTO.SEX_PATTERN_ERROR;
+import static mediscreen.patient.model.PatientValidation.ADDRESS_NOT_BLANK_ERROR;
+import static mediscreen.patient.model.PatientValidation.DOB_PAST_ERROR;
+import static mediscreen.patient.model.PatientValidation.FAMILY_NOT_BLANK_ERROR;
+import static mediscreen.patient.model.PatientValidation.SEX_PATTERN_ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

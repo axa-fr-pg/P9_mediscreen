@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +36,8 @@ public class NoteServiceTest {
     @MockBean
     DoctorClient doctorClient;
 
-    private Response buildDoctorResponse(HttpStatus httpStatus, long patientId, List<NoteData> noteDataList) throws JsonProcessingException {
+    private Response buildDoctorResponse(HttpStatus httpStatus, long patientId, List<NoteData> noteDataList)
+            throws JsonProcessingException {
         Request request = Request.create(
                 Request.HttpMethod.GET,
                 "",
@@ -51,7 +53,7 @@ public class NoteServiceTest {
     }
 
     @Test
-    public void test_getByPatientId_ok() throws JsonProcessingException, DoctorUnavailableException {
+    public void test_getByPatientId_ok() throws IOException, DoctorUnavailableException {
         // GIVEN
         long patientId = 53;
         NoteData noteData1 = new NoteData("id-1", "content 1");
@@ -67,7 +69,7 @@ public class NoteServiceTest {
     }
 
     @Test
-    public void test_getByPatient_serverError() throws JsonProcessingException {
+    public void test_getByPatient_serverError() throws IOException {
         // GIVEN
         long patientId = 62;
         Response response = buildDoctorResponse(HttpStatus.INTERNAL_SERVER_ERROR, patientId, null);

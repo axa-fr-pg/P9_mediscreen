@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -29,25 +30,27 @@ public class AssessmentServiceImpl implements AssessmentService {
     NoteService noteService;
 
     @Override
-    public PatientAssessmentDTO get(@NotNull PatientData patientData) throws DoctorUnavailableException, JsonProcessingException {
+    public PatientAssessmentDTO get(@NotNull PatientData patientData)
+            throws DoctorUnavailableException, IOException {
         return assessment(patientData, noteService.getList(patientData.id));
     }
 
     @Override
     public PatientAssessmentDTO get(long patientId) throws
-            JsonProcessingException, PatientNotFoundException, DoctorUnavailableException {
+            IOException, PatientNotFoundException, DoctorUnavailableException {
         PatientData patientData = patientService.get(patientId);
         return get(patientData);
     }
 
     @Override
-    public PatientAssessmentDTO get(String family) throws PatientNotUniqueException, PatientNotFoundException, JsonProcessingException, DoctorUnavailableException {
+    public PatientAssessmentDTO get(String family) throws PatientNotUniqueException,
+            PatientNotFoundException, IOException, DoctorUnavailableException {
         PatientData patientData = patientService.get(family);
         return get(patientData);
     }
 
     private List<PatientRiskDTO> convertPatientDataListToPatientRiskDTOList(List<PatientData> patientDataList)
-            throws JsonProcessingException, DoctorUnavailableException {
+            throws IOException, DoctorUnavailableException {
         List<PatientRiskDTO> patientRiskDTOList = new ArrayList<>();
         for (PatientData patientData : patientDataList) {
             List<NoteData> noteDataList = noteService.getList(patientData.id);
@@ -58,7 +61,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public Page<PatientRiskDTO> get(Pageable pageRequest) throws JsonProcessingException, DoctorUnavailableException {
+    public Page<PatientRiskDTO> get(Pageable pageRequest) throws IOException, DoctorUnavailableException {
         Page<PatientData> patientDataPage = patientService.getPage(pageRequest);
         Page<PatientRiskDTO> patientRiskDTOPage;
         patientRiskDTOPage = new PageImpl<>(

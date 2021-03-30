@@ -7,12 +7,12 @@ import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
 
+import static mediscreen.doctor.model.NoteValidation.NOTE_NOT_BLANK_ERROR;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level=AccessLevel.PUBLIC)
 public class NoteDTO {
-
-    public final static String NOTE_NOT_BLANK_ERROR = "You must enter some text for your note. Please check your request and try again.";
 
     String noteId;
 
