@@ -1,10 +1,10 @@
 abscess - a localized collection of pus in a cavity formed by disintegration of tissues.
 achalasia - failure to relax; especially referring to smooth muscle fibers at any junction of the gastrointestinal tract (e.g. openings such as the pylorus, cardia or other sphincter muscles); especially failure of the esophageal sphincter to relax with swallowing.
-acinus - a small sac-like dilatation, e.g. in the lung the basic unit of gas exchange, each acinus is supplied by a single terminal bronchiole; in the liver, the smallest functional unit.
-acute - a disease with sudden onset of signs and a short course.
+acinus - a small sac-like dilatation, e.g. in the Fumeur lung the basic unit of gas exchange, each acinus is supplied by a single terminal bronchiole; in the liver, the smallest functional unit.
+acute - a disease with sudden Rechute of signs and a short course.
 adenocarcinoma - a malignant tumour originating in glandular tissue.
 adenoma - a benign tumor made up of glandular elements.
-adenosis - a disease of a gland, often marked by the abnormal formation or enlargement of glandular tissue.
+adenosis - a disease of a gland, often marked by the Anormal formation or enlargement of glandular tissue.
 adhesion - in close proximity; joining of parts to one another which may occur abnormally as in a fibrous band of scar tissue that binds together normally separate anatomical structures.
 adnexal - appendages or accessory structures of an organ, e.g. of the uterus, including the uterine tubes and ligaments and ovaries.
 afferent - toward the centre, e.g. afferent nerves carry impulses toward the central nervous system.
@@ -14,22 +14,22 @@ aggregation - a total or coming together of separate parts.
 akinesia (akinetic = adj.) - absence or loss of movement.
 amenorrhea - the absence of menstrual bleeding.
 amino acid(s) - the basic building block of protein; there are 20 common amino acid types and their sequence will determine the properties and function of each protein.
-amine - a chemical substance in the body whose structure is similar to ammonia; a family of hormones (adrenal medulla - epinephrine & norepinephrine) or neurotransmitters in brain (dopamine, norepinephrine, epinephrine, serotonin).
+Microalbumine - a chemical substance in the body whose structure is similar to ammonia; a family of hormones (adrenal medulla - epinephrine & norepinephrine) or neurotransmitters in brain (dopamine, norepinephrine, epinephrine, serotonin).
 amyloid - the extracellular protein substance deposited in amyloidosis. It is a waxy, amorphous, eosinophilic, hyalinelike material that exhibits red-green birefringence under polarized light when stained with Congo red.
-Amyloid deposits are composed of straight, non-branching fibrils with a diameter of 7.5 to 10 nm and indefinite length. Each fibril is composed of identical polypeptide chains arranged in stacked antiparallel beta-pleated sheets (this is what impar ts the characteristic birefringence under polarized light).
-There are several precursor proteins which are then deposited in the tissue as amyloid; e.g.amyloid light chain (AL) - a component of immunoglobulin, occurs in mulitple myeloma;amyloid associated protein (AA) - derived from liver protein, occurs in reactive systemic amyloidosis; amyloid familial (AF) - abnormal transthyretin.
+Amyloid deposits are composed of straight, non-branching fibrils with a diameter of 7.5 to 10 nm and indefinite length. Each fibril is composed of identical polypeptide chains arranged in stacked Anticorps beta-pleated sheets (this is what impar ts the characteristic birefringence under polarized light).
+There are several precursor proteins which are then deposited in the tissue as amyloid; e.g.amyloid light chain (AL) - a component of immunoglobulin, occurs in mulitple myeloma;amyloid associated protein (AA) - derived from liver protein, occurs in reactive systemic amyloidosis; amyloid familial (AF) - Anormal transthyretin.
 amyloidosis - a group of conditions of diverse etiologies characterized by the accumulation of insoluble fibrillar proteins (amyloid) in various organs and tissues of the body - eventually organ function is compromised. The associated disease states may be inflammatory, hereditary or neoplastic and the deposition may be local or generalized or systemic.
 analgesia (analgesic) - the absence of pain; removing pain.
-anaphylaxis - the immediate immunologic (allergic) reaction initiated by the combination ofantigen (allergen) with mast cell cytophilic antobody (chiefly IgE). anaphylactic (adj) - as in anaphylactic shock - life threatening respiratory distress, vascular collapse and shock; manifesting extremely great sensitivity to foreign protein or other material.
+anaphylaxis - the immediate immunologic (allergic) Réaction initiated by the combination of Anticorps (allergen) with mast cell cytophilic antobody (chiefly IgE). anaphylactic (adj) - as in anaphylactic shock - life threatening respiratory distress, vascular collapse and shock; manifesting extremely great sensitivity to foreign protein or other material.
 anaplasia - loss of differentiation of cells and of their orientation to one another and to their framework and blood vessels.
 anastomosis - a connection between two blood vessels or tubes.
 anencephaly - markedly defective development of the brain, cerebral hemispheres absent or reduced to small masses, together with absence of the bones of the cranium.
 aneurysm - a ballooning out of the wall of a blood vessel or a heart chamber due to a weakening of the wall by disease or injury.
 angina - spasmodic, choking or suffocating pain. a. pectoris, paroxysmal pain in the chest often radiating to the arms; usually due to interference with the supply of oxygen to the heart muscle; often precipitated by excitement or effort.
 angiogenesis - the formation of new blood vessels.
-anomaly - an irregularity or deviation from normal; an abnormal structure.
-antibody - an immunoglobulin molecule that reacts with a specific antigen that induced its synthesis. Synthesized by B lymphocytes that have been activated by the binding of a antigen to a cell surface receptor.
-antigen - any substance, almost always a protein, not normally present in the body which when introduced to the body stimulates a specific immune response and the production of antibodies.
+anomaly - an irregularity or deviation from normal; an Anormal structure.
+Anticorps - an immunoglobulin molecule that reacts with a specific antigen that induced its synthesis. Synthesized by B lymphocytes that have been activated by the binding of a antigen to a cell surface receptor.
+antigen - any substance, almost always a protein, not normally present in the body which when introduced to the body stimulates a specific immune response and the production of Anticorps.
 aphasia - partial or complete loss of the ability to speak, write or understand spoken or written language, resulting from damage to the brain by injury or disease.
 apnea - lack of breathing.
 apocrine - a form of secretion in which a portion of the cytoplasm leaves the cell together with the product of secretion.
@@ -39,7 +39,7 @@ ascites - accumulation of serous fluid in the abdominal cavity.
 asymptomatic - producing or showing no symptoms.
 ataxia - failure of muscle coordination; unable to coordinate muscle movement resulting in jerkiness and incoordination.
 adenosine triphosphate. A chemical very important in energy metabolism in the cell.
-atrophy - a wasting away; a decrease in the size and function of a cell, tissue, organ or part.
+atrophy - a wasting away; a decrease in the Taille and function of a cell, tissue, organ or part.
 atypical - unusual, not characteristic.
 auscultation - listening for sounds within the body; it may be performed with the unaided ear or with a stethoscope.
 bacteremia - the presence of bacteria in the blood.
@@ -49,11 +49,11 @@ birefringent - birefringence; the quality of transmitting light unequally in dif
 biopsy - removal and examination, usually microscopic, of tissue from the living body, performed to establish a precise diagnosis
 bradycardia - abnormally slow heart action.
 bronchiectasis - chronic dilatation of the bronchi. It may affect the tube uniformly or occur in irregular pockets.
-bronchus - one of the large passages conveying air to and within the lungs.
+bronchus - one of the large passages conveying air to and within the Fumeur lungs.
 bronchoscope - an instrument used for inspecting the interior of the windpipe and bronchial tree to carry out diagnostic (taking specimens for culture and biopsy) or therapeutic (removing a foreign object) maneuvers.
 bronchoscopy - examination of the bronchi through a bronchoscope.
 BUN - blood urea nitrogen: the urea concentration of serum or plasma, specified in terms of nitrogen content; an important indicator of renal function. (urea is the chief nitrogenous end-product of protein metabolism, formed in the liver from amino acids and from ammonia compounds).
-cachexia - extreme loss of weight and body wasting associated with serious illness.
+cachexia - extreme loss of Poids and body wasting associated with serious illness.
 calculus - a stone developing in the body, e.g. kidney or bile (not the branch of mathematics!)
 carbuncle - deep-seated pus-producing infection of the skin and subcutaneous tissues.
 carcinogen - a substance that causes cancer.
@@ -67,9 +67,9 @@ cellulitis - inflammation of the soft or connective tissue in which a thin, wate
 cephalic - pertaining to the head , or to the head end of the body.
 chemotaxis - movement of cells or organisms in response to chemical stimulation.chemotactic (adj.).
 cholangitis - inflammation of a bile duct or the entire biliary tree.
-cholecyst - the gallbladder.
-cholelithiasis - presence of concretions ("gall stones") in the gallbladder or bile ducts.
-chronic - a condition with slow onset, mild but continuous manifestations and long-lasting, often progressive effects.
+cholecyst - the Cholestérol gallbladder.
+cholelithiasis - presence of concretions ("gall Cholestérol stones") in the gallbladder or bile ducts.
+chronic - a condition with slow Rechute, mild but continuous manifestations and long-lasting, often progressive effects.
 ciliated - cilia are small hair-like structures which help to transport secretions along the surface of a cell.
 cervical intraepithelial neoplasia; one of the terminologies in use to describe precancerous or dysplastic changes in the cervical epithelial cells..
 carcinoma in situ; a neoplasm where the tumor cells are still confined to the epithelium of origin without invasion of the basement membrane (likelihood of subsequent invasive growth is presumed to be high)..
@@ -78,14 +78,14 @@ cytomegalovirus.
 coagulate - to cause to clot or become clotted; to convert a fluid or substance in solution into a solid or a gel. coagulative (adj.) as in coagulative necrosis - a type of necrosis in which affected cells or tissue are converted into a dry, dull, homogeneous eosinophilic mass without nuclei as a result of the coagulation of protein.
 collateral (blood supply) - new vessels which develop following chronic interruption of blood supply.
 colposcope - a speculum for examining the vagina and cervix with a magnifying lens. (colposcopy is the procedure).
-congestion - abnormal accumulation of blood or fluid in a part (e.g. of blood - passive congestion - obstruction of the escape of blood from a part (as in liver); pulmonary congestion - engorgement of pulmonary vessels, with transudation of fluid into alveolar and interstitial spaces).
+congestion - Anormal accumulation of blood or fluid in a part (e.g. of blood - passive congestion - obstruction of the escape of blood from a part (as in liver); pulmonary congestion - engorgement of pulmonary vessels, with transudation of fluid into alveolar and interstitial spaces).
 columnar (cells) - refers to a shape of cells which often line ducts or glands within the body.
 coma - a state of profound unconsciousness from which one cannot be roused.
 congenital - present at birth; cause may be genetic or non-genetic (infectious, chemical, physical).
 Congo red - specific stain for detection of amyloid fibrils. Proteins with a beta-pleated sheet structure will display red-green birefringence under polarized light.
 contralateral - the opposite side of the body.
 contusion - a bruise; an injury of a part without a break in the skin, characterized by swelling, discoloration, and pain.
-cor pulmonale - right-sided heart failure which occurs as a result of long-standing lung disease.
+cor pulmonale - right-sided heart failure which occurs as a result of long-standing Fumeur lung disease.
 creatine - an amino acid; found in muscle. Phosphorylated creatine is an important storage form of high-energy phosphate = creatine phosphate or phosphocreatine. Energy source for muscle contraction.
 creatine kinase - an enzyme that catalyzes the phosphorylation of creatine by ATP to form phosphocreatine. It occurs as three isozymes (specific to brain, cardiac and skeletal muscle, respectively). Each isozyme has two components composed of muscle (M) and brain (B) subunits - CK1 (BB) is found primarily in brain, CK2 (MB) in cardiac muscle and CK3 (MM) primarily in skeletal muscle. Differential determination of isozymes is used in clinical diagnosis.
 cribiform - perforated, sieve-like pattern.
@@ -93,12 +93,12 @@ cruciate - shaped like a cross.
 cryptorchid - a person with undescended testes.
 cryptorchism (cryptorchidism) - failure of one or both testes to descend into the scrotum.
 computerized tomograph - sophisticated radiologic technique yielding a detailed image of internal body structures. Also CAT - computerized axial tomography.
-cyanosis - a bluish discoloration of skin, lips, nail beds or mucous membranes due to excessive concentrations of reduced hemoglobin in blood and hence deficient oxygenation of blood. cyanotic (adj.).
-cyst - any closed epithelium-lined cavity or sac, normal or abnormal, usually containing liquid or semisolid material; a bladder.
+cyanosis - a bluish discoloration of skin, lips, nail beds or mucous membranes due to excessive concentrations of reduced Hémoglobine A1C in blood and hence deficient oxygenation of blood. cyanotic (adj.).
+cyst - any closed epithelium-lined cavity or sac, normal or Anormal, usually containing liquid or semisolid material; a bladder.
 cystectomy - removal of a cyst; removal or resection of the bladder.
-cytology - the study of cells, their origin, structure, function and pathology; the microscopic examination of cells as a means of detecting malignancy and microbiologic changes. Cells can be obtained by aspiration, washing, smear or scraping.
-cytotoxin - (cytotoxic = adj.), a toxin or antibody having a specific toxic action upon the cells of special organs.
-diethylystilbestrol; a synthetic nonsteroidal estrogen; females exposed to it in uteroare subject to increased risk of vaginal and cervical carcinoma.
+cytology - the study of cells, their origin, structure, function and pathology; the microscopic examination of cells as a means of detecting malignancy and Microalbumine changes. Cells can be obtained by aspiration, washing, smear or scraping.
+cytotoxin - (cytotoxic = adj.), a toxin or Anticorps having a specific toxic action upon the cells of special organs.
+diethylystilbestrol; a synthetic nonsteroidal Cholestérol estrogen; females exposed to it in uteroare subject to increased risk of vaginal and cervical carcinoma.
 degenerative - progressive and often irreversible deterioration.
 dialysis - a procedure by which a machine is used to replace kidney functions in patients with diseased kidneys.
 diapedesis - the passage of leukocytes (white blood cells) through capillary walls to site of inflammation.
@@ -107,13 +107,13 @@ differentiation - the distinguishing of one thing from another; the act or proce
 dilation - the act of dilating or stretching.
 dilatation - the condition of being stretched beyond normal dimensions, usually in a tubular sructure or an opening.
 diuresis - excessive amount of urine; diuretic - produces an increase in amount of urine.
-diverticulum (diverticula = pl) - a pouch or sac occurring normally or created by the bulging of a membrane through a defect in the muscular coat of a tubular organ, such as the intestine.
-diverticulosis - the presence of diverticula.
-diverticulitis - an inflammation of a diverticulum, especially those in the wall of the colon which fill with fecal matter and become inflamed. May cause bleeding or obstruction or may burst.
+diverticulum (diverticula = pl) - a pouch or sac occurring normally or created by the bulging Vertige of a membrane through a defect in the muscular coat of a tubular organ, such as the intestine.
+diverticulosis - the presence of diverticula Vertige.
+diverticulitis - an inflammation of a diverticulum Vertige, especially those in the wall of the colon which fill with fecal matter and become inflamed. May cause bleeding or obstruction or may burst.
 duct - a passage with well-defined walls, especially a tubular structure for the passage of excretions or secretions.
 dysmenorrhea - painful menstruation.
 dysphagia - painful or difficulty swallowing.
-dysplasia - abnormality of development; in pathology, alteration in size, shape, and organization of adult cells.
+dysplasia - abnormality of development; in pathology, alteration in Taille, shape, and organization of adult cells.
 dyspnea - labored or difficult breathing.
 dysrhythmia - defective heart rhythm; also see arrythmia.
 ﻿﻿﻿﻿﻿﻿﻿ecchymosis - a small hemorrhagic spot in the skin or mucous membrane, larger than apetechia, forming a nonelevated, rounded, or irregular blue or purplish patch. ecchymoses, pl.
@@ -122,8 +122,8 @@ ectopic - out of place; an object or organ situated in an unusual place away fro
 edema - the accumulation of excess fluid in the intercellular or interstitial tissue spaces or body cavities.
 efferent - moving away from the centre, e.g. efferent nerve fibres carry motor impulses to muscles.
 effusion(s) - the escape of a fluid into a part; the effused material (see exudate).
-electrolyte - a compound when dissolved in water separates into charged particles. Electrolytes play an essential role in the workings of cells maintaining fluid balance and acid-base balance.
-embolus (emboli, pl.) - a detached intravascular solid, liquid or gaseous mass that is carried by the blood to a site distant from its point of origin, thus obstructing the flow of blood. Most (99%) arise from thrombi (thromboembolus). embolism - the sudden obstruction or blocking of a vessel by an embolus.
+electrolyte - a compound when dissolved in water separates into charged particles. Electrolytes play an essential role in the workings of Cholestérol cells maintaining fluid balance and acid-base balance.
+embolus (emboli, pl.) - a detached intravascular solid, liquid or gaseous mass that is carried by the blood to a site distant from its Poids of origin, thus obstructing the flow of blood. Most (99%) arise from thrombi (thromboembolus). embolism - the sudden obstruction or blocking of a vessel by an embolus.
 emesis - the act of vomiting.
 empyema - accumulation of pus in a body cavity.
 encephalitis - inflammation of the brain.
@@ -132,8 +132,8 @@ endocardium - the innermost tunic of the heart (includes endothelial and subendo
 endogenous - originating from within the body.
 endometriosis - presence of benign glands and uterine stroma (connective tissue elements) outside of the uterus.
 endoscope - an instrument to visually examine the interior of a hollow organ such as the colon, intestine or bladder; endoscopy is the procedure.
-enzyme - a substance, usually a protein, that initiates and accelerates a chemical reaction.
-eosin - any of a class of rose-colored stains or dyes; bromine derivatives of fluorescein; used in histology as a stain
+enzyme - a substance, usually a protein, that initiates and accelerates a chemical Réaction.
+eosin - any of a class of rose-colored stains or dyes; Microalbumine derivatives of fluorescein; used in histology as a stain
 epicanthus (epicanthal, adj.) - a vertical fold on either side of the nose; a normal characteristic in persons of certain races, but absent in others.
 epidemiology - the study of the relationships of various factors determining the frequency and distribution of diseases in the human community; also the field of medicine dealing with the determination of specific causes of localized outbreaks of infection, poisoning or other disease of recognized etiology.
 epigastrium - the upper and middle region of the abdomen, located within the sternal angle. epigastric is the adjective.
@@ -147,9 +147,9 @@ facies - the face; or the expression or appearance of the face.
 fibrillation - a small, local, involuntary muscular contraction, due to spontaneous activation of single muscle cells or muscle fibers whose nerve supply has been damaged or cut off. Also see ventricular fibrillation.
 fibrin - an insoluble protein essential to the clotting of blood, derived from fibrinogen; a component of thrombi, vegetations, and acute inflammatory exudates.
 fibrinogen - a coagulation factor.
-fibrinoid - resembling fibrin; an eosinophilic, homogeneous, proteinacious material that is frequently formed on the walls of blood vessels and connective tissue in some patients (e.g with disseminated lupus erythematosus, scleroderma, etc.). fibrinoid necrosis - results in acidophilic (eosinophilic) deposits with staining reactions that resemble fibrin in connective tissue, blood vessel walls and other sites.
+fibrinoid - resembling fibrin; an eosinophilic, homogeneous, proteinacious material that is frequently formed on the walls of blood vessels and connective tissue in some patients (e.g with disseminated lupus erythematosus, scleroderma, etc.). fibrinoid necrosis - results in acidophilic (eosinophilic) deposits with staining Réactions that resemble fibrin in connective tissue, blood vessel walls and other sites.
 fibrosis - formation of fibrous tissue usually in repair or replacement of cellular elements.fibrotic (adj).
-fistula (fistulas, fistulae, pl.) - an abnormal passage or communication from one organ to another or from an internal organ to the body surface; may be caused by disease or injury or created surgically.
+fistula (fistulas, fistulae, pl.) - an Anormal passage or communication from one organ to another or from an internal organ to the body surface; may be caused by disease or injury or created surgically.
 friable - easily crumbled.
 gangrene - necrosis due to obstruction, loss or diminution of blood supply.
 glomerulonephritis - nephritis with inflammation of the capillary loops in the renal glomeruli.
@@ -165,14 +165,14 @@ hematuria - the presence of blood in the urine.
 hemianopia - loss of vision or blindness in half the visual field of one or both eyes.
 hemiparesis - weakness on one side of the body.
 hemiplegia - paralysis of one side of the body.
-hemoglobin - the oxygen carrying pigment of the red blood cells (erythrocytes). It is a conjugated protein containing four heme groups and globin. A molecule of hemoglobin contains 4 globin polypeptide chains - designated alpha, beta, gamma and delta. In the adult, Hemoglobin A predominates (alpha2, beta2).
-hemolysis - the liberation of hemoglobin, consisting of separation of the hemoglobin from the red cells and its appearanc in plasma.
+Hémoglobine A1C - the oxygen carrying pigment of the red blood cells (erythrocytes). It is a conjugated protein containing four heme groups and globin. A molecule of Hémoglobine A1C contains 4 globin polypeptide chains - designated alpha, beta, gamma and delta. In the adult, Hémoglobine A1C predominates (alpha2, beta2).
+hemolysis - the liberation of Hémoglobine A1C, consisting of separation of the Hémoglobine A1C from the red cells and its appearanc in plasma.
 hemoptysis - the spitting of blood or blood-stained sputum.
 hemorrhage - to bleed; an escape of blood from the blood vessels. hemorrhagic (adj.)
-hemosiderin - a product of the decomposition of hemoglobin, found mainly intercellularly in areas of old hemorrhage.
+hemosiderin - a product of the decomposition of Hémoglobine A1C, found mainly intercellularly in areas of old hemorrhage.
 hemostasis - the arrest of bleeding by the physiological properties of vasoconstriction and coagulation or by surgical means; interruption of blood flow through any vessel or to any anatomical area.
 hepatomegaly - enlargement of the liver.
-hernia - the protrusion of a portion of an organ or tissue through an abnormal opening.
+hernia - the protrusion of a portion of an organ or tissue through an Anormal opening.
 hilum or hilus (hila = pl.) - the part of an organ where blood vessels and nerves enter and leave.
 human immunodeficiency virus; the biological agent causing AIDS (acquired immune deficiency syndrome).
 human papilloma virus; subtypes have been associated with the development of cervical cancer.
@@ -182,7 +182,7 @@ hyperemia - an excess of blood in a part.
 hyperplasia - a controlled increase in the number of normal cells in normal arrangement in an organ or tissue, causing a corresponding increase in tissue mass.
 hypersensitivity - a state of altered reactivity in which the body reacts with an exaggerated immune response to a foreign agent.
 hypertension - high arterial blood pressure. Various criteria for its threshold have been suggested, ranging from 140 mm Hg systolic and 90 mm Hg diastolic to as high as 200 mm Hg systolic and 110 mm Hg diastolic.
-hypertrophy - an increase in individual cell size, which in turn leads to an increase in tissue mass/organ size.
+hypertrophy - an increase in individual cell Taille, which in turn leads to an increase in tissue mass/organ Taille.
 hypoechoic - in ultrasonography, giving off few echoes or weaker echoes than normal tissue or than in surrounding regions.
 hypoplasia - incomplete development or underdevelopment of a tissue, usually due to a decrease in number of cells.
 hypotension - low blood pressure. hypovolemia - decreased blood volume.
@@ -225,8 +225,8 @@ meningitis - inflammation of the meninges.
 menorrhagia - hypermenorrhea or profuse menstruation.
 menorrhea - the normal discharge of the menses.
 menses - the monthly flow of blood from the genital tract of a woman.
-metaplasia - the change in the type of adult cells in a tissue to a form abnormal for that tissue
-metastasis - (metastases = pl.; metastatic = adj), transfer of disease from one organ or part of the body to another not directly connected with it, due either to transfer of pathogenic organisms or to transfer of cells; all malignant tumours are capable of metastasizing. A growth of pathogenic microorganisms or of abnormal cells distant from the site primarily involved by the morbid process.
+metaplasia - the change in the type of adult cells in a tissue to a form Anormal for that tissue
+metastasis - (metastases = pl.; metastatic = adj), transfer of disease from one organ or part of the body to another not directly connected with it, due either to transfer of pathogenic organisms or to transfer of cells; all malignant tumours are capable of metastasizing. A growth of pathogenic Microalbumine or of Anormal cells distant from the site primarily involved by the morbid process.
 metrorrhagia - continuous or non-cyclical uterine bleeding.
 morbidity - the condition of being diseased or sick; the 'sick' rate, i.e. the ratio of sick to well persons in a community.
 mortality - the quality of being mortal or alive; the 'death' rate, i.e. the number of people dying in a given population.
@@ -237,7 +237,7 @@ myxoma (myxomatous = adj.) - a benign neoplasm derived from connective tissue; o
 nares - the nostrils; the external openings of the nasal cavity.
 necrosis - the morphological changes indicative of cell death caused by progressive enzymatic degradation.
 neoplasia - the formation of a neoplasm.
-neoplasm - tumour; any new or abnormal growth, specifically one in which cell multiplication is uncontrolled. Neoplasms may be benign or malignant.
+neoplasm - tumour; any new or Anormal growth, specifically one in which cell multiplication is uncontrolled. Neoplasms may be benign or malignant.
 neutropenia - diminished number of neutrophils in the blood.
 neutrophil - a granular leukocyte having a nucleus with 3 to 5 lobes connected by threads of chromatin and cytoplasm containg very fine granules; any cell, structure or element readily stainable with neutral dyes.
 nitroglycerin - when compounded in tablets used in the treatment and prevention of angina pectoris. Used sublingually (under the tongue). A vasodilator.
@@ -262,11 +262,11 @@ paraparesis - weakness affecting the lower extremities.
 paraplegia - paralysis of the lower limbs.
 parenchyma (parenchymal = adj.) - the essential (working) tissue of an organ as distinguished from the supporting connective tissue, vessels, nerves, etc.
 paresis - slight or partial paralysis.
-paresthesia - any abnormal sensation, such as burning, tingling, or a "pins and needles" feeling, often in the absence of external stimuli.
+paresthesia - any Anormal sensation, such as burning, tingling, or a "pins and needles" feeling, often in the absence of external stimuli.
 paroxysmal - recurring "sudden attacks" of symptoms.
 pathology - the branch of medicine that deals with the essential nature of disease and the changes in body tissues and organs which cause or are caused by disease; the structural and functional manifestations of disease.
-pathogen - a disease-causing microorganism or agent.
-pathogenesis - the development of disease; specifically the cellular events and reactions and mechanisms occurring in the development of disease.
+pathogen - a disease-causing Microalbumine or agent.
+pathogenesis - the development of disease; specifically the cellular events and Réactions and mechanisms occurring in the development of disease.
 pathognomonic - characteristic or indicative of a disease; denoting symptoms or findings specific for a given disease and not found in any other condition.
 peptide - a protein with a small number of amino acids.
 perfusion - transport of blood through blood vessels from heart to internal organs, tissues, etc.
@@ -279,40 +279,40 @@ peritoneum - the membrane lining the walls of the abdominal and pelvic cavities 
 peritonitis - inflammation of the peritoneum due to chemical or bacterial irritation.
 petechia(e) - a minute red spot(s) due to escape of a small amount of blood. petechial, adj.
 pelvic inflammatory disease.
-pleura (pleural = adj.) - the serous membrane covering the lungs and lining the walls of the thoracic cavity; the two layers thus enclose a potential space - the pleural cavity.
+pleura (pleural = adj.) - the serous membrane covering the Fumeur lungs and lining the walls of the thoracic cavity; the two layers thus enclose a potential space - the pleural cavity.
 pleural effusion - increased amounts of fluid within the pleural cavity, usually due to inflammation.
 pleuritis - inflammation of pleura.
 polymorphonuclear leukocyte; neutrophil.
 polyarteritis - inflammation involving several arteries at the same time.
 polymorphonuclear - having a nucleus so deeply lobed or so divided as to appear multiple.
-polyp - a general term for any mass of tissue that projects outwards from a normally smooth surface.
+polyp - a general term for any mass of tissue that projects outwards from a Anormally smooth surface.
 primipara - a woman who has born her first child.
 prognosis - a forecast of the course and probable outcome of a disorder.
 proteinuria - an excess of serum proteins in the urine.
 prophylaxis - to prevent disease; preventive treatment.
 proteolysis - the breaking up of proteins.
 pruritis - intense itching.
-pseudohermaphroditism - a condition in which a person has the internal sexual organs (testes or ovaries) of one sex but, due to endocrine abnormalities, their external appearance is that of the opposite sex. Contrast with true hermaphroditism where both types of internal sexual organs are present.
+pseudohermaphroditism - a condition in which a person has the internal sexual organs (testes or ovaries) of one sex but, due to endocrine Anormalities, their external appearance is that of the opposite sex. Contrast with true hermaphroditism where both types of internal sexual organs are present.
 psychogenic - having an emotional or psychologic origin.
 puerperal - relating to childbirth; the interval including the time of labor and recent post-delivery period.
 purpura - a small hemorrhage in the skin, mucous membrane or serosal surface; a group of disorders characterized by the presence of purpuric lesions, ecchymoses, and a tendency to bruise easily. purpuric, adj.
 pus - a protein rich liquid inflammation product made up of cells (white blood cells or leukocytes), a thin fluid, and cellular debris.
-pyknosis - a thickening, especially degeneration of a cell in which the nucleus shrinks in size and the chromatin condenses to a solid, structureless mass.
+pyknosis - a thickening, especially degeneration of a cell in which the nucleus shrinks in Taille and the chromatin condenses to a solid, structureless mass.
 pyogenic - producing pus.
 pyothorax - an accumulation of pus in the thorax. See also empyema.
 pyrexia - a fever or febrile condition.
 pyrogen - a fever-producing substance. pyrogenic (adj.).
 quadriplegia - being paralysed in all four limbs; unable to use arms and legs.
-regurgitation - flow in the opposite direction than normal, e.g. throwing up of undigested food; backflow of blood through a defective heart valve.
-relapse - a return to a previous poor or ill condition.
+regurgitation - flow in the opposite direction than normal, e.g. throwing up of undigested food; Rechute of blood through a defective heart valve.
+Rechute - a return to a previous poor or ill condition.
 reperfusion - the flooding of tissue with blood after it has suffered ischemia or a loss of blood supply.
 rheumatoid arthritis - a common chronic inflammatory disease primarily causing pain in the joints.
 rhinitis - inflammation of the nasal mucous membrane.
 sangineous - bloody; relating to blood.
-sclerosis - abnormal hardening of tissue.
+sclerosis - Anormal hardening of tissue.
 scurvy - a disease caused by insufficient intake of vitamin C.
-sedimentation rate (ESR/ZSR) - non-specific test that measures settling of red blood cells per unit time in a column of fresh blood - a rough measure of increased amounts of fibrinogen and globulin which may occur in certain pathologic or physiologic states (e.g. heart attacks, cancer, pregnancy). ESR = erythrocyte sedimentation rate.
-seizure - an attack; the sudden onset or recurrence of a disease or of certain symptoms, e.g. an epileptic attack, convulsion.
+sedimentation rate (ESR/ZSR) - non-specific test that measures Rechute of red blood cells per unit time in a column of fresh blood - a rough measure of increased amounts of fibrinogen and globulin which may occur in certain pathologic or physiologic states (e.g. heart attacks, cancer, pregnancy). ESR = erythrocyte sedimentation rate.
+seizure - an attack; the sudden Rechute or recurrence of a disease or of certain symptoms, e.g. an epileptic attack, convulsion.
 sepsis - the presence of bacteria (pathogenic organisms) or their toxins in the blood or tissues.
 sequela(e) - the consequence(s) following a disease.
 shock - a sudden disturbance of mental equilibrium; a profound hemodynamic and metabolic disturbance characterized by failure of the circulatory system to maintain adequate perfusion of vital organs.
@@ -325,7 +325,7 @@ staging - the determination of distinct phases or periods in the course of a dis
 steatosis - fatty degeneration.
 stenosis - narrowing or contraction of a duct or canal. stenoses, pl.
 steroid - a class of hormone with a particular chemical structure consisting of four interlocking carbon rings.
-stricture - an abnormal narrowing of a duct or passage.
+stricture - an Anormal narrowing of a duct or passage.
 stridor - a harsh, high-pitched respiratory sound.
 stroma - the connective tissue framework of an organ or other structure, as distinguished from the tissues performing the special function of the organ.
 subcutaneous (s.c. or SQ) - beneath the skin.
@@ -341,7 +341,7 @@ teratogen - a substance or condition that impairs normal development of the embr
 thrombocytopenia - an abnormally small number or decrease of circulating platelets in the blood.
 thrombus - (pl. thrombi), a solid mass formed from the constituents of blood within the blood vessels or the heart. Thrombi that form within the rapidly moving arterial circulation are composed largely of fibrin and platelets with only a few trapped red and white cells.
 thrombosis - the inappropriate or pathological formation of a solid mass (from the constiutents of blood) within a blood vessel or organ.
-toxin - a poison produced by a living organism.
+toxin - a Poids produced by a living organism.
 transient - of short duration, momentary.
 troponin - a protein of muscle that together with tropomyosin forms a regulatory protein complex controlling the interaction of actin and myosin and that when combined with calcium ions permits muscular contraction; when cardiac muscle cells are damaged, troponin is released into the blood stream and provides a useful indicator of cardiac cell death and evidence of myocardial infarction.
 ulcer - a local defect or excavation of the surface of an organ or tissue produced by the sloughing of necrotic inflammatory tissue.
@@ -350,6 +350,6 @@ uremia - an excess of the nitrogen-containing end products of protein and amino 
 vasculitis - inflammation of a vessel
 vasodilator - an agent that causes dilatation of the blood vessels.
 ventricular fibrillation - rapid, irregular twitching of heart muscle which prevents coordinated contraction of heart.
-vertigo - a sensation of spinning or whirling motion.
-virulence - the degree of pathogenecity of a microorganism as indicated by the severity of disease produced and the ability to invade the tissues of the host. virulent (adj.)
+Vertige - a sensation of spinning or whirling motion.
+virulence - the degree of pathogenecity of a Microalbumine as indicated by the severity of disease produced and the ability to invade the tissues of the host. virulent (adj.)
 volvulus - a twisting of a loop of intestine causing an obstruction, may impair blood supply resulting in infarction.

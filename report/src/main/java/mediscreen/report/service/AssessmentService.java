@@ -1,16 +1,19 @@
 package mediscreen.report.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
 import mediscreen.report.model.PatientRiskDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 
 public interface AssessmentService {
+
+    String RISK_NONE = "None";
+    String RISK_BORDERLINE = "Borderline";
+    String RISK_IN_DANDER = "In danger";
+    String RISK_EARLY_ONSET = "Early onset";
 
     PatientAssessmentDTO get(PatientData patientData) throws DoctorUnavailableException, IOException;
     PatientAssessmentDTO get(long patientId) throws IOException, PatientNotFoundException, DoctorUnavailableException;
