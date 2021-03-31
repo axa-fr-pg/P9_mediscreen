@@ -6,6 +6,7 @@ import "../css/MediscreenClient.css";
 import Notes from "./notes/Notes";
 import Note from "./notes/Note";
 import Reports from "./reports/Reports";
+import Report from "./reports/Report";
 
 const Home = () => (
     <div>
@@ -65,6 +66,9 @@ function MediscreenClient() {
                     </Route>
                     <Route exact path="/reports">
                         <Reports />
+                    </Route>
+                    <Route path="/reports">
+                        <Report />
                     </Route>
                 </Switch>
             </div>

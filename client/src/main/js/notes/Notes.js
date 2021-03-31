@@ -11,7 +11,11 @@ import '@axa-fr/react-toolkit-form-input-select/dist/select.scss';
 import '@axa-fr/react-toolkit-table/dist/Pager/pager.scss';
 import '@axa-fr/react-toolkit-table/dist/Paging/paging.scss';
 
-function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, setUpdateRequired}) {
+function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, history, setUpdateRequired}) {
+
+    if (!report===false) {
+        return null;
+    }
 
     function onChangePatientIdSwitch() {
         setUpdateRequired(true);
@@ -32,7 +36,11 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, setError, history, 
     );
 }
 
-function NotesRandom({patientIdGiven, setUpdateRequired, setError}) {
+function NotesRandom({patientIdGiven, setUpdateRequired, setError, report}) {
+
+    if (! report===false) {
+        return null;
+    }
 
     function generateRandomNotes(event) {
         let url = notesApiUrl;
@@ -178,9 +186,9 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
     return (
         <div className="div-note-list">
             <form className="form-filter" onSubmit={submitFilter}>
-                <label>Expected note content :&nbsp;</label>
+                <label hidden={patientIdGiven>=0}>Expected note content :&nbsp;</label>
                 <input className="filter-input" id="input-filter" type="text"
-                       onBlur={submitFilter}/>
+                       onBlur={submitFilter} hidden={patientIdGiven>=0}/>
             </form>
             <p/>
             <TreeView className="tree-view" expanded={activeBranches}
@@ -218,7 +226,7 @@ function NotesError({error}) {
     );
 }
 
-function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, setUpdateRequired, setError, history}) {
+function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, report, setUpdateRequired, setError, history}) {
 
     function onSubmitPatientIdGivenField() {
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
@@ -234,12 +242,12 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, se
 
     return (
         <h1 className="title-note-list">Note list
-            <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
+            <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} report={report}
                              setError={setError} history={history} setUpdateRequired={setUpdateRequired}/>
             <div hidden={patientIdGiven >= 0}>
                 <label>for all patients</label>
             </div>
-            <div hidden={patientIdGiven < 0}>
+            <div hidden={patientIdGiven<0 || !report===false}>
                 <form>
                     <label>for patient with id</label>
                     <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
@@ -257,7 +265,7 @@ function getPatIdFromUrl(rawUrl) {
     return url.includes('patients') ? url.split("/").pop() : -1;
 }
 
-function Notes() {
+function Notes({report}) {
     const [notes, setNotes] = useState([]);
     const [updateRequired, setUpdateRequired] = useState(false);
     const [error, setError] = useState('');
@@ -275,13 +283,13 @@ function Notes() {
 
     return (
         <div>
-            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
+            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} report={report}
                                               setUpdateRequired={setUpdateRequired} history={history} setError={setError}/>
-            <button hidden={patientIdGiven < 0} className="button-new" onClick={newNote}>Register new note</button>
+            <button hidden={patientIdGiven<0 || !report===false} className="button-new" onClick={newNote}>Register new note</button>
             <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
                       notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError}/>
+            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError} report={report}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
         </div>
     );

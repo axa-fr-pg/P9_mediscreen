@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -66,7 +67,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void test_getByPatientId_ok() throws JsonProcessingException, PatientNotFoundException {
+    public void test_getByPatientId_ok() throws IOException, PatientNotFoundException {
         // GIVEN
         long patientId = 123456;
         Response response = buildPatientResponse(HttpStatus.OK);
@@ -78,7 +79,7 @@ public class PatientServiceTest {
     }
 
     @Test
-    public void test_getByPatientId_notFound() throws JsonProcessingException {
+    public void test_getByPatientId_notFound() throws IOException {
         // GIVEN
         long patientId = 123456;
         Response response = buildPatientResponse(HttpStatus.NOT_FOUND);

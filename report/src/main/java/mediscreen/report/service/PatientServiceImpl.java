@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 public class PatientServiceImpl implements PatientService {
 
@@ -23,10 +25,10 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PatientData get(long patientId)
-            throws JsonProcessingException, PatientNotFoundException {
+            throws IOException, PatientNotFoundException {
         Response response = client.get(patientId);
         if (response.status() == HttpStatus.OK.value()) {
-            return objectMapper.readValue(response.body().toString(), PatientData.class);
+            return objectMapper.readValue(response.body().asInputStream(), PatientData.class);
         }
         throw new PatientNotFoundException(
                 "Could not find patient with id " + patientId +

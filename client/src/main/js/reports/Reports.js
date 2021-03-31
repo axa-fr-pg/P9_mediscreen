@@ -45,14 +45,12 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
     const [orderDirection, setOrderDirection] = React.useState('asc');
     const [filterId, setFilterId] = React.useState('');
     const [filterFamily, setFilterFamily] = React.useState('');
-    const [filterDob, setFilterDob] = React.useState('');
 
     useEffect(() => {
         if (updateRequired) {
             const inputData = {
                 pageNumber, rowsPerPage, orderField, orderDirection,
-                filterId, filterFamily, filterDob,
-                setPatients, setUpdateRequired, setError
+                filterId, filterFamily, setPatients, setUpdateRequired, setError
             };
             getPatients(inputData);
         }
@@ -95,13 +93,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setFilterFamily(document.getElementById('input-filter-family').value);
         setPageNumber(0);
         setUpdateRequired(true);
-    }
-
-    function submitFilterDob(event) {
-/*        event.preventDefault();
-        setFilterDob(document.getElementById('input-filter-dob').value);
-        setPageNumber(0);
-        setUpdateRequired(true);*/
     }
 
     function onChange(event) {
@@ -158,16 +149,15 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                         </form>
                     </th>
                     <th>
-                        <form className="form-filter" onSubmit={submitFilterDob}>
-                            <input className="filter-input" id="input-filter-risk" type="text"
-                                   onBlur={submitFilterDob}/>
+                        <form className="form-filter" >
+                            <input className="filter-input" id="input-filter-risk" type="text"/>
                         </form>
                     </th>
                 </tr>
                 </thead>
                 <tbody>
                 {patients.content.map(patient => (
-                    <tr key={patient.id} onClick={() => history.push("/patients/" + patient.id)}>
+                    <tr key={patient.id} onClick={() => history.push("/reports/patients/" + patient.id)}>
                         <td>{patient.id}</td>
                         <td>{patient.family}</td>
                         <td>{patient.risk}</td>

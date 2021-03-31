@@ -14,11 +14,11 @@ const patientFields = [
     {field : "phone", label : "Phone"}
 ];
 
-function Patient() {
+function Patient({report}) {
 
     const [input, setInput] = useState(true);
     const [error, setError] = useState('');
-    const [patient, setPatient] = React.useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
+    const [patient, setPatient] = useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
     const [modify, setModify] = useState(window.location.href.includes('new'));
 
     function DisplayError() {
@@ -35,8 +35,7 @@ function Patient() {
         if (isNaN(parseInt(patient.id))) {
             setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
             setInput(false);
-        } else
-        {
+        } else {
             axios.get(patientsApiUrl + "/" + patient.id)
                 .then(response => {
                     setPatient(response.data);
@@ -121,7 +120,7 @@ function Patient() {
     }
 
     function displayModifySwitch() {
-        if (!input || window.location.href.includes('new')) {
+        if (!input || window.location.href.includes('new') || !report===false) {
             return null;
         }
         return(
