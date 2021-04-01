@@ -14,6 +14,8 @@ const patientFields = [
     {field : "phone", label : "Phone"}
 ];
 
+export const NUMBER_OF_PATIENT_FIELDS = 7;
+
 function Patient({report}) {
 
     const [input, setInput] = useState(true);

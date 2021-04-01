@@ -13,7 +13,7 @@ import '@axa-fr/react-toolkit-table/dist/Paging/paging.scss';
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, history, setUpdateRequired}) {
 
-    if (!report===false) {
+    if (!report === false) {
         return null;
     }
 
@@ -38,7 +38,7 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, h
 
 function NotesRandom({patientIdGiven, setUpdateRequired, setError, report}) {
 
-    if (! report===false) {
+    if (!report === false) {
         return null;
     }
 
@@ -70,14 +70,12 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setError, report}) {
     }
 
     return (
-        <form>
-            <div className="div-random">
-                <button onClick={generateRandomNotes}>Add</button>
-                <input id="input-random-volume" className="input-narrow" defaultValue={5}/>
-                <label>
-                    random note(s) to database
-                </label>
-            </div>
+        <form className="form-random">
+            <button onClick={generateRandomNotes}>Add</button>
+            <input id="input-random-volume" className="input-narrow" defaultValue={5}/>
+            <label>
+                random note(s) to database
+            </label>
         </form>
     );
 }
@@ -175,9 +173,9 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
 
     function onChange(event) {
         const {numberItems, page} = event;
-        setPageNumber(page-1);
-        if (page > (notes.totalElements/numberItems)) {
-            setPageNumber(Math.floor(notes.totalElements/numberItems));
+        setPageNumber(page - 1);
+        if (page > (notes.totalElements / numberItems)) {
+            setPageNumber(Math.floor(notes.totalElements / numberItems));
         }
         setRowsPerPage(numberItems);
         setUpdateRequired(true);
@@ -186,9 +184,9 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
     return (
         <div className="div-note-list">
             <form className="form-filter" onSubmit={submitFilter}>
-                <label hidden={patientIdGiven>=0}>Expected note content :&nbsp;</label>
+                <label hidden={patientIdGiven >= 0}>Expected note content :&nbsp;</label>
                 <input className="filter-input" id="input-filter" type="text"
-                       onBlur={submitFilter} hidden={patientIdGiven>=0}/>
+                       onBlur={submitFilter} hidden={patientIdGiven >= 0}/>
             </form>
             <p/>
             <TreeView className="tree-view" expanded={activeBranches}
@@ -200,9 +198,9 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
                 ))}
             </TreeView>
             <p/>
-            <div hidden={patientIdGiven>=0}>
+            <div hidden={patientIdGiven >= 0}>
                 <Paging
-                    currentPage={pageNumber+1}
+                    currentPage={pageNumber + 1}
                     numberPages={notes.totalPages}
                     numberItems={rowsPerPage}
                     displayLabel=""
@@ -247,12 +245,12 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, re
             <div hidden={patientIdGiven >= 0}>
                 <label>for all patients</label>
             </div>
-            <div hidden={patientIdGiven<0 || !report===false}>
+            <div hidden={patientIdGiven < 0 || !report === false}>
                 <form>
                     <label>for patient with id</label>
                     <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
-                           value={patientIdGiven>=0 ? patientIdGiven : 0}
-                            onChange={onChangePatientIdGiven}/>
+                           value={patientIdGiven >= 0 ? patientIdGiven : 0}
+                           onChange={onChangePatientIdGiven}/>
                     <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
                 </form>
             </div>
@@ -283,13 +281,18 @@ function Notes({report}) {
 
     return (
         <div>
-            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} report={report}
-                                              setUpdateRequired={setUpdateRequired} history={history} setError={setError}/>
-            <button hidden={patientIdGiven<0 || !report===false} className="button-new" onClick={newNote}>Register new note</button>
+            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
+                                              report={report}
+                                              setUpdateRequired={setUpdateRequired} history={history}
+                                              setError={setError}/>
+            <button hidden={patientIdGiven < 0 || !report === false} className="button-new" onClick={newNote}>Register
+                new note
+            </button>
             <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
                       notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError} report={report}/>
+            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError}
+                         report={report}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
         </div>
     );

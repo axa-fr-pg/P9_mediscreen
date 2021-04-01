@@ -4,6 +4,11 @@ import {patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import {Paging} from "@axa-fr/react-toolkit-table";
+import {File} from '@axa-fr/react-toolkit-form-input-file';
+import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
+import {readString} from 'react-papaparse';
+import {NUMBER_OF_PATIENT_FIELDS} from './Patient';
+import moment from 'moment';
 
 function getPatients(inputData) {
     const {
@@ -229,10 +234,95 @@ function generateRandomPatients(event, setUpdateRequired, setError) {
         });
 }
 
+function convertSlashDateToDashDate(slashDate, setError) {
+    const numbers = slashDate.split('/');
+    if (numbers.length !== 3) {
+        setError("File contains at least one date with wrong format !")
+    }
+    const day = numbers[0];
+    const month = numbers[1];
+    const year = numbers[2];
+    const date = new Date(year, month, day);
+    return moment(date).format('YYYY-MM-DD');
+}
+
+let numberOfPatientsPosted;
+
+function postPatient(line, setError) {
+    console.log("Ajouter patient " + line)
+    const patient = {
+        id : 0,
+        family : line[0],
+        given : line[1],
+        dob : line[2],
+        sex : line[3].replace(/ /g,''),
+        address : line[4],
+        phone : line[5]
+    };
+    if (patient.dob.includes('/')) {
+        patient.dob = convertSlashDateToDashDate(patient.dob, setError);
+    }
+    axios.post(patientsApiUrl, patient)
+        .then(() => numberOfPatientsPosted++)
+        .catch(error => {
+            if (error.response) {
+                setError(error.response.status + " " + error.response.data);
+            } else {
+                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+            }
+        });
+}
+
+function waitAndRefreshDisplay(numberOfPatientsToPost, setUpdateRequired, setError) {
+    if (numberOfPatientsPosted < numberOfPatientsToPost) {
+        setTimeout(waitAndRefreshDisplay, 1000, numberOfPatientsToPost, setUpdateRequired, setError);
+    } else {
+        setUpdateRequired(true);
+        setError(numberOfPatientsToPost +" patients have been uploaded successfully !")
+    }
+}
+
+function addPatients(text, setUpdateRequired, setError) {
+    numberOfPatientsPosted = 0;
+    const csvConfig = {
+        delimiter: ";",
+        skipEmptyLines: true
+    };
+    const results = readString(text, csvConfig);
+    if (results.errors.length > 0) {
+        setError("File parsing has encountered errors. Please check and try again or ask your IT");
+        return;
+    }
+    let numberOfLinesWithWrongFormat = 0;
+    results.data.forEach(line => {
+        if (line.length !== NUMBER_OF_PATIENT_FIELDS - 1) {
+            numberOfLinesWithWrongFormat++;
+        }
+    });
+    if (numberOfLinesWithWrongFormat > 0) {
+        setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
+        return;
+    }
+    setError("Creating " + results.data.length + " patients from uploaded file ...");
+    results.data.forEach(line => postPatient(line, setError));
+    waitAndRefreshDisplay(results.data.length, setUpdateRequired, setError);
+}
+
+function uploadPatientFile(values, setUpdateRequired, setError) {
+    if (values.length === 0) {
+        setError("You selected an invalid file format. Please check and try again or ask your IT");
+        return;
+    }
+    setError("Uploading " + values[0].file.name + " ...");
+    fetch(values[0].file.preview)
+        .then(response => response.blob())
+        .then(blob => blob.text())
+        .then(content => addPatients(content, setUpdateRequired, setError));
+}
+
 function PatientsRandom({setUpdateRequired, setError}) {
     return (
-        <form>
-            <div className="div-random">
+            <form className="form-random">
                 <button
                     onClick={(event) => generateRandomPatients(event, setUpdateRequired, setError)}>Add
                 </button>
@@ -240,8 +330,20 @@ function PatientsRandom({setUpdateRequired, setError}) {
                 <label>
                     random patient(s) to database
                 </label>
-            </div>
-        </form>
+            </form>
+    );
+}
+
+function PatientsUpload({setUpdateRequired, setError}) {
+    return (
+        <File
+            label="Browse file"
+            placeholder="You can upload a CSV patient file with drag and drop here"
+            id="file-to-be-uploaded"
+            name="file-upload"
+            accept=".csv"
+            onChange={(values) => uploadPatientFile(values.values, setUpdateRequired, setError)}
+        />
     );
 }
 
@@ -258,6 +360,7 @@ function Patients() {
                          setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError}/>
+            <PatientsUpload setUpdateRequired={setUpdateRequired} setError={setError}/>
             <PatientsError error={error}/>
         </div>
     );
