@@ -56,6 +56,8 @@ public class AssessmentServiceTest {
             LocalDate.of(2004, 5, 6),
             "7", "8", "9");
 
+    private List<String> testRiskTriggerWordList = new ArrayList<>(riskTriggerWordList);
+
     private List<NoteData> noteDataListWithTriggers(int numberOfTriggers) {
         List<NoteData> noteDataList = new ArrayList<>();
         for (int i=0; i<numberOfTriggers; i++) {
@@ -66,7 +68,7 @@ public class AssessmentServiceTest {
         for (int i=0; i<numberOfTriggers; i++) {
             String id = "id-" + i;
             String e = randomAlphabetic(nextInt(3, 15)) + " "  +
-                    riskTriggerWordList.get(nextInt(0,riskTriggerWordList.size()-1)) + " " +
+                    testRiskTriggerWordList.get(nextInt(0,testRiskTriggerWordList.size()-1)) + " " +
                     randomAlphabetic(nextInt(3, 15));
             noteDataList.add(new NoteData(id, e));
         }
@@ -292,5 +294,21 @@ public class AssessmentServiceTest {
         String risk = serviceImpl.risk(patientData, noteDataList);
         // THEN
         assertEquals(RISK_EARLY_ONSET, risk);
+    }
+    @Test
+    public void test_risk_borderline_two_triggers_case_doesnt_matter() {
+        // GIVEN
+        for (int i=0; i<testRiskTriggerWordList.size(); i++) {
+            String word = testRiskTriggerWordList.get(0);
+            testRiskTriggerWordList.remove(0);
+            String newWord = (i%2==0) ? word.toLowerCase() : word.toUpperCase();
+            testRiskTriggerWordList.add(newWord);
+        }
+        List<NoteData> noteDataList = noteDataListWithTriggers(2);
+        patientData.dob = LocalDate.of(LocalDate.now().getYear()-32, 5, 6);
+        // WHEN
+        String risk = serviceImpl.risk(patientData, noteDataList);
+        // THEN
+        assertEquals(RISK_BORDERLINE, risk);
     }
 }
