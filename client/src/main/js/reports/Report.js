@@ -38,12 +38,18 @@ function Report() {
         }
     }, [patientId]);
 
+    if (error !== '') {
+        return <div>
+            <h1/>
+            <DisplayError />
+        </div>
+    }
+
     return (
         <div>
             <h1>{patient.assessment}</h1>
             <Patient report="true"/>
             <Notes report="true"/>
-            <DisplayError />
         </div>
     );
 }

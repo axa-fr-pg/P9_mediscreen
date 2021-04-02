@@ -138,3 +138,7 @@ footer {
     border-right-style: dashed;
     border-right-width: 2px;
 }
+
+#file-to-be-uploaded:hover  {
+    border-right-color: #00008f;
+}

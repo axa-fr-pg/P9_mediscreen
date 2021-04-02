@@ -10,6 +10,11 @@ import {Paging} from '@axa-fr/react-toolkit-table';
 import '@axa-fr/react-toolkit-form-input-select/dist/select.scss';
 import '@axa-fr/react-toolkit-table/dist/Pager/pager.scss';
 import '@axa-fr/react-toolkit-table/dist/Paging/paging.scss';
+import {File} from '@axa-fr/react-toolkit-form-input-file';
+import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
+import {readString} from 'react-papaparse';
+import {getPatients} from '../patients/Patients';
+import {postNote} from './Note';
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, history, setUpdateRequired}) {
 
@@ -258,20 +263,140 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, re
     );
 }
 
-function getPatIdFromUrl(rawUrl) {
+function getPatientIdByUrl(rawUrl) {
     const url = rawUrl.split("?").shift();
     return url.includes('patients') ? url.split("/").pop() : -1;
+}
+
+let numberOfNotesPosted;
+let numberOfNotesAdded;
+let numberOfPatientsChecked;
+let numberOfPatientsFound;
+let noteContent;
+
+function waitAllNotesPosted(numberOfNotesToPost, setError) {
+    if (numberOfNotesPosted < numberOfNotesToPost) {
+        setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setError);
+    } else if (numberOfNotesAdded === numberOfNotesPosted) {
+        setError(numberOfNotesToPost +" patient notes have been uploaded successfully !")
+    }
+}
+
+function postPatientNoteByPatientId(results) {
+    const patientId = results.content[0].id;
+    numberOfNotesPosted++;
+    numberOfNotesAdded++;
+    const body = {noteId : '', e: noteContent};
+    postNote(body, patientId, ()=>{}, ()=>{});
+}
+
+function postPatientNote(line, setError) {
+    const family = line[0];
+    noteContent = line[1];
+    const inputData = {
+        pageNumber : 0, rowsPerPage : 10, orderField : 'id', orderDirection : 'asc',
+        filterId : '', filterFamily : family, filterDob : '',
+        setPatients : postPatientNoteByPatientId, setUpdateRequired : () => {},
+        setError : (text) => {setError(text); numberOfNotesPosted++}
+    };
+    getPatients(inputData);
+}
+
+function countLinesWithFormatError(results) {
+    let numberOfLinesWithWrongFormat = 0;
+    results.data.forEach(line => {
+        if (line.length !== 2) {
+            numberOfLinesWithWrongFormat++;
+        }
+    });
+    return numberOfLinesWithWrongFormat;
+}
+
+function checkPatientByFamily(family) {
+    const inputData = {
+        pageNumber : 0, rowsPerPage : 10, orderField : 'id', orderDirection : 'asc',
+        filterId : '', filterFamily : family, filterDob : '',
+        setPatients : () => {numberOfPatientsFound++; numberOfPatientsChecked++},
+        setUpdateRequired : () => {}, setError : () => {numberOfPatientsChecked++}
+    };
+    getPatients(inputData);
+}
+
+function waitAllPatientsCheckedAndPostNotes(results, setError) {
+    if (numberOfPatientsChecked < results.data.length) {
+        setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setError);
+        return;
+    }
+    if (numberOfPatientsFound < numberOfPatientsChecked) {
+        setError("CSV file contains " + (numberOfPatientsChecked - numberOfPatientsFound) +
+            " note(s) for unknown or ambiguous patient(s). Aborting upload.");
+        return;
+    }
+    results.data.forEach(line => postPatientNote(line, setError));
+    waitAllNotesPosted(results.data.length, setError);
+}
+
+function checkAllPatientsFoundAndPostNotes(results, setError) {
+    results.data.forEach(results => checkPatientByFamily(results[0]));
+    waitAllPatientsCheckedAndPostNotes(results, setError);
+}
+
+function addPatientNotes(text, setUpdateRequired, setError) {
+    numberOfNotesPosted = 0;
+    numberOfNotesAdded = 0;
+    numberOfPatientsChecked = 0;
+    numberOfPatientsFound = 0;
+    const csvConfig = {
+        delimiter: ";",
+        skipEmptyLines: true
+    };
+    const results = readString(text, csvConfig);
+    if (results.errors.length > 0) {
+        setError("File parsing has encountered errors. Please check and try again or ask your IT");
+        return;
+    }
+    const numberOfLinesWithWrongFormat = countLinesWithFormatError(results);
+    if (numberOfLinesWithWrongFormat > 0) {
+        setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
+        return;
+    }
+    checkAllPatientsFoundAndPostNotes(results, setError);
+}
+
+function uploadPatientNoteFile(values, setUpdateRequired, setError) {
+    if (values.length === 0) {
+        setError("You selected an invalid file format. Please check and try again or ask your IT");
+        return;
+    }
+    setError("Uploading " + values[0].file.name + " ...");
+    fetch(values[0].file.preview)
+        .then(response => response.blob())
+        .then(blob => blob.text())
+        .then(content => addPatientNotes(content, setUpdateRequired, setError));
+}
+
+function NotesUpload({setUpdateRequired, setError}) {
+    return (
+        <File
+            label="Browse file"
+            placeholder="You can upload a CSV note file with drag and drop here"
+            id="file-to-be-uploaded"
+            name="file-upload"
+            accept=".csv"
+            onChange={(values) => uploadPatientNoteFile(values.values, setUpdateRequired, setError)}
+        />
+    );
 }
 
 function Notes({report}) {
     const [notes, setNotes] = useState([]);
     const [updateRequired, setUpdateRequired] = useState(false);
     const [error, setError] = useState('');
-    const [patientIdGiven, setPatientIdGiven] = useState(getPatIdFromUrl(window.location.href));
+    const [patientIdGiven, setPatientIdGiven] = useState(getPatientIdByUrl(window.location.href));
     const history = useHistory();
 
     useEffect(() => {
-        setPatientIdGiven(getPatIdFromUrl(window.location.href));
+        setPatientIdGiven(getPatientIdByUrl(window.location.href));
         setUpdateRequired(true);
     }, [history.location.pathname]);
 
@@ -293,6 +418,7 @@ function Notes({report}) {
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError}
                          report={report}/>
+            <NotesUpload setUpdateRequired={setUpdateRequired} setError={setError}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
         </div>
     );

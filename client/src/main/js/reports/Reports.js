@@ -22,10 +22,10 @@ function getPatients(inputData) {
     }
     axios.get(url)
         .then(response => {
-            setPatients(response.data);
             if (response.data.numberOfElements === 0) {
                 setError('Your selection criteria match no patient (or the database is empty).');
             }
+            setPatients(response.data);
         })
         .catch(error => {
             if (error.response) {
@@ -56,19 +56,19 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         }
     });
 
+    const handleSortByFamily = (event) => {
+        const isAsc = orderField === 'family' && orderDirection === 'asc';
+        setOrderDirection(isAsc ? 'desc' : 'asc');
+        setOrderField('family');
+        setUpdateRequired(true);
+    };
+
     if (patients.length === 0) return null;
 
     const handleSortById = (event) => {
         const isAsc = orderField === 'id' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
         setOrderField('id');
-        setUpdateRequired(true);
-    };
-
-    const handleSortByFamily = (event) => {
-        const isAsc = orderField === 'family' && orderDirection === 'asc';
-        setOrderDirection(isAsc ? 'desc' : 'asc');
-        setOrderField('family');
         setUpdateRequired(true);
     };
 

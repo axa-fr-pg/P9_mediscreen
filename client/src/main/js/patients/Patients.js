@@ -10,7 +10,7 @@ import {readString} from 'react-papaparse';
 import {NUMBER_OF_PATIENT_FIELDS} from './Patient';
 import moment from 'moment';
 
-function getPatients(inputData) {
+export function getPatients(inputData) {
     const {
         pageNumber, rowsPerPage, orderField, orderDirection,
         filterId, filterFamily, filterDob,
@@ -98,13 +98,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setUpdateRequired(true);
     }
 
-    function submitFilterFamily(event) {
-        event.preventDefault();
-        setFilterFamily(document.getElementById('input-filter-family').value);
-        setPageNumber(0);
-        setUpdateRequired(true);
-    }
-
     function submitFilterDob(event) {
         event.preventDefault();
         setFilterDob(document.getElementById('input-filter-dob').value);
@@ -119,6 +112,13 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
             setPageNumber(Math.floor(patients.totalElements / numberItems));
         }
         setRowsPerPage(numberItems);
+        setUpdateRequired(true);
+    }
+
+    function submitFilterFamily(event) {
+        event.preventDefault();
+        setFilterFamily(document.getElementById('input-filter-family').value);
+        setPageNumber(0);
         setUpdateRequired(true);
     }
 
@@ -247,9 +247,9 @@ function convertSlashDateToDashDate(slashDate, setError) {
 }
 
 let numberOfPatientsPosted;
+let numberOfPatientsAdded;
 
 function postPatient(line, setError) {
-    console.log("Ajouter patient " + line)
     const patient = {
         id : 0,
         family : line[0],
@@ -263,8 +263,9 @@ function postPatient(line, setError) {
         patient.dob = convertSlashDateToDashDate(patient.dob, setError);
     }
     axios.post(patientsApiUrl, patient)
-        .then(() => numberOfPatientsPosted++)
+        .then(() => {numberOfPatientsPosted++; numberOfPatientsAdded++;})
         .catch(error => {
+            numberOfPatientsPosted++;
             if (error.response) {
                 setError(error.response.status + " " + error.response.data);
             } else {
@@ -273,17 +274,20 @@ function postPatient(line, setError) {
         });
 }
 
-function waitAndRefreshDisplay(numberOfPatientsToPost, setUpdateRequired, setError) {
+function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setUpdateRequired, setError) {
     if (numberOfPatientsPosted < numberOfPatientsToPost) {
-        setTimeout(waitAndRefreshDisplay, 1000, numberOfPatientsToPost, setUpdateRequired, setError);
+        setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setUpdateRequired, setError);
     } else {
         setUpdateRequired(true);
-        setError(numberOfPatientsToPost +" patients have been uploaded successfully !")
+        if (numberOfPatientsAdded === numberOfPatientsPosted) {
+            setError(numberOfPatientsToPost +" patients have been uploaded successfully !")
+        }
     }
 }
 
 function addPatients(text, setUpdateRequired, setError) {
     numberOfPatientsPosted = 0;
+    numberOfPatientsAdded = 0;
     const csvConfig = {
         delimiter: ";",
         skipEmptyLines: true
@@ -303,9 +307,8 @@ function addPatients(text, setUpdateRequired, setError) {
         setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
         return;
     }
-    setError("Creating " + results.data.length + " patients from uploaded file ...");
     results.data.forEach(line => postPatient(line, setError));
-    waitAndRefreshDisplay(results.data.length, setUpdateRequired, setError);
+    waitAllPatientsPostedAndRefreshDisplay(results.data.length, setUpdateRequired, setError);
 }
 
 function uploadPatientFile(values, setUpdateRequired, setError) {

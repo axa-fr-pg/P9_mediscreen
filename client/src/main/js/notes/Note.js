@@ -4,6 +4,23 @@ import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import ReactQuill from "react-quill";
 
+export function postNote(body, patId, setInput, setError) {
+    body.noteId = '';
+    axios.post(notesApiUrl + '/patients/' + patId, body)
+        .then(response => {
+            body.noteId = response.data.noteId;
+            setInput(false);
+            setError("Note created successfully with id=" + body.noteId);
+        })
+        .catch(error => {
+            if (error.response) {
+                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
+            } else {
+                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+            }
+        });
+}
+
 function NoteSaveButton({input, modify, onClick}) {
     if (!input || !modify) return null;
     return (
@@ -60,20 +77,7 @@ function Note() {
 
         const body = {...note};
         if (note.noteId === 'new') {
-            body.noteId = '';
-            axios.post(notesApiUrl + '/patients/' + note.patId, body)
-                .then(response => {
-                    body.noteId = response.data.noteId;
-                    setInput(false);
-                    setError("Note created successfully with id=" + body.noteId);
-                })
-                .catch(error => {
-                    if (error.response) {
-                        setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
-                    } else {
-                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
-                });
+            postNote(body, note.patId, setInput, setError);
         } else {
             axios.put(notesApiUrl + "/" + note.noteId, body)
                 .then(response => {
