@@ -375,7 +375,10 @@ function uploadPatientNoteFile(values, setUpdateRequired, setError) {
         .then(content => addPatientNotes(content, setUpdateRequired, setError));
 }
 
-function NotesUpload({setUpdateRequired, setError}) {
+function NotesUpload({setUpdateRequired, setError, report}) {
+    if (!report === false) {
+        return null;
+    }
     return (
         <File
             label="Browse file"
@@ -418,7 +421,7 @@ function Notes({report}) {
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError}
                          report={report}/>
-            <NotesUpload setUpdateRequired={setUpdateRequired} setError={setError}/>
+            <NotesUpload setUpdateRequired={setUpdateRequired} setError={setError} report={report}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
         </div>
     );
