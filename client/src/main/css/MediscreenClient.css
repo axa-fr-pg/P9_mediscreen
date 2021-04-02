@@ -142,3 +142,19 @@ footer {
 #file-to-be-uploaded:hover  {
     border-right-color: #00008f;
 }
+
+.risk-none {
+    background-color: palegreen ;
+}
+
+.risk-borderline {
+    background-color: steelblue ;
+}
+
+.risk-in-danger {
+    background-color: darkorange ;
+}
+
+.risk-early-onset {
+    background-color: red ;
+}

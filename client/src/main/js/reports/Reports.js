@@ -37,6 +37,19 @@ function getPatients(inputData) {
     setUpdateRequired(false);
 }
 
+function getRiskColorClassName(risk) {
+    switch (risk) {
+        case 'None' :
+            return "risk-none";
+        case 'Borderline' :
+            return "risk-borderline";
+        case 'In danger' :
+            return "risk-in-danger";
+        case 'Early onset' :
+            return "risk-early-onset";
+    }
+}
+
 function PatientList({patients, setPatients, updateRequired, setUpdateRequired, setError, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
@@ -160,7 +173,7 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                     <tr key={patient.id} onClick={() => history.push("/reports/patients/" + patient.id)}>
                         <td>{patient.id}</td>
                         <td>{patient.family}</td>
-                        <td>{patient.risk}</td>
+                        <td className={getRiskColorClassName(patient.risk)}>{patient.risk}</td>
                     </tr>
                 ))}
                 </tbody>
