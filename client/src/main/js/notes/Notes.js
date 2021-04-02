@@ -341,7 +341,8 @@ function checkAllPatientsFoundAndPostNotes(results, setError) {
     waitAllPatientsCheckedAndPostNotes(results, setError);
 }
 
-function addPatientNotes(text, setUpdateRequired, setError) {
+function addPatientNotes(content, setUpdateRequired, setError) {
+    const text = new Buffer(content).toString( 'latin1');
     numberOfNotesPosted = 0;
     numberOfNotesAdded = 0;
     numberOfPatientsChecked = 0;
@@ -371,7 +372,7 @@ function uploadPatientNoteFile(values, setUpdateRequired, setError) {
     setError("Uploading " + values[0].file.name + " ...");
     fetch(values[0].file.preview)
         .then(response => response.blob())
-        .then(blob => blob.text())
+        .then(blob => blob.arrayBuffer())
         .then(content => addPatientNotes(content, setUpdateRequired, setError));
 }
 
