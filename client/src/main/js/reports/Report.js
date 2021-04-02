@@ -3,6 +3,7 @@ import axios from "axios";
 import {reportsApiUrl} from '../api/URLs';
 import Patient from "../patients/Patient";
 import Notes from "../notes/Notes";
+import {getRiskColorClassName} from "./Reports"
 
 function Report() {
 
@@ -47,7 +48,7 @@ function Report() {
 
     return (
         <div>
-            <h1>{patient.assessment}</h1>
+            <h1 className={getRiskColorClassName(patient.assessment)}>{patient.assessment}</h1>
             <Patient report="true"/>
             <Notes report="true"/>
         </div>

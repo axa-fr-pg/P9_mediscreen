@@ -37,16 +37,18 @@ function getPatients(inputData) {
     setUpdateRequired(false);
 }
 
-function getRiskColorClassName(risk) {
-    switch (risk) {
-        case 'None' :
-            return "risk-none";
-        case 'Borderline' :
-            return "risk-borderline";
-        case 'In danger' :
-            return "risk-in-danger";
-        case 'Early onset' :
-            return "risk-early-onset";
+export function getRiskColorClassName(risk) {
+    if (risk.includes('None')) {
+        return "risk-none";
+    }
+    if (risk.includes('Borderline')) {
+        return "risk-borderline";
+    }
+    if (risk.includes('In danger')) {
+        return "risk-in-danger";
+    }
+    if (risk.includes('Early onset')) {
+        return "risk-early-onset";
     }
 }
 
