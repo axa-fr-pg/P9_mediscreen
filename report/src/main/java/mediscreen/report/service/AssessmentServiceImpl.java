@@ -98,7 +98,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     private long numberOfNotesWithTrigger(List<NoteData> noteDataList, String word) {
-        return noteDataList.stream().filter(noteData -> noteData.e.contains(word)).count();
+        return noteDataList.stream().filter(noteData -> noteData.e.toUpperCase().contains(word.toUpperCase())).count();
     }
 
     private long totalRiskTriggers(List<NoteData> noteDataList) {
