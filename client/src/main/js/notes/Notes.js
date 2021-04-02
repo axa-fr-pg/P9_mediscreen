@@ -272,7 +272,6 @@ let numberOfNotesPosted;
 let numberOfNotesAdded;
 let numberOfPatientsChecked;
 let numberOfPatientsFound;
-let noteContent;
 
 function waitAllNotesPosted(numberOfNotesToPost, setError) {
     if (numberOfNotesPosted < numberOfNotesToPost) {
@@ -282,7 +281,7 @@ function waitAllNotesPosted(numberOfNotesToPost, setError) {
     }
 }
 
-function postPatientNoteByPatientId(results) {
+function postPatientNoteByPatientId(results, noteContent) {
     const patientId = results.content[0].id;
     numberOfNotesPosted++;
     numberOfNotesAdded++;
@@ -292,11 +291,11 @@ function postPatientNoteByPatientId(results) {
 
 function postPatientNote(line, setError) {
     const family = line[0];
-    noteContent = line[1];
+    const setPatients = (results) => {postPatientNoteByPatientId(results, line[1])};
     const inputData = {
         pageNumber : 0, rowsPerPage : 10, orderField : 'id', orderDirection : 'asc',
         filterId : '', filterFamily : family, filterDob : '',
-        setPatients : postPatientNoteByPatientId, setUpdateRequired : () => {},
+        setPatients : setPatients, setUpdateRequired : () => {},
         setError : (text) => {setError(text); numberOfNotesPosted++}
     };
     getPatients(inputData);
