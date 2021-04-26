@@ -87,13 +87,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         setUpdateRequired(true);
     };
 
-    const handleSortByRisk = (event) => {
-        /* const isAsc = orderField === 'risk' && orderDirection === 'asc';
-        setOrderDirection(isAsc ? 'desc' : 'asc');
-        setOrderField('risk');
-        setUpdateRequired(true); */
-    };
-
     function submitFilterId(event) {
         event.preventDefault();
         const inputField = document.getElementById('input-filter-id');
@@ -141,14 +134,7 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                             Family name
                         </TableSortLabel>
                     </th>
-                    <th>
-                        <TableSortLabel
-                            active={orderField === 'risk'}
-                            direction={orderDirection}
-                            onClick={handleSortByRisk}>
-                            Risk level
-                        </TableSortLabel>
-                    </th>
+                    <th rowSpan="2">Risk level<br/>&nbsp;</th>
                 </tr>
                 <tr>
                     <th>
@@ -163,11 +149,7 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                                    onBlur={submitFilterFamily}/>
                         </form>
                     </th>
-                    <th>
-                        <form className="form-filter" >
-                            <input className="filter-input" id="input-filter-risk" type="text"/>
-                        </form>
-                    </th>
+                    <th />
                 </tr>
                 </thead>
                 <tbody>
