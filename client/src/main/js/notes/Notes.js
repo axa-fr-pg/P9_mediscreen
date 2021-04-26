@@ -273,12 +273,13 @@ let numberOfNotesAdded;
 let numberOfPatientsChecked;
 let numberOfPatientsFound;
 
-function waitAllNotesPosted(numberOfNotesToPost, setError) {
+function waitAllNotesPosted(numberOfNotesToPost, setError, setUpdateRequired) {
     if (numberOfNotesPosted < numberOfNotesToPost) {
-        setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setError);
+        setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setError, setUpdateRequired);
     } else if (numberOfNotesAdded === numberOfNotesPosted) {
         setError(numberOfNotesToPost +" patient notes have been uploaded successfully !")
     }
+    setUpdateRequired(true);
 }
 
 function postPatientNoteByPatientId(results, noteContent) {
@@ -321,9 +322,9 @@ function checkPatientByFamily(family) {
     getPatients(inputData);
 }
 
-function waitAllPatientsCheckedAndPostNotes(results, setError) {
+function waitAllPatientsCheckedAndPostNotes(results, setError, setUpdateRequired) {
     if (numberOfPatientsChecked < results.data.length) {
-        setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setError);
+        setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setError, setUpdateRequired);
         return;
     }
     if (numberOfPatientsFound < numberOfPatientsChecked) {
@@ -332,12 +333,12 @@ function waitAllPatientsCheckedAndPostNotes(results, setError) {
         return;
     }
     results.data.forEach(line => postPatientNote(line, setError));
-    waitAllNotesPosted(results.data.length, setError);
+    waitAllNotesPosted(results.data.length, setError, setUpdateRequired);
 }
 
-function checkAllPatientsFoundAndPostNotes(results, setError) {
+function checkAllPatientsFoundAndPostNotes(results, setError, setUpdateRequired) {
     results.data.forEach(results => checkPatientByFamily(results[0]));
-    waitAllPatientsCheckedAndPostNotes(results, setError);
+    waitAllPatientsCheckedAndPostNotes(results, setError, setUpdateRequired);
 }
 
 function addPatientNotes(content, setUpdateRequired, setError) {
@@ -360,7 +361,7 @@ function addPatientNotes(content, setUpdateRequired, setError) {
         setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
         return;
     }
-    checkAllPatientsFoundAndPostNotes(results, setError);
+    checkAllPatientsFoundAndPostNotes(results, setError, setUpdateRequired);
 }
 
 function uploadPatientNoteFile(values, setUpdateRequired, setError) {
