@@ -26,7 +26,6 @@ import static mediscreen.report.service.AssessmentService.RISK_BORDERLINE;
 import static mediscreen.report.service.AssessmentService.RISK_EARLY_ONSET;
 import static mediscreen.report.service.AssessmentService.RISK_IN_DANDER;
 import static mediscreen.report.service.AssessmentService.RISK_NONE;
-import static mediscreen.report.service.AssessmentServiceImpl.riskTriggerWordList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,13 +49,18 @@ public class AssessmentServiceTest {
 
     @Autowired
     AssessmentService service;
-    AssessmentServiceImpl serviceImpl = new AssessmentServiceImpl();
+    AssessmentServiceImpl serviceImpl;
 
     final private PatientData patientData = new PatientData(1, "2", "3",
             LocalDate.of(2004, 5, 6),
             "7", "8", "9");
 
-    private List<String> testRiskTriggerWordList = new ArrayList<>(riskTriggerWordList);
+    private final List<String> testRiskTriggerWordList;
+
+    public AssessmentServiceTest() throws IOException {
+        serviceImpl = new AssessmentServiceImpl();
+        testRiskTriggerWordList = new ArrayList<>(serviceImpl.riskTriggerWordList);
+    }
 
     private List<NoteData> noteDataListWithTriggers(int numberOfTriggers) {
         List<NoteData> noteDataList = new ArrayList<>();

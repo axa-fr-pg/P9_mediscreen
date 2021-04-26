@@ -5,6 +5,9 @@ import mediscreen.report.model.PatientAssessmentDTO;
 import mediscreen.report.model.PatientData;
 import mediscreen.report.model.PatientRiskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,19 +33,17 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Autowired
     NoteService noteService;
 
-    final static protected List<String> riskTriggerWordList = Arrays.asList(
-            "Hémoglobine A1C",
-            "Microalbumine",
-            "Taille",
-            "Poids",
-            "Fumeur",
-            "Anormal",
-            "Cholestérol",
-            "Vertige",
-            "Rechute",
-            "Réaction",
-            "Anticorps"
-    );
+    protected List<String> riskTriggerWordList;
+
+    AssessmentServiceImpl() throws IOException {
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+        Resource resource = resourceLoader.getResource("classpath:risk-triggers.txt");
+        Scanner scanner = new Scanner(resource.getInputStream());
+        riskTriggerWordList = new ArrayList<>();
+        while (scanner.hasNextLine()) {
+            riskTriggerWordList.add(scanner.nextLine());
+        }
+    }
 
     @Override
     public PatientAssessmentDTO get(@NotNull PatientData patientData)
