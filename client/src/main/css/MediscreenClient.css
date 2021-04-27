@@ -158,3 +158,9 @@ footer {
 .risk-early-onset {
     background-color: red ;
 }
+
+.swagger-url {
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+}

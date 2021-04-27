@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import axios from "axios";
-import {notesApiUrl} from "../api/URLs";
+import {doctorUrl, notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -424,6 +424,7 @@ function Notes({report}) {
                          report={report}/>
             <NotesUpload setUpdateRequired={setUpdateRequired} setError={setError} report={report}/>
             <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
+            <a className="swagger-url" href={doctorUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );
 }
