@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import {Paging} from "@axa-fr/react-toolkit-table";
 import {useHistory} from "react-router";
-import {reportsApiUrl} from "../api/URLs";
+import {reportUrl, reportsApiUrl} from "../api/URLs";
 import axios from "axios";
 
 function getPatients(inputData) {
@@ -203,6 +203,7 @@ function Reports() {
             <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                          setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <ReportsError error={error}/>
+            <a className="swagger-url" href={reportUrl + "/swagger-ui/"}>Swagger</a>
         </>
     );
 }

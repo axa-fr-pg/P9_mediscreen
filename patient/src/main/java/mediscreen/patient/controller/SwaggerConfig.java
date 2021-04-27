@@ -1,4 +1,4 @@
-package mediscreen.doctor.controller;
+package mediscreen.patient.controller;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +17,8 @@ public class SwaggerConfig {
     public Docket api() {
 
         ApiInfo info = new ApiInfo(
-                "Doctor",
-                "Module for medical notes management written during project 9 of the AXA software academy.",
+                "Patient",
+                "Module for patient personal data management written during project 9 of the AXA software academy.",
                 "1.0.0",
                 null,
                 null,
@@ -30,7 +30,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(info)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("mediscreen.doctor.controller"))
+                .apis(RequestHandlerSelectors.basePackage("mediscreen.patient.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

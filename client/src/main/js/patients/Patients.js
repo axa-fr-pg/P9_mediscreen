@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import axios from "axios";
-import {patientsApiUrl} from '../api/URLs';
+import {patientUrl, patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import {Paging} from "@axa-fr/react-toolkit-table";
@@ -365,6 +365,7 @@ function Patients() {
             <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError}/>
             <PatientsUpload setUpdateRequired={setUpdateRequired} setError={setError}/>
             <PatientsError error={error}/>
+            <a className="swagger-url" href={patientUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );
 }
