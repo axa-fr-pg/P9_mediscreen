@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PatientWithFamilyLike.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">patient</a> &gt; <a href="index.source.html" class="el_package">mediscreen.patient.service</a> &gt; <span class="el_source">PatientWithFamilyLike.java</span></div><h1>PatientWithFamilyLike.java</h1><pre class="source lang-java linenums">package mediscreen.patient.service;
+
+import mediscreen.patient.model.PatientEntity;
+import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+public class PatientWithFamilyLike implements Specification&lt;PatientEntity&gt; {
+
+<span class="fc" id="L13">    private String family = null;</span>
+
+<span class="fc" id="L15">    public PatientWithFamilyLike(String family) {</span>
+<span class="fc" id="L16">        this.family = family;</span>
+<span class="fc" id="L17">    }</span>
+
+    @Override
+    public Predicate toPredicate(Root&lt;PatientEntity&gt; root, CriteriaQuery&lt;?&gt; criteriaQuery, CriteriaBuilder criteriaBuilder) {
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (family == null) {</span>
+<span class="fc" id="L22">            return criteriaBuilder.isTrue(criteriaBuilder.literal(true)); // always true = no filtering</span>
+        }
+<span class="fc" id="L24">        return criteriaBuilder.like(root.get(&quot;family&quot;), &quot;%&quot; + this.family + &quot;%&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

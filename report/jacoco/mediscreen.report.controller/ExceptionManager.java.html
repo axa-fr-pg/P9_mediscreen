@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">report</a> &gt; <a href="index.source.html" class="el_package">mediscreen.report.controller</a> &gt; <span class="el_source">ExceptionManager.java</span></div><h1>ExceptionManager.java</h1><pre class="source lang-java linenums">package mediscreen.report.controller;
+
+import mediscreen.report.service.DoctorUnavailableException;
+import mediscreen.report.service.PatientNotFoundException;
+import mediscreen.report.service.PatientNotUniqueException;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@ControllerAdvice
+<span class="fc" id="L22">public class ExceptionManager extends ResponseEntityExceptionHandler {</span>
+
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT = &quot;You must choose between requesting a report by patient id or by patient family name. Please check your request or ask your IT support.&quot;;
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_TYPE = &quot;Your request has not the right format. Please check or ask your IT support.&quot;;
+    public final static String EXCEPTION_MANAGER_PATIENT_NOT_FOUND = &quot;No report has been found for this patient. Please check your request or ask your IT support.&quot;;
+    public final static String EXCEPTION_MANAGER_PATIENT_NOT_UNIQUE = &quot;Several patients match your report request. Please check or ask your IT support.&quot;;
+    public final static String EXCEPTION_MANAGER_DOCTOR_UNAVAILABLE = &quot;Notes are currently unavailable. Please ask your IT support.&quot;;
+
+    @Override
+    public ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+<span class="nc" id="L32">        List&lt;String&gt; errorList = ex.getBindingResult()</span>
+<span class="nc" id="L33">                .getFieldErrors()</span>
+<span class="nc" id="L34">                .stream()</span>
+<span class="nc" id="L35">                .map(DefaultMessageSourceResolvable::getDefaultMessage)</span>
+<span class="nc" id="L36">                .collect(Collectors.toList());</span>
+<span class="nc" id="L37">        return new ResponseEntity&lt;&gt;(errorList, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @Override
+    protected ResponseEntity&lt;Object&gt; handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+<span class="fc" id="L42">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_REQUEST_PARAM_TYPE, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @ExceptionHandler(value=RequestParamConflictException.class)
+    public ResponseEntity&lt;Object&gt; handleRequestParamConflict(RequestParamConflictException ex, WebRequest request) {
+<span class="nc" id="L47">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_REQUEST_PARAM_CONFLICT, HttpStatus.CONFLICT);</span>
+    }
+
+    @ExceptionHandler(value= PatientNotFoundException.class)
+    public ResponseEntity&lt;Object&gt; handlePatientNotFound(PatientNotFoundException ex, WebRequest request) {
+<span class="fc" id="L52">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_PATIENT_NOT_FOUND, HttpStatus.NOT_FOUND);</span>
+    }
+
+    @ExceptionHandler(value= DoctorUnavailableException.class)
+    public ResponseEntity&lt;Object&gt; handleDoctorUnavailable(DoctorUnavailableException ex, WebRequest request) {
+<span class="nc" id="L57">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_DOCTOR_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE);</span>
+    }
+
+    @ExceptionHandler(value= PatientNotUniqueException.class)
+    public ResponseEntity&lt;Object&gt; handlePatientNotUnique(PatientNotUniqueException ex, WebRequest request) {
+<span class="fc" id="L62">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_PATIENT_NOT_UNIQUE, HttpStatus.CONFLICT);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

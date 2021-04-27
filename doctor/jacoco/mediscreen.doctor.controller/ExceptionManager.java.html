@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExceptionManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">doctor</a> &gt; <a href="index.source.html" class="el_package">mediscreen.doctor.controller</a> &gt; <span class="el_source">ExceptionManager.java</span></div><h1>ExceptionManager.java</h1><pre class="source lang-java linenums">package mediscreen.doctor.controller;
+
+import mediscreen.doctor.service.CreateExistingNoteException;
+import mediscreen.doctor.service.NoteNotFoundException;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@ControllerAdvice
+<span class="fc" id="L20">public class ExceptionManager extends ResponseEntityExceptionHandler {</span>
+
+    public final static String EXCEPTION_MANAGER_NOTE_NOT_FOUND = &quot;No such note has been found. Please check your request or ask your IT support.&quot;;
+    public final static String EXCEPTION_MANAGER_CREATE_EXISTING_NOTE = &quot;it seems that the note you wan't to save already exists in the database. Please check your request or ask your IT support.&quot;;
+    public final static String EXCEPTION_MANAGER_REQUEST_PARAM_TYPE = &quot;Your request has not the right format. Please check your request or ask your IT support.&quot;;
+
+    @Override
+    public ResponseEntity&lt;Object&gt; handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+<span class="fc" id="L28">        List&lt;String&gt; errorList = ex.getBindingResult()</span>
+<span class="fc" id="L29">                .getFieldErrors()</span>
+<span class="fc" id="L30">                .stream()</span>
+<span class="fc" id="L31">                .map(DefaultMessageSourceResolvable::getDefaultMessage)</span>
+<span class="fc" id="L32">                .collect(Collectors.toList());</span>
+<span class="fc" id="L33">        return new ResponseEntity&lt;&gt;(errorList, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @Override
+    protected ResponseEntity&lt;Object&gt; handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+<span class="nc" id="L38">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_REQUEST_PARAM_TYPE, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @ExceptionHandler(value=CreateExistingNoteException.class)
+    public ResponseEntity&lt;Object&gt; handleCreateExistingPatient(CreateExistingNoteException ex, WebRequest request) {
+<span class="nc" id="L43">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_CREATE_EXISTING_NOTE, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @ExceptionHandler(value= NoteNotFoundException.class)
+    public ResponseEntity&lt;Object&gt; handleCreateExistingPatient(NoteNotFoundException ex, WebRequest request) {
+<span class="fc" id="L48">        return new ResponseEntity&lt;&gt;(EXCEPTION_MANAGER_NOTE_NOT_FOUND, HttpStatus.NOT_FOUND);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

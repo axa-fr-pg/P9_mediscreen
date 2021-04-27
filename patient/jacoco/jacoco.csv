@@ -1,0 +1,13 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+patient,mediscreen.patient,PatientApplication,5,3,0,0,2,1,1,1,1,1
+patient,mediscreen.patient.controller,ExceptionManager,12,31,0,0,2,9,2,4,2,4
+patient,mediscreen.patient.controller,PatientController,16,47,1,1,1,6,2,5,1,5
+patient,mediscreen.patient.model,PatientDTO,0,45,0,0,0,4,0,3,0,3
+patient,mediscreen.patient.model,PatientValidation,3,0,0,0,1,0,1,0,1,0
+patient,mediscreen.patient.model,PatientEntity,0,113,0,2,0,12,0,5,0,4
+patient,mediscreen.patient.service,PatientNotFoundException,0,3,0,0,0,1,0,1,0,1
+patient,mediscreen.patient.service,PatientServiceImpl,0,142,0,8,0,22,0,12,0,8
+patient,mediscreen.patient.service,CreateExistingPatientException,0,3,0,0,0,1,0,1,0,1
+patient,mediscreen.patient.service,PatientWithFamilyLike,0,36,0,2,0,7,0,3,0,2
+patient,mediscreen.patient.service,PatientWithDobEqual,0,46,0,2,0,12,0,3,0,2
+patient,mediscreen.patient.service,PatientWithIdEqual,0,29,0,2,0,7,0,3,0,2

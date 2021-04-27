@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PatientDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">patient</a> &gt; <a href="index.source.html" class="el_package">mediscreen.patient.model</a> &gt; <span class="el_source">PatientDTO.java</span></div><h1>PatientDTO.java</h1><pre class="source lang-java linenums">package mediscreen.patient.model;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
+
+import static mediscreen.patient.model.PatientValidation.ADDRESS_NOT_BLANK_ERROR;
+import static mediscreen.patient.model.PatientValidation.DOB_NOT_NULL_ERROR;
+import static mediscreen.patient.model.PatientValidation.DOB_PAST_ERROR;
+import static mediscreen.patient.model.PatientValidation.FAMILY_NOT_BLANK_ERROR;
+import static mediscreen.patient.model.PatientValidation.GIVEN_NOT_BLANK_ERROR;
+import static mediscreen.patient.model.PatientValidation.PHONE_NOT_BLANK_ERROR;
+import static mediscreen.patient.model.PatientValidation.PHONE_PATTERN_ERROR;
+import static mediscreen.patient.model.PatientValidation.SEX_NOT_NULL_ERROR;
+import static mediscreen.patient.model.PatientValidation.SEX_PATTERN_ERROR;
+
+<span class="fc" id="L25">@AllArgsConstructor</span>
+<span class="fc" id="L26">@NoArgsConstructor</span>
+@FieldDefaults(level=AccessLevel.PUBLIC)
+public class PatientDTO {
+    long id;
+
+    @NotBlank(message=FAMILY_NOT_BLANK_ERROR)
+    String family;
+
+    @NotBlank(message=GIVEN_NOT_BLANK_ERROR)
+    String given;
+
+    @NotNull(message=DOB_NOT_NULL_ERROR)
+    @Past(message=DOB_PAST_ERROR)
+    @JsonFormat(pattern=&quot;yyyy-MM-dd&quot;)
+    LocalDate dob;
+
+    @NotNull(message=SEX_NOT_NULL_ERROR)
+    @Pattern(regexp = &quot;^[m|M|f|F]{1}$&quot;, message=SEX_PATTERN_ERROR)
+    String sex;
+
+    @NotBlank(message=ADDRESS_NOT_BLANK_ERROR)
+    String address;
+
+    @NotBlank(message=PHONE_NOT_BLANK_ERROR)
+    @Pattern(regexp = &quot;.*[- +()0-9]&quot;, message=PHONE_PATTERN_ERROR)
+    String phone;
+
+    public PatientDTO(PatientEntity patient) {
+<span class="fc" id="L54">        this(patient.id, patient.family, patient.given, patient.dob, patient.sex.toUpperCase(), patient.address, patient.phone);</span>
+<span class="fc" id="L55">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

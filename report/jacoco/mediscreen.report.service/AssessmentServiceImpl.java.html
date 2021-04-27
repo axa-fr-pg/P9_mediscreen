@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AssessmentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">report</a> &gt; <a href="index.source.html" class="el_package">mediscreen.report.service</a> &gt; <span class="el_source">AssessmentServiceImpl.java</span></div><h1>AssessmentServiceImpl.java</h1><pre class="source lang-java linenums">package mediscreen.report.service;
+
+import mediscreen.report.model.NoteData;
+import mediscreen.report.model.PatientAssessmentDTO;
+import mediscreen.report.model.PatientData;
+import mediscreen.report.model.PatientRiskDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+@Service
+public class AssessmentServiceImpl implements AssessmentService {
+
+    @Autowired
+    PatientService patientService;
+
+    @Autowired
+    NoteService noteService;
+
+    protected List&lt;String&gt; riskTriggerWordList;
+
+<span class="fc" id="L38">    AssessmentServiceImpl() throws IOException {</span>
+<span class="fc" id="L39">        ResourceLoader resourceLoader = new DefaultResourceLoader();</span>
+<span class="fc" id="L40">        Resource resource = resourceLoader.getResource(&quot;classpath:risk-triggers.txt&quot;);</span>
+<span class="fc" id="L41">        Scanner scanner = new Scanner(resource.getInputStream());</span>
+<span class="fc" id="L42">        riskTriggerWordList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        while (scanner.hasNextLine()) {</span>
+<span class="fc" id="L44">            riskTriggerWordList.add(scanner.nextLine());</span>
+        }
+<span class="fc" id="L46">    }</span>
+
+    @Override
+    public PatientAssessmentDTO get(@NotNull PatientData patientData)
+            throws DoctorUnavailableException, IOException {
+<span class="fc" id="L51">        return assessment(patientData, noteService.getList(patientData.id));</span>
+    }
+
+    @Override
+    public PatientAssessmentDTO get(long patientId) throws
+            IOException, PatientNotFoundException, DoctorUnavailableException {
+<span class="fc" id="L57">        PatientData patientData = patientService.get(patientId);</span>
+<span class="fc" id="L58">        return get(patientData);</span>
+    }
+
+    @Override
+    public PatientAssessmentDTO get(String family) throws PatientNotUniqueException,
+            PatientNotFoundException, IOException, DoctorUnavailableException {
+<span class="fc" id="L64">        PatientData patientData = patientService.get(family);</span>
+<span class="fc" id="L65">        return get(patientData);</span>
+    }
+
+    private List&lt;PatientRiskDTO&gt; convertPatientDataListToPatientRiskDTOList(List&lt;PatientData&gt; patientDataList)
+            throws IOException, DoctorUnavailableException {
+<span class="fc" id="L70">        List&lt;PatientRiskDTO&gt; patientRiskDTOList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        for (PatientData patientData : patientDataList) {</span>
+<span class="fc" id="L72">            List&lt;NoteData&gt; noteDataList = noteService.getList(patientData.id);</span>
+<span class="fc" id="L73">            String risk = risk(patientData, noteDataList);</span>
+<span class="fc" id="L74">            patientRiskDTOList.add(new PatientRiskDTO(patientData.id, patientData.family, risk));</span>
+<span class="fc" id="L75">        }</span>
+<span class="fc" id="L76">        return patientRiskDTOList;</span>
+    }
+
+    @Override
+    public Page&lt;PatientRiskDTO&gt; get(Pageable pageRequest) throws IOException, DoctorUnavailableException {
+<span class="fc" id="L81">        return get(pageRequest, null, null);</span>
+    }
+
+    @Override
+    public Page&lt;PatientRiskDTO&gt; get(Pageable pageRequest, String filterId, String filterFamily)
+            throws IOException, DoctorUnavailableException {
+<span class="fc" id="L87">        Page&lt;PatientData&gt; patientDataPage = patientService.getPage(pageRequest, filterId, filterFamily);</span>
+<span class="fc" id="L88">        List&lt;PatientRiskDTO&gt; patientRiskDTOList = convertPatientDataListToPatientRiskDTOList(patientDataPage.toList());</span>
+<span class="fc" id="L89">        return new PageImpl&lt;&gt;(patientRiskDTOList, pageRequest, patientDataPage.getTotalElements());</span>
+    }
+
+    private int age(LocalDate dob) {
+<span class="fc" id="L93">        return Period.between(dob, LocalDate.now()).getYears();</span>
+    }
+
+    // This method is public for testing purposes but no exposure in the interface is required
+    public PatientAssessmentDTO assessment(PatientData patientData, List&lt;NoteData&gt; noteDataList) {
+<span class="fc" id="L98">        return (new PatientAssessmentDTO( &quot;Patient: &quot; + patientData.family + &quot; &quot; + patientData.given +</span>
+<span class="fc" id="L99">                        &quot; (age &quot; + age(patientData.dob) + &quot;) diabetes assessment is: &quot; + risk(patientData, noteDataList)));</span>
+    }
+
+    private long numberOfNotesWithTrigger(List&lt;NoteData&gt; noteDataList, String word) {
+<span class="fc" id="L103">        return noteDataList.stream().filter(noteData -&gt; noteData.e.toUpperCase().contains(word.toUpperCase())).count();</span>
+    }
+
+    private long totalRiskTriggers(List&lt;NoteData&gt; noteDataList) {
+<span class="fc" id="L107">        Map&lt;String, Long&gt; numberOfNotesPerTrigger = riskTriggerWordList.stream().collect(</span>
+<span class="fc" id="L108">                Collectors.toMap(word-&gt;word, word-&gt;numberOfNotesWithTrigger(noteDataList, word)));</span>
+<span class="fc" id="L109">        return numberOfNotesPerTrigger.values().stream().reduce(0L,Long::sum);</span>
+    }
+
+    private String riskFemaleUnderThirtyYears(long numberOfTriggers) {
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (numberOfTriggers &lt;4) {</span>
+<span class="fc" id="L114">            return RISK_NONE;</span>
+        }
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (numberOfTriggers &lt;7) {</span>
+<span class="fc" id="L117">            return RISK_IN_DANDER;</span>
+        }
+<span class="fc" id="L119">        return RISK_EARLY_ONSET;</span>
+    }
+
+    private String riskMaleUnderThirtyYears(long numberOfTriggers) {
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (numberOfTriggers &lt;3) {</span>
+<span class="fc" id="L124">            return RISK_NONE;</span>
+        }
+<span class="fc bfc" id="L126" title="All 2 branches covered.">        if (numberOfTriggers &lt;5) {</span>
+<span class="fc" id="L127">            return RISK_IN_DANDER;</span>
+        }
+<span class="fc" id="L129">        return RISK_EARLY_ONSET;</span>
+    }
+
+    private String riskUnderThirtyYears(String sex, long numberOfTriggers) {
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (sex.equals(&quot;F&quot;)) {</span>
+<span class="fc" id="L134">            return riskFemaleUnderThirtyYears(numberOfTriggers);</span>
+        }
+<span class="fc" id="L136">        return riskMaleUnderThirtyYears(numberOfTriggers);</span>
+    }
+
+    private String riskAboveThirtyYears(long numberOfTriggers) {
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (numberOfTriggers &lt;2) {</span>
+<span class="nc" id="L141">            return RISK_NONE;</span>
+        }
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        if (numberOfTriggers &lt;6) {</span>
+<span class="fc" id="L144">            return RISK_BORDERLINE;</span>
+        }
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (numberOfTriggers &lt;8) {</span>
+<span class="fc" id="L147">            return RISK_IN_DANDER;</span>
+        }
+<span class="nc" id="L149">        return RISK_EARLY_ONSET;</span>
+    }
+
+    // This method is public for testing purposes but no exposure in the interface is required
+    public String risk(PatientData patientData, List&lt;NoteData&gt; noteDataList) {
+<span class="fc" id="L154">        long numberOfTriggers = totalRiskTriggers(noteDataList);</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        if (age(patientData.dob) &gt; 30) {</span>
+<span class="fc" id="L156">            return riskAboveThirtyYears(numberOfTriggers);</span>
+        };
+<span class="fc" id="L158">        return riskUnderThirtyYears(patientData.sex, numberOfTriggers);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -5,6 +5,5 @@ build/
 target/
 *.log.txt
 *.log.txt*gz
-*RELEASE*.jar
 node_modules/
 *.tmp

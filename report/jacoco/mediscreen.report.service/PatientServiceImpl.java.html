@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PatientServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">report</a> &gt; <a href="index.source.html" class="el_package">mediscreen.report.service</a> &gt; <span class="el_source">PatientServiceImpl.java</span></div><h1>PatientServiceImpl.java</h1><pre class="source lang-java linenums">package mediscreen.report.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Response;
+import mediscreen.report.client.PatientClient;
+import mediscreen.report.model.PatientData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+
+@Service
+<span class="fc" id="L18">public class PatientServiceImpl implements PatientService {</span>
+
+    @Autowired
+    PatientClient client;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    @Override
+    public PatientData get(long patientId)
+            throws IOException, PatientNotFoundException {
+<span class="fc" id="L29">        Response response = client.get(patientId);</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (response.status() == HttpStatus.OK.value()) {</span>
+<span class="fc" id="L31">            return objectMapper.readValue(response.body().asInputStream(), PatientData.class);</span>
+        }
+<span class="fc" id="L33">        throw new PatientNotFoundException(</span>
+                &quot;Could not find patient with id &quot; + patientId +
+<span class="fc" id="L35">                &quot; : received return code &quot; + response.status() + &quot; from API.&quot;</span>
+        );
+    }
+
+    @Override
+    public PatientData get(String family) throws PatientNotFoundException, PatientNotUniqueException {
+<span class="fc" id="L41">        Page&lt;PatientData&gt; patientDataPage = client.getPage(</span>
+<span class="fc" id="L42">                PageRequest.of(0,10),</span>
+                &quot;&quot;,
+                family,
+                &quot;&quot;);
+<span class="fc" id="L46">        int size = patientDataPage.getSize();</span>
+<span class="fc bfc" id="L47" title="All 3 branches covered.">        switch (size) {</span>
+            case 0:
+<span class="fc" id="L49">                throw new PatientNotFoundException(</span>
+                        &quot;Could not find patient with name &quot; + family +
+                        &quot; : received empty page as response from API.&quot;
+                );
+            case 1:
+<span class="fc" id="L54">                return patientDataPage.getContent().get(0);</span>
+            default:
+<span class="fc" id="L56">                throw new PatientNotUniqueException(</span>
+                        &quot;Could not find patient with name &quot; + family +
+                        &quot; : received &quot; + size + &quot; matches from API.&quot;
+                );
+        }
+    }
+
+    @Override
+    public Page&lt;PatientData&gt; getPage(Pageable pageRequest) {
+<span class="fc" id="L65">        return client.getPage(pageRequest, null, null, null);</span>
+    }
+
+    @Override
+    public Page&lt;PatientData&gt; getPage(Pageable pageRequest, String filterId, String filterFamily) {
+<span class="fc" id="L70">        return client.getPage(pageRequest, filterId, filterFamily, null);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

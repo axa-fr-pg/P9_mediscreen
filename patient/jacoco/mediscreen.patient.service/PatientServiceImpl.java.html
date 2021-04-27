@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PatientServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">patient</a> &gt; <a href="index.source.html" class="el_package">mediscreen.patient.service</a> &gt; <span class="el_source">PatientServiceImpl.java</span></div><h1>PatientServiceImpl.java</h1><pre class="source lang-java linenums">package mediscreen.patient.service;
+
+import mediscreen.patient.model.PatientDTO;
+import mediscreen.patient.model.PatientEntity;
+import mediscreen.patient.repository.PatientRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Service
+<span class="fc" id="L18">public class PatientServiceImpl implements PatientService {</span>
+    @Autowired
+    PatientRepository patientRepository;
+
+    @Override
+    public List&lt;PatientDTO&gt; getList() {
+<span class="fc" id="L24">        return patientRepository.findAll().stream().map(PatientDTO::new).collect(Collectors.toList());</span>
+    }
+
+    @Override
+    public Page&lt;PatientDTO&gt; getPage(Pageable pageRequest, String patientId, String family, String dob) {
+<span class="fc" id="L29">        Specification&lt;PatientEntity&gt; specification = Specification</span>
+<span class="fc" id="L30">                .where(new PatientWithIdEqual(patientId))</span>
+<span class="fc" id="L31">                .and(new PatientWithFamilyLike(family))</span>
+<span class="fc" id="L32">                .and(new PatientWithDobEqual(dob));</span>
+<span class="fc" id="L33">        return patientRepository.findAll(specification, pageRequest).map(PatientDTO::new);</span>
+    }
+
+    @Override
+    public PatientDTO get(long patientId) throws PatientNotFoundException {
+<span class="fc" id="L38">        Optional&lt;PatientEntity&gt; patient = patientRepository.findById(patientId);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (patient.isPresent()) return new PatientDTO(patient.get());</span>
+<span class="fc" id="L40">        throw new PatientNotFoundException();</span>
+    }
+
+    @Override
+    public PatientDTO put(PatientDTO patient) throws PatientNotFoundException {
+<span class="fc" id="L45">        Optional&lt;PatientEntity&gt; optional = patientRepository.findById(patient.id);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (optional.isPresent()) {</span>
+<span class="fc" id="L47">            return new PatientDTO(patientRepository.save(new PatientEntity(patient)));</span>
+        }
+<span class="fc" id="L49">        throw new PatientNotFoundException();</span>
+    }
+
+    @Override
+    public PatientDTO post(PatientDTO patient) throws CreateExistingPatientException {
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (patient.id != 0) throw new CreateExistingPatientException();</span>
+<span class="fc" id="L55">        List&lt;PatientEntity&gt; existingPatients = patientRepository.findByFamilyAndDob(patient.family, patient.dob);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (existingPatients.size() &gt; 0) throw new CreateExistingPatientException();</span>
+<span class="fc" id="L57">        PatientEntity result = patientRepository.save(new PatientEntity(patient));</span>
+<span class="fc" id="L58">        return new PatientDTO(result);</span>
+    }
+
+    @Override
+    public List&lt;PatientDTO&gt; post(int numberOfRows) {
+<span class="fc" id="L63">        return Stream.generate(PatientEntity::random).limit(numberOfRows)</span>
+<span class="fc" id="L64">                .map(patient -&gt; new PatientDTO(patientRepository.save(patient)))</span>
+<span class="fc" id="L65">                .collect(Collectors.toList());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
