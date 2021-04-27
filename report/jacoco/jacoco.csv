@@ -12,5 +12,6 @@ report,mediscreen.report.service,AssessmentServiceImpl,4,280,2,20,2,53,2,28,0,19
 report,mediscreen.report.service,DoctorUnavailableException,0,4,0,0,0,2,0,1,0,1
 report,mediscreen.report,ReportApplication,5,7,0,0,2,2,1,2,1,2
 report,mediscreen.report.controller,ExceptionManager,28,21,0,0,8,4,3,4,3,4
+report,mediscreen.report.controller,SwaggerConfig,0,29,0,0,0,9,0,2,0,2
 report,mediscreen.report.controller,ReportController,0,50,0,8,0,8,0,6,0,2
 report,mediscreen.report.controller,RequestParamConflictException,0,4,0,0,0,2,0,1,0,1
