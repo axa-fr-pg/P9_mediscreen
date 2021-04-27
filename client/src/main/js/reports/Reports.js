@@ -149,7 +149,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
                                    onBlur={submitFilterFamily}/>
                         </form>
                     </th>
-                    <th />
                 </tr>
                 </thead>
                 <tbody>
