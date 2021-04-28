@@ -164,3 +164,19 @@ footer {
     bottom: 10px;
     right: 0px;
 }
+
+.af-btn--reverse {
+    display: none;
+}
+
+.modal-error .af-modal__header-title {
+    font-weight: bold;
+    font-size: xx-large;
+    color: red;
+}
+
+.modal-success .af-modal__header-title {
+    font-weight: bold;
+    font-size: xx-large;
+    color: green;
+}

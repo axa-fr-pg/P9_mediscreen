@@ -52,6 +52,7 @@
     ]
   },
   "devDependencies": {
+    "@axa-fr/react-toolkit-modal-boolean": "^1.4.0",
     "@axa-fr/react-toolkit-table": "^1.4.0-alpha.0",
     "@material-ui/icons": "^4.11.2",
     "@react-navigation/native": "^5.8.9",

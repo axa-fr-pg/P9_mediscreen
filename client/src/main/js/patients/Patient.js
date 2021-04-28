@@ -3,6 +3,9 @@ import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import Switch from "react-switch";
 import moment from 'moment'
+import ModalError from "../modal/error";
+import ModalSuccess from "../modal/success";
+import {useHistory} from "react-router";
 
 const patientFields = [
     {field : "id", label : "Patient id", readonly : true},
@@ -20,17 +23,9 @@ function Patient({report}) {
 
     const [input, setInput] = useState(true);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [patient, setPatient] = useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
     const [modify, setModify] = useState(window.location.href.includes('new'));
-
-    function DisplayError() {
-        if (! error) return null;
-        return (
-            <footer>
-                {error}
-            </footer>
-        );
-    }
 
     React.useEffect(() => {
         if (patient.id === 'new') return;
@@ -41,7 +36,6 @@ function Patient({report}) {
             axios.get(patientsApiUrl + "/" + patient.id)
                 .then(response => {
                     setPatient(response.data);
-                    setError('');
                 })
                 .catch( error => {
                     setInput(false);
@@ -56,6 +50,8 @@ function Patient({report}) {
 
     function onClickSave(event) {
         event.preventDefault();
+        setError('');
+        setSuccess('');
 
         const givenDate = moment(patient.dob, "YYYY-MM-DD", true).toDate();
         const givenTime = givenDate.getTime();
@@ -72,7 +68,7 @@ function Patient({report}) {
                 .then(response => {
                     body.id=response.data.id;
                     setInput(false);
-                    setError("Patient created successfully with id=" + body.id);
+                    setSuccess("Patient created successfully with id=" + body.id);
                 })
                 .catch(error => {
                     if (error.response) {
@@ -86,7 +82,7 @@ function Patient({report}) {
             axios.put(patientsApiUrl + "/" + patient.id, body)
                 .then(response => {
                     setPatient(response.data);
-                    setError('Patient has been saved successfully !');
+                    setSuccess('Patient has been saved successfully !');
                 })
                 .catch(error => {
                     if (error.response) {
@@ -118,7 +114,6 @@ function Patient({report}) {
 
     function onChangeModify() {
         setModify(!modify);
-        setError('');
     }
 
     function displayModifySwitch() {
@@ -158,7 +153,8 @@ function Patient({report}) {
                 {patientFields.map(fieldSpec => displayField(fieldSpec.field, fieldSpec.label, fieldSpec.readonly))}
                 {displayModifySwitch()}
                 {displaySaveButton()}
-                <DisplayError />
+                <ModalError message={error} closureAction={()=>setError('')}/>
+                <ModalSuccess message={success} closureAction={() => setModify(false)}/>
             </form>
         </div>
     );
