@@ -137,7 +137,7 @@ function Note() {
         setModify(false);
         setSuccess('');
         if (window.location.href.includes('new')) {
-            history.push('/notes')
+            history.push(window.location.href.split('/').slice(0, -1).join('/'));
         }
     }
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useHistory} from "react-router";
 import axios from "axios";
 import {doctorUrl, notesApiUrl} from "../api/URLs";
@@ -15,6 +15,8 @@ import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
 import {readString} from 'react-papaparse';
 import {getPatients} from '../patients/Patients';
 import {postNote} from './Note';
+import ModalError from "../modal/error";
+import ModalSuccess from "../modal/success";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, history, setUpdateRequired}) {
 
@@ -41,7 +43,7 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, h
     );
 }
 
-function NotesRandom({patientIdGiven, setUpdateRequired, setError, report}) {
+function NotesRandom({patientIdGiven, setUpdateRequired, setSuccess, setError, report}) {
 
     if (!report === false) {
         return null;
@@ -54,7 +56,7 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setError, report}) {
         inputFieldRandomVolume.blur();
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
         inputFieldPatientId.blur();
-        setError("Processing request...");
+// TODO         setError("Processing request...");
 
         if (patientIdGiven >= 0) {
             url = url + "/patients/" + patientIdGiven;
@@ -63,13 +65,13 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setError, report}) {
         axios.post(url + "/random/" + inputFieldRandomVolume.value)
             .then(response => {
                 setUpdateRequired(true);
-                setError(response.data.length + " random notes have been generated successfully !");
+                setSuccess(response.data.length + " random notes have been generated successfully !");
             })
-            .catch(error => {
-                if (error.response) {
-                    setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
+            .catch(exception => {
+                if (exception.response) {
+                    setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
                 } else {
-                    setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                    setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                 }
             });
     }
@@ -102,11 +104,11 @@ function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, set
                 setError('It seems that the database is empty : please generate some random patients or ask your IT support.');
             }
         })
-        .catch(error => {
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
+        .catch(exception => {
+            if (exception.response) {
+                setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
-                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
 }
@@ -216,16 +218,6 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
                 />
             </div>
         </div>
-    );
-}
-
-function NotesError({error}) {
-
-    if (!error) return null;
-    return (
-        <footer>
-            {error}
-        </footer>
     );
 }
 
@@ -395,17 +387,45 @@ function NotesUpload({setUpdateRequired, setError, report}) {
 function Notes({report}) {
     const [notes, setNotes] = useState([]);
     const [updateRequired, setUpdateRequired] = useState(false);
-    const [error, setError] = useState('');
-    const [patientIdGiven, setPatientIdGiven] = useState(getPatientIdByUrl(window.location.href));
+    const error = useRef('');
+    const success = useRef('');
+    const [, setModal] = useState(false);
+    const [patientIdGiven, setPatientIdGiven] = useState(-1);
     const history = useHistory();
 
     useEffect(() => {
-        setPatientIdGiven(getPatientIdByUrl(window.location.href));
-        setUpdateRequired(true);
+        const patientId = getPatientIdByUrl(window.location.href);
+        if (isNaN(parseInt(patientId))) {
+            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
+        } else {
+            setPatientIdGiven(patientId);
+            setUpdateRequired(true);
+        }
     }, [history.location.pathname]);
 
     function newNote() {
         history.push('/notes/patients/' + patientIdGiven + '/new');
+    }
+
+    function setSuccess (message) {
+        success.current = message;
+        setModal(message.length > 0);
+    }
+
+    function setError (message) {
+        error.current = message;
+        setModal(message.length > 0);
+    }
+
+    function closeErrorModal() {
+        setError('');
+        if (window.location.href.includes('/notes/patients/')) {
+            history.push('/notes');
+        }
+    }
+
+    function closeSuccessModal() {
+        setSuccess('');
     }
 
     return (
@@ -414,16 +434,17 @@ function Notes({report}) {
                                               report={report}
                                               setUpdateRequired={setUpdateRequired} history={history}
                                               setError={setError}/>
-            <button hidden={patientIdGiven < 0 || !report === false} className="button-new" onClick={newNote}>Register
-                new note
+            <button hidden={patientIdGiven < 0 || !report === false} className="button-new" onClick={newNote}>
+                Register new note
             </button>
             <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
                       notes={notes} setNotes={setNotes} updateRequired={updateRequired}
                       setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired} setError={setError}
-                         report={report}/>
+            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired}
+                         setSuccess={setSuccess} setError={setError} report={report}/>
             <NotesUpload setUpdateRequired={setUpdateRequired} setError={setError} report={report}/>
-            <NotesError patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} error={error}/>
+            <ModalError message={error.current} closureAction={closeErrorModal}/>
+            <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
             <a className="swagger-url" href={doctorUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );
