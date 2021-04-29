@@ -9,7 +9,7 @@ function Modal({message, closureAction, className, title}) {
         if (!isOpen) {
             setIsOpen(message.length>0);
         }
-    });
+    }, [isOpen, message.length]);
 
     function onClosure() {
         setIsOpen(false);
