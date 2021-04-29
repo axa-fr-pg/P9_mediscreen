@@ -90,24 +90,32 @@ function Patient({report}) {
     const [modify, setModify] = useState(window.location.href.includes('new'));
     const history = useHistory();
 
+    function setError (message) {
+        error.current = message;
+        setModal(message.length > 0);
+    }
+
+    function setSuccess (message) {
+        success.current = message;
+        setModal(message.length > 0);
+    }
+
     useEffect(() => {
         if (patient.current.id === 'new') return;
         if (isNaN(parseInt(patient.current.id))) {
-            error.current = 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !';
-            setModal(true);
+            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
         } else {
             axios.get(patientsApiUrl + "/" + patient.current.id)
                 .then(response => {
                     setPatient(response.data);
                 })
                 .catch(exception => {
-                    if (exception.response) {
-                        error.current = exception.response.status + " " + exception.response.data;
-                    } else {
-                        error.current = exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
-                    }
                     patient.current.id = 'not-found';
-                    setModal(true);
+                    if (exception.response) {
+                        setError(exception.response.status + " " + exception.response.data);
+                    } else {
+                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                    }
                 });
         }
     }, []);
@@ -119,45 +127,38 @@ function Patient({report}) {
 
     function onClickSave(event) {
         event.preventDefault();
-        error.current = '';
-        success.current = '';
         const body = {...patient.current};
         const givenDate = moment(body.dob, "YYYY-MM-DD", true).toDate();
         const givenTime = givenDate.getTime();
 
         if (isNaN(givenTime) || givenTime < -5000000000000) {
-            error.current = "Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid).";
-            setModal(true);
+            setError("Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid).");
         } else if (body.id === 'new') {
             body.id = 0;
             axios.post(patientsApiUrl, body)
                 .then(response => {
                     body.id = response.data.id;
-                    success.current = "Patient created successfully with id=" + body.id;
-                    setModal(true);
+                    setSuccess("Patient created successfully with id=" + body.id);
                 })
                 .catch(exception => {
                     if (exception.response) {
-                        error.current = exception.response.status + " " + exception.response.data;
+                        setError(exception.response.status + " " + exception.response.data);
                     } else {
-                        error.current = exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
+                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
-                    setModal(true);
                 });
         } else {
             axios.put(patientsApiUrl + "/" + patient.current.id, body)
                 .then(response => {
-                    success.current = 'Patient has been saved successfully !';
                     setPatient(response.data);
-                    setModal(true);
+                    setSuccess('Patient has been saved successfully !');
                 })
                 .catch(exception => {
                     if (exception.response) {
-                        error.current = exception.response.status + " " + exception.response.data;
+                        setError(exception.response.status + " " + exception.response.data);
                     } else {
-                        error.current = exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
+                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
-                    setModal(true);
                 });
         }
     }
@@ -175,8 +176,7 @@ function Patient({report}) {
     }
 
     function closeErrorModal() {
-        error.current = '';
-        setModal(false);
+        setError('');
         if (!window.location.href.includes('new') && isNaN(parseInt(patient.current.id))) {
             history.push('/patients');
         }
@@ -184,8 +184,7 @@ function Patient({report}) {
 
     function closeSuccessModal() {
         setModify(false);
-        success.current = '';
-        setModal(false);
+        setSuccess('');
         if (window.location.href.includes('new')) {
             history.push('/patients')
         }

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import axios from "axios";
 import {patientUrl, patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
@@ -9,6 +9,8 @@ import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
 import {readString} from 'react-papaparse';
 import {NUMBER_OF_PATIENT_FIELDS} from './Patient';
 import moment from 'moment';
+import ModalError from "../modal/error";
+import ModalSuccess from "../modal/success";
 
 export function getPatients(inputData) {
     const {
@@ -35,11 +37,11 @@ export function getPatients(inputData) {
                 setError('Your selection criteria match no patient (or the database is empty).');
             }
         })
-        .catch(error => {
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
+        .catch(exception => {
+            if (exception.response) {
+                setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
-                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
     setUpdateRequired(false);
@@ -203,33 +205,23 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
     );
 }
 
-function PatientsError({error}) {
-
-    if (!error) return null;
-    return (
-        <footer>
-            {error}
-        </footer>
-    );
-}
-
-function generateRandomPatients(event, setUpdateRequired, setError) {
+function generateRandomPatients(event, setUpdateRequired, setSuccess, setError) {
     event.preventDefault();
     const inputField = document.getElementById('input-expected-number-of-patients');
     inputField.blur();
     const randomVolume = inputField.value;
-    setError("Processing request...");
+// TODO    setError("Processing request...");
 
     axios.post(patientsApiUrl + "/random/" + randomVolume)
         .then(response => {
             setUpdateRequired(true);
-            setError(response.data.length + " random patients have been generated successfully !");
+            setSuccess(response.data.length + " random patients have been generated successfully !");
         })
-        .catch(error => {
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
+        .catch(exception => {
+            if (exception.response) {
+                setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
             } else {
-                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
 }
@@ -264,28 +256,28 @@ function postPatient(line, setError) {
     }
     axios.post(patientsApiUrl, patient)
         .then(() => {numberOfPatientsPosted++; numberOfPatientsAdded++;})
-        .catch(error => {
+        .catch(exception => {
             numberOfPatientsPosted++;
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data);
+            if (exception.response) {
+                setError(exception.response.status + " " + exception.response.data);
             } else {
-                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
 }
 
-function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setUpdateRequired, setError) {
+function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setUpdateRequired, setSuccess, setError) {
     if (numberOfPatientsPosted < numberOfPatientsToPost) {
-        setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setUpdateRequired, setError);
+        setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setUpdateRequired, setSuccess, setError);
     } else {
         setUpdateRequired(true);
         if (numberOfPatientsAdded === numberOfPatientsPosted) {
-            setError(numberOfPatientsToPost +" patients have been uploaded successfully !")
+            setSuccess(numberOfPatientsToPost +" patients have been uploaded successfully !")
         }
     }
 }
 
-function addPatients(text, setUpdateRequired, setError) {
+function addPatients(text, setUpdateRequired, setSuccess, setError) {
     numberOfPatientsPosted = 0;
     numberOfPatientsAdded = 0;
     const csvConfig = {
@@ -308,22 +300,22 @@ function addPatients(text, setUpdateRequired, setError) {
         return;
     }
     results.data.forEach(line => postPatient(line, setError));
-    waitAllPatientsPostedAndRefreshDisplay(results.data.length, setUpdateRequired, setError);
+    waitAllPatientsPostedAndRefreshDisplay(results.data.length, setUpdateRequired, setSuccess, setError);
 }
 
-function uploadPatientFile(values, setUpdateRequired, setError) {
+function uploadPatientFile(values, setUpdateRequired, setSuccess, setError) {
     if (values.length === 0) {
         setError("You selected an invalid file format. Please check and try again or ask your IT");
         return;
     }
-    setError("Uploading " + values[0].file.name + " ...");
+// TODO   setError("Uploading " + values[0].file.name + " ...");
     fetch(values[0].file.preview)
         .then(response => response.blob())
         .then(blob => blob.text())
-        .then(content => addPatients(content, setUpdateRequired, setError));
+        .then(content => addPatients(content, setUpdateRequired, setSuccess, setError));
 }
 
-function PatientsRandom({setUpdateRequired, setError}) {
+function PatientsRandom({setUpdateRequired, setSuccess, setError}) {
     return (
             <form className="form-random">
                 <button
@@ -337,7 +329,7 @@ function PatientsRandom({setUpdateRequired, setError}) {
     );
 }
 
-function PatientsUpload({setUpdateRequired, setError}) {
+function PatientsUpload({setUpdateRequired, setSuccess, setError}) {
     return (
         <File
             label="Browse file"
@@ -345,16 +337,36 @@ function PatientsUpload({setUpdateRequired, setError}) {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChange={(values) => uploadPatientFile(values.values, setUpdateRequired, setError)}
+            onChange={(values) => uploadPatientFile(values.values, setUpdateRequired, setSuccess, setError)}
         />
     );
 }
 
 function Patients() {
+    const error = useRef('');
+    const success = useRef('');
+    const [, setModal] = useState(false);
     const [patients, setPatients] = useState([]);
-    const [error, setError] = useState('');
     const [updateRequired, setUpdateRequired] = useState('false');
     const history = useHistory();
+
+    function setError (message) {
+        error.current = message;
+        setModal(message.length > 0);
+    }
+
+    function setSuccess (message) {
+        success.current = message;
+        setModal(message.length > 0);
+    }
+
+    function closeErrorModal() {
+        setError('');
+    }
+
+    function closeSuccessModal() {
+        setSuccess('');
+    }
 
     return (
         <div>
@@ -362,9 +374,10 @@ function Patients() {
             <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                          setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
             <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
-            <PatientsRandom setUpdateRequired={setUpdateRequired} setError={setError}/>
-            <PatientsUpload setUpdateRequired={setUpdateRequired} setError={setError}/>
-            <PatientsError error={error}/>
+            <PatientsRandom setUpdateRequired={setUpdateRequired} setSuccess={setSuccess} setError={setError}/>
+            <PatientsUpload setUpdateRequired={setUpdateRequired} setSuccess={setSuccess} setError={setError}/>
+            <ModalError message={error.current} closureAction={closeErrorModal}/>
+            <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
             <a className="swagger-url" href={patientUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );
