@@ -5,6 +5,7 @@ import Switch from "react-switch";
 import moment from 'moment'
 import ModalError from "../modal/error";
 import ModalSuccess from "../modal/success";
+import {useHistory} from "react-router";
 
 const patientFields = [
     {field : "id", label : "Patient id", readonly : true},
@@ -22,31 +23,32 @@ function Patient({report}) {
 
     const error = useRef('');
     const success = useRef('');
-    const [modal, setModal] = useState(false);
-    const [input, setInput] = useState(true);
+    const [, setModal] = useState(false);
     const [patient, setPatient] = useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
     const [modify, setModify] = useState(window.location.href.includes('new'));
+    const history = useHistory();
 
     useEffect(() => {
         if (patient.id === 'new') return;
         if (isNaN(parseInt(patient.id))) {
             error.current = 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !';
-            setInput(false);
+            setModal(true);
         } else {
             axios.get(patientsApiUrl + "/" + patient.id)
                 .then(response => {
                     setPatient(response.data);
                 })
-                .catch( error => {
-                    setInput(false);
-                    if (error.response) {
-                        error.current = error.response.status + " " + error.response.data;
+                .catch( exception => {
+                    if (exception.response) {
+                        error.current = exception.response.status + " " + exception.response.data;
                     } else {
-                        error.current = error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
+                        error.current = exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
                     }
+                    patient.id = 'not-found';
+                    setModal(true);
                 });
         }
-    }, [patient.id]);
+    }, [patient, history]);
 
     function onClickSave(event) {
         event.preventDefault();
@@ -64,8 +66,8 @@ function Patient({report}) {
             axios.post(patientsApiUrl, body)
                 .then(response => {
                     body.id=response.data.id;
-                    setInput(false);
                     success.current = "Patient created successfully with id=" + body.id;
+                    setModal(true);
                 })
                 .catch(exception => {
                     if (exception.response) {
@@ -101,7 +103,6 @@ function Patient({report}) {
     }
 
     function displayField(field, label, readonly) {
-        if (!input) return null;
         const disabled = !!readonly;
         if (field === 'id' && patient.id === 'new') return null;
         return (<div key={field}>
@@ -116,7 +117,7 @@ function Patient({report}) {
     }
 
     function displayModifySwitch() {
-        if (!input || window.location.href.includes('new') || !report===false) {
+        if (window.location.href.includes('new') || !report===false) {
             return null;
         }
         return(
@@ -131,7 +132,7 @@ function Patient({report}) {
     }
 
     function displaySaveButton() {
-        if (!input || !modify) return null;
+        if (!modify) return null;
         return(
             <button className="button-save" onClick={onClickSave}>Save</button>
         );
@@ -148,12 +149,18 @@ function Patient({report}) {
     function closeErrorModal() {
         error.current = '';
         setModal(false);
+        if (! window.location.href.includes('new') && isNaN(parseInt(patient.id))) {
+            history.push('/patients');
+        }
     }
 
     function closeSuccessModal() {
         setModify(false);
         success.current = '';
         setModal(false);
+        if (window.location.href.includes('new')) {
+            history.push('/patients')
+        }
     }
 
     return (
