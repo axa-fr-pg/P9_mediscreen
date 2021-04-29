@@ -37,12 +37,13 @@ function ModifySwitch({modify, onChangeModify, report}) {
 function PatientField({patient, modify, field, label, readOnly}) {
 
     const [value, setValue] = useState(undefined);
+    const patientData = patient.current;
 
     useEffect(() => {
-        if (value === undefined && patient.current !== undefined && patient.current[field] !== undefined) {
-            setValue(patient.current[field]);
+        if (value === undefined && patientData !== undefined && patientData[field] !== undefined) {
+            setValue(patientData[field]);
         }
-    });
+    }, [field, patientData, value]);
 
     if (field === 'id' && value === 'new') {
         return null;
@@ -72,18 +73,18 @@ function PatientFields({patient, modify}) {
     });
 }
 
+function SaveButton({modify, onClickSave}) {
+    if (!modify) return null;
+    return (
+        <button className="button-save" onClick={onClickSave}>Save</button>
+    );
+}
+
+
 function Patient({report}) {
     const error = useRef('');
     const success = useRef('');
-    const patient = useRef({
-        id: window.location.pathname.split("/").pop() /*,
-        family: '',
-        given: '',
-        dob: '',
-        sex: '',
-        address: '',
-        phone: ''*/
-    });
+    const patient = useRef({id: window.location.pathname.split("/").pop()});
     const [, setModal] = useState(false);
     const [, setPatientReady] = useState(false);
     const [modify, setModify] = useState(window.location.href.includes('new'));
@@ -165,13 +166,6 @@ function Patient({report}) {
         setModify(!modify);
     }
 
-    function displaySaveButton() {
-        if (!modify) return null;
-        return (
-            <button className="button-save" onClick={onClickSave}>Save</button>
-        );
-    }
-
     function displayTitle() {
         const view = modify ? 'edit' : 'view';
         const title = patient.current.id === 'new' ? 'creation' : view;
@@ -203,7 +197,7 @@ function Patient({report}) {
             <form>
                 <PatientFields patient={patient} modify={modify}/>
                 <ModifySwitch modify={modify} onChangeModify={onChangeModify} report={report}/>
-                {displaySaveButton()}
+                <SaveButton modify={modify} onClickSave={onClickSave}/>
                 <ModalError message={error.current} closureAction={closeErrorModal}/>
                 <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
             </form>

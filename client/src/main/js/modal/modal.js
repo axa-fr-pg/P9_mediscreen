@@ -20,14 +20,8 @@ function Modal({message, closureAction, className, title}) {
 
     return (
         <ModalBoolean
-            id="id-modal-boolean"
-            className={className}
-            title={title}
-            submitTitle="OK"
-            isOpen={isOpen}
-            onSubmit={onClosure}
-            onCancel={undefined}
-        >
+            id="id-modal-boolean" className={className} title={title} submitTitle="OK"
+            isOpen={isOpen} onSubmit={onClosure} onCancel={undefined} >
             {message}
         </ModalBoolean>
     );
