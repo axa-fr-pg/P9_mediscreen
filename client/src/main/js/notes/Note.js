@@ -1,38 +1,42 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import ReactQuill from "react-quill";
+import ModalError from "../modal/error";
+import ModalSuccess from "../modal/success";
+import {useHistory} from "react-router";
 
-export function postNote(body, patId, setInput, setError) {
+const NOTE_NOT_FOUND = 'note-not-found';
+
+export function postNote(body, patId, setSuccess, setError) {
     body.noteId = '';
     axios.post(notesApiUrl + '/patients/' + patId, body)
         .then(response => {
             body.noteId = response.data.noteId;
-            setInput(false);
-            setError("Note created successfully with id=" + body.noteId);
+            setSuccess("Note created successfully with id=" + body.noteId);
         })
-        .catch(error => {
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
+        .catch(exception => {
+            if (exception.response) {
+                setError(exception.response.status + " " + exception.response.data);
             } else {
-                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
             }
         });
 }
 
-function NoteSaveButton({input, modify, onClick}) {
-    if (!input || !modify) return null;
+function NoteSaveButton({modify, onClick}) {
+    if (!modify) return null;
     return (
         <button className="button-save" onClick={onClick}>Save</button>
     );
 }
 
-function NoteTitleWithModeSelector({note, input, modify, onChangeSwitch}) {
+function NoteTitleWithModeSelector({note, modify, onChangeSwitch}) {
     const view = modify ? 'edit' : 'view';
-    const title = note.noteId === 'new' ? 'creation' : view;
+    const title = note.current.noteId === 'new' ? 'creation' : view;
     let switchHidden = false;
-    if (!input || window.location.href.includes('new')) {
+    if (window.location.href.includes('new')) {
         switchHidden = true;
     }
     return (
@@ -49,58 +53,70 @@ function NoteTitleWithModeSelector({note, input, modify, onChangeSwitch}) {
 
 function Note() {
     const currentUrl = window.location.pathname.split("/");
-    const [note, setNote] = useState({noteId: currentUrl.pop(), patId: currentUrl.pop(), e: ''});
+    const note = useRef({noteId: currentUrl.pop(), patId: currentUrl.pop(), e: ''});
+    const error = useRef('');
+    const success = useRef('');
+    const [, setModal] = useState(false);
+    const [, setNoteReady] = useState(false);
     const [modify, setModify] = useState(window.location.href.includes('new'));
-    const [input, setInput] = useState(true);
-    const [error, setError] = useState('');
+    const history = useHistory();
+
+    function setSuccess (message) {
+        success.current = message;
+        setModal(message.length > 0);
+    }
+
+    function setError (message) {
+        error.current = message;
+        setModal(message.length > 0);
+    }
+
+    function setNote(data) {
+        note.current = data;
+        setNoteReady(true);
+    }
 
     React.useEffect(() => {
-        if (note.noteId === 'new') return;
-        axios.get(notesApiUrl + "/" + note.noteId)
-            .then(response => {
-                setNote(response.data);
-                setError('');
-            })
-            .catch(error => {
-                setInput(false);
-                if (error.response) {
-                    setError(error.response.status + " " + error.response.data);
-                } else {
-                    setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                }
-            });
-
-    }, [note.noteId]);
+        if (note.current.noteId !== 'new') {
+            axios.get(notesApiUrl + "/" + note.current.noteId)
+                .then(response => {
+                    setNote(response.data);
+                })
+                .catch(exception => {
+                    note.current.noteId = NOTE_NOT_FOUND;
+                    if (exception.response) {
+                        setError(exception.response.status + " " + exception.response.data);
+                    } else {
+                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                    }
+                });
+        }
+    }, []);
 
     function onClickSave(event) {
         event.preventDefault();
 
-        const body = {...note};
-        if (note.noteId === 'new') {
-            postNote(body, note.patId, setInput, setError);
+        const body = {...note.current};
+        if (note.current.noteId === 'new') {
+            postNote(body, note.current.patId, setSuccess, setError);
         } else {
-            axios.put(notesApiUrl + "/" + note.noteId, body)
+            axios.put(notesApiUrl + "/" + note.current.noteId, body)
                 .then(response => {
                     setNote(response.data);
-                    setError('Note has been saved successfully !');
+                    setSuccess('Note has been saved successfully !');
                 })
-                .catch(error => {
-                    if (error.response) {
-                        setError(error.response.status + " " + error.response.data);
+                .catch(exception => {
+                    if (exception.response) {
+                        setError(exception.response.status + " " + exception.response.data);
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
                 });
         }
     }
 
-    function DisplayError() {
-        if (!error) return null;
-        return (<h4>{error}</h4>);
-    }
-
     function onChangeNote(content) {
-        const newNote = {...note};
+        const newNote = {...note.current};
         newNote['e'] = content;
         setNote(newNote);
     }
@@ -110,15 +126,31 @@ function Note() {
         setError('');
     }
 
+    function closeErrorModal() {
+        setError('');
+        if (!window.location.href.includes('new') && note.current.noteId === NOTE_NOT_FOUND) {
+            history.push('/notes');
+        }
+    }
+
+    function closeSuccessModal() {
+        setModify(false);
+        setSuccess('');
+        if (window.location.href.includes('new')) {
+            history.push('/notes')
+        }
+    }
+
     return (
         <div>
-            <NoteTitleWithModeSelector note={note} input={input} modify={modify} onChangeSwitch={onChangeSwitch}/>
-            <link rel="stylesheet" href="//cdn.quilljs.com/1.2.6/quill.snow.css"/>
-            <DisplayError/>
-            <NoteSaveButton input={input} modify={modify} onClick={onClickSave}/>
-            <ReactQuill className="quill-note-content" key={note.noteId} value={note.e}
+            <NoteTitleWithModeSelector note={note} modify={modify} onChangeSwitch={onChangeSwitch}/>
+            <link rel="stylesheet" href={"//cdn.quilljs.com/1.2.6/quill.snow.css"}/>
+            <NoteSaveButton modify={modify} onClick={onClickSave}/>
+            <ReactQuill className="quill-note-content" key={note.current.noteId} value={note.current.e}
                         readOnly={modify === false} onChange={onChangeNote}
                         modules={{toolbar: modify}}/>
+            <ModalError message={error.current} closureAction={closeErrorModal}/>
+            <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
         </div>
     );
 }

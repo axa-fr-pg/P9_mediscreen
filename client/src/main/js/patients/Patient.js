@@ -177,7 +177,7 @@ function Patient({report}) {
 
     function closeErrorModal() {
         setError('');
-        if (!window.location.href.includes('new') && isNaN(parseInt(patient.current.id))) {
+        if (!window.location.href.includes('new')) {
             history.push('/patients');
         }
     }
