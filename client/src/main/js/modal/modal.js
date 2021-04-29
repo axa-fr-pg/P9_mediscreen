@@ -3,15 +3,13 @@ import ModalBoolean from "@axa-fr/react-toolkit-modal-boolean";
 import '@axa-fr/react-toolkit-modal-default/dist/modal.scss';
 
 function Modal({message, closureAction, className, title}) {
-    const [isOpen, setIsOpen] = useState(message.length > 0);
 
-    useEffect(() => {
-        setIsOpen(message.length > 0);
-    }, [message]);
-
-    if (!isOpen) {
-        return null;
-    }
+    const [isOpen, setIsOpen] = useState(false);
+    useEffect(()=>{
+        if (!isOpen) {
+            setIsOpen(message.length>0);
+        }
+    });
 
     function onClosure() {
         setIsOpen(false);
@@ -28,7 +26,7 @@ function Modal({message, closureAction, className, title}) {
             submitTitle="OK"
             isOpen={isOpen}
             onSubmit={onClosure}
-            onCancel
+            onCancel={undefined}
         >
             {message}
         </ModalBoolean>

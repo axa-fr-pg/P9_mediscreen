@@ -1,11 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import Switch from "react-switch";
 import moment from 'moment'
 import ModalError from "../modal/error";
 import ModalSuccess from "../modal/success";
-import {useHistory} from "react-router";
 
 const patientFields = [
     {field : "id", label : "Patient id", readonly : true},
@@ -21,16 +20,17 @@ export const NUMBER_OF_PATIENT_FIELDS = 7;
 
 function Patient({report}) {
 
+    const error = useRef('');
+    const success = useRef('');
+    const [modal, setModal] = useState(false);
     const [input, setInput] = useState(true);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
     const [patient, setPatient] = useState({ id : window.location.pathname.split("/").pop(), family : '', given : '', dob : '', sex : '', address : '', phone : ''});
     const [modify, setModify] = useState(window.location.href.includes('new'));
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (patient.id === 'new') return;
         if (isNaN(parseInt(patient.id))) {
-            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
+            error.current = 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !';
             setInput(false);
         } else {
             axios.get(patientsApiUrl + "/" + patient.id)
@@ -40,9 +40,9 @@ function Patient({report}) {
                 .catch( error => {
                     setInput(false);
                     if (error.response) {
-                        setError(error.response.status + " " + error.response.data);
+                        error.current = error.response.status + " " + error.response.data;
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                        error.current = error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
                     }
                 });
         }
@@ -50,46 +50,45 @@ function Patient({report}) {
 
     function onClickSave(event) {
         event.preventDefault();
-        setError('');
-        setSuccess('');
-
+        error.current = '';
+        success.current = '';
+        const body = {...patient};
         const givenDate = moment(patient.dob, "YYYY-MM-DD", true).toDate();
         const givenTime = givenDate.getTime();
 
         if (isNaN(givenTime) || givenTime < -5000000000000) {
-            setError("Please enter a valid date of birth with format YYYY-MM-DD ("+ patient.dob + " is invalid).");
-            return;
-        }
-
-        const body = {...patient};
-        if (patient.id === 'new') {
+            error.current = "Please enter a valid date of birth with format YYYY-MM-DD ("+ patient.dob + " is invalid).";
+            setModal(true);
+        } else if (patient.id === 'new') {
             body.id=0;
             axios.post(patientsApiUrl, body)
                 .then(response => {
                     body.id=response.data.id;
                     setInput(false);
-                    setSuccess("Patient created successfully with id=" + body.id);
+                    success.current = "Patient created successfully with id=" + body.id;
                 })
-                .catch(error => {
-                    if (error.response) {
-                        setError(error.response.status + " " + error.response.data);
+                .catch(exception => {
+                    if (exception.response) {
+                        error.current = exception.response.status + " " + exception.response.data;
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                        error.current = exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
                     }
+                    setModal(true);
                 });
         } else
         {
             axios.put(patientsApiUrl + "/" + patient.id, body)
                 .then(response => {
+                    success.current = 'Patient has been saved successfully !';
                     setPatient(response.data);
-                    setSuccess('Patient has been saved successfully !');
                 })
-                .catch(error => {
-                    if (error.response) {
-                        setError(error.response.status + " " + error.response.data);
+                .catch(exception => {
+                    if (exception.response) {
+                        error.current = exception.response.status + " " + exception.response.data;
                     } else {
-                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
+                        error.current = exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !";
                     }
+                    setModal(true);
                 });
         }
     }
@@ -146,6 +145,17 @@ function Patient({report}) {
         );
     }
 
+    function closeErrorModal() {
+        error.current = '';
+        setModal(false);
+    }
+
+    function closeSuccessModal() {
+        setModify(false);
+        success.current = '';
+        setModal(false);
+    }
+
     return (
         <div>
             {displayTitle()}
@@ -153,8 +163,8 @@ function Patient({report}) {
                 {patientFields.map(fieldSpec => displayField(fieldSpec.field, fieldSpec.label, fieldSpec.readonly))}
                 {displayModifySwitch()}
                 {displaySaveButton()}
-                <ModalError message={error} closureAction={()=>setError('')}/>
-                <ModalSuccess message={success} closureAction={() => setModify(false)}/>
+                <ModalError message={error.current} closureAction={closeErrorModal}/>
+                <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
             </form>
         </div>
     );
