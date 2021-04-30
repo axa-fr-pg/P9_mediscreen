@@ -111,11 +111,7 @@ function Patient({report}) {
                 })
                 .catch(exception => {
                     patient.current.id = 'not-found';
-                    if (exception.response) {
-                        setError(exception.response.status + " " + exception.response.data);
-                    } else {
-                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
                 });
         }
     }, []);
@@ -141,11 +137,7 @@ function Patient({report}) {
                     setSuccess("Patient created successfully with id=" + body.id);
                 })
                 .catch(exception => {
-                    if (exception.response) {
-                        setError(exception.response.status + " " + exception.response.data);
-                    } else {
-                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
                 });
         } else {
             axios.put(patientsApiUrl + "/" + patient.current.id, body)
@@ -154,11 +146,7 @@ function Patient({report}) {
                     setSuccess('Patient has been saved successfully !');
                 })
                 .catch(exception => {
-                    if (exception.response) {
-                        setError(exception.response.status + " " + exception.response.data);
-                    } else {
-                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
                 });
         }
     }

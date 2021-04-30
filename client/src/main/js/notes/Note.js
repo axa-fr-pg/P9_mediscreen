@@ -17,11 +17,7 @@ export function postNote(body, patId, setSuccess, setError) {
             setSuccess("Note created successfully with id=" + body.noteId);
         })
         .catch(exception => {
-            if (exception.response) {
-                setError(exception.response.status + " " + exception.response.data);
-            } else {
-                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-            }
+            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
 }
 
@@ -84,11 +80,7 @@ function Note() {
                 })
                 .catch(exception => {
                     note.current.noteId = NOTE_NOT_FOUND;
-                    if (exception.response) {
-                        setError(exception.response.status + " " + exception.response.data);
-                    } else {
-                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
                 });
         }
     }, []);
@@ -106,11 +98,7 @@ function Note() {
                     setSuccess('Note has been saved successfully !');
                 })
                 .catch(exception => {
-                    if (exception.response) {
-                        setError(exception.response.status + " " + exception.response.data);
-                    } else {
-                        setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
                 });
         }
     }

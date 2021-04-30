@@ -28,21 +28,15 @@ function Report() {
                 .then(response => {
                     setPatient(response.data);
                 })
-                .catch( error => {
-                    if (error.response) {
-                        setError("Error " + error.response.status + " : Please ask your IT support ! it seems that the patient can't be read !");
-                    } else {
-                        setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                    }
+                .catch( exception => {
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
                 });
         }
     }, [patientId]);
 
     function closeErrorModal() {
         setError('');
-        if (!window.location.href.includes('new')) {
-            history.push('/reports');
-        }
+        history.push('/reports');
     }
 
     return (

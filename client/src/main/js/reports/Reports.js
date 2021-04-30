@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import {Paging} from "@axa-fr/react-toolkit-table";
 import {useHistory} from "react-router";
 import {reportUrl, reportsApiUrl} from "../api/URLs";
 import axios from "axios";
+import ModalError from "../modal/error";
 
 function getPatients(inputData) {
     const {
@@ -23,16 +24,12 @@ function getPatients(inputData) {
     axios.get(url)
         .then(response => {
             if (response.data.numberOfElements === 0) {
-                setError('Your selection criteria match no patient (or the database is empty).');
+                setError('Your selection criteria match no patient. Database may also be empty.');
             }
             setPatients(response.data);
         })
-        .catch(error => {
-            if (error.response) {
-                setError(error.response.status + " " + error.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
-            } else {
-                setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-            }
+        .catch(exception => {
+            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
     setUpdateRequired(false);
 }
@@ -181,28 +178,28 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
     );
 }
 
-function ReportsError({error}) {
-
-    if (!error) return null;
-    return (
-        <footer>
-            {error}
-        </footer>
-    );
-}
-
 function Reports() {
     const [patients, setPatients] = useState([]);
-    const [error, setError] = useState('');
+    const error = useRef('');
+    const [, setModal] = useState(false);
     const [updateRequired, setUpdateRequired] = useState('false');
     const history = useHistory();
+
+    function setError (message) {
+        error.current = message;
+        setModal(message.length > 0);
+    }
+
+    function closeErrorModal() {
+        setError('');
+    }
 
     return (
         <>
             <h1>Report list</h1>
             <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
                          setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <ReportsError error={error}/>
+            <ModalError message={error.current} closureAction={closeErrorModal}/>
             <a className="swagger-url" href={reportUrl + "/swagger-ui/"}>Swagger</a>
         </>
     );

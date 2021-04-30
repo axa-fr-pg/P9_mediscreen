@@ -34,15 +34,11 @@ export function getPatients(inputData) {
         .then(response => {
             setPatients(response.data);
             if (response.data.numberOfElements === 0) {
-                setError('Your selection criteria match no patient (or the database is empty).');
+                setError('Your selection criteria match no patient. Database may also be empty.');
             }
         })
         .catch(exception => {
-            if (exception.response) {
-                setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
-            } else {
-                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-            }
+            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
     setUpdateRequired(false);
 }
@@ -218,11 +214,7 @@ function generateRandomPatients(event, setUpdateRequired, setSuccess, setError) 
             setSuccess(response.data.length + " random patients have been generated successfully !");
         })
         .catch(exception => {
-            if (exception.response) {
-                setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
-            } else {
-                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-            }
+            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
 }
 
@@ -258,11 +250,7 @@ function postPatient(line, setError) {
         .then(() => {numberOfPatientsPosted++; numberOfPatientsAdded++;})
         .catch(exception => {
             numberOfPatientsPosted++;
-            if (exception.response) {
-                setError(exception.response.status + " " + exception.response.data);
-            } else {
-                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-            }
+            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
 }
 

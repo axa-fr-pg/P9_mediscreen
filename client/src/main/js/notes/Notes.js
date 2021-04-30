@@ -67,11 +67,7 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setSuccess, setError, r
                 setSuccess(response.data.length + " random notes have been generated successfully !");
             })
             .catch(exception => {
-                if (exception.response) {
-                    setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
-                } else {
-                    setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-                }
+                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
             });
     }
 
@@ -104,11 +100,7 @@ function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, set
             }
         })
         .catch(exception => {
-            if (exception.response) {
-                setError(exception.response.status + " " + exception.response.data + " ! Please ask your IT support : it seems that the database is not ready !");
-            } else {
-                setError(exception.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
-            }
+            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
 }
 
