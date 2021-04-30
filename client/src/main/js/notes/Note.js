@@ -17,7 +17,26 @@ export function postNote(body, patId, setSuccess, setError) {
             setSuccess("Note created successfully with id=" + body.noteId);
         })
         .catch(exception => {
-            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            if (exception.response) {
+                setError(exception.response.data);
+            } else {
+                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            }
+        });
+}
+
+function putNote(body, setNote, setSuccess, setError) {
+    axios.put(notesApiUrl + "/" + body.noteId, body)
+        .then(response => {
+            setNote(response.data);
+            setSuccess('Note has been saved successfully !');
+        })
+        .catch(exception => {
+            if (exception.response) {
+                setError(exception.response.data);
+            } else {
+                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            }
         });
 }
 
@@ -85,21 +104,22 @@ function Note() {
         }
     }, []);
 
+    function checkNoteContent(currentNote) {
+        let element = document.createElement("div");
+        element.innerHTML = currentNote.e;
+        if(element.textContent.length===0) {
+            currentNote.e='';
+        }
+    }
+
     function onClickSave(event) {
         event.preventDefault();
-
+        checkNoteContent(note.current);
         const body = {...note.current};
-        if (note.current.noteId === 'new') {
-            postNote(body, note.current.patId, setSuccess, setError);
+        if (body.noteId === 'new') {
+            postNote(body, body.patId, setSuccess, setError);
         } else {
-            axios.put(notesApiUrl + "/" + note.current.noteId, body)
-                .then(response => {
-                    setNote(response.data);
-                    setSuccess('Note has been saved successfully !');
-                })
-                .catch(exception => {
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
-                });
+            putNote(body, setNote, setSuccess, setError);
         }
     }
 
