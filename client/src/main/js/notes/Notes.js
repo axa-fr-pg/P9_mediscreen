@@ -67,7 +67,11 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setSuccess, setError, r
                 setSuccess(response.data.length + " random notes have been generated successfully !");
             })
             .catch(exception => {
-                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                if (exception.response) {
+                    setError(exception.response.data);
+                } else {
+                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                }
             });
     }
 
@@ -95,8 +99,9 @@ function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, set
         .then(response => {
             setUpdateRequired(false);
             setNotes(response.data);
-            if (response.data.length === 0) {
-                setError('It seems that the database is empty : please generate some random patients or ask your IT support.');
+            if ((response.data.content !== undefined && response.data.content.length === 0)
+                || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven>0)) {
+                setError('Your selection criteria match no note. Database may also be empty.');
             }
         })
         .catch(exception => {
@@ -260,7 +265,7 @@ function waitAllNotesPosted(numberOfNotesToPost, setError, setUpdateRequired) {
     if (numberOfNotesPosted < numberOfNotesToPost) {
         setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setError, setUpdateRequired);
     } else if (numberOfNotesAdded === numberOfNotesPosted) {
-        setError(numberOfNotesToPost +" patient notes have been uploaded successfully !")
+        setError(numberOfNotesToPost + " patient notes have been uploaded successfully !")
     }
     setUpdateRequired(true);
 }
@@ -269,18 +274,26 @@ function postPatientNoteByPatientId(results, noteContent) {
     const patientId = results.content[0].id;
     numberOfNotesPosted++;
     numberOfNotesAdded++;
-    const body = {noteId : '', e: noteContent};
-    postNote(body, patientId, ()=>{}, ()=>{});
+    const body = {noteId: '', e: noteContent};
+    postNote(body, patientId, () => {
+    }, () => {
+    });
 }
 
 function postPatientNote(line, setError) {
     const family = line[0];
-    const setPatients = (results) => {postPatientNoteByPatientId(results, line[1])};
+    const setPatients = (results) => {
+        postPatientNoteByPatientId(results, line[1])
+    };
     const inputData = {
-        pageNumber : 0, rowsPerPage : 10, orderField : 'id', orderDirection : 'asc',
-        filterId : '', filterFamily : family, filterDob : '',
-        setPatients : setPatients, setUpdateRequired : () => {},
-        setError : (text) => {setError(text); numberOfNotesPosted++}
+        pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
+        filterId: '', filterFamily: family, filterDob: '',
+        setPatients: setPatients, setUpdateRequired: () => {
+        },
+        setError: (text) => {
+            setError(text);
+            numberOfNotesPosted++
+        }
     };
     getPatients(inputData);
 }
@@ -297,10 +310,16 @@ function countLinesWithFormatError(results) {
 
 function checkPatientByFamily(family) {
     const inputData = {
-        pageNumber : 0, rowsPerPage : 10, orderField : 'id', orderDirection : 'asc',
-        filterId : '', filterFamily : family, filterDob : '',
-        setPatients : () => {numberOfPatientsFound++; numberOfPatientsChecked++},
-        setUpdateRequired : () => {}, setError : () => {numberOfPatientsChecked++}
+        pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
+        filterId: '', filterFamily: family, filterDob: '',
+        setPatients: () => {
+            numberOfPatientsFound++;
+            numberOfPatientsChecked++
+        },
+        setUpdateRequired: () => {
+        }, setError: () => {
+            numberOfPatientsChecked++
+        }
     };
     getPatients(inputData);
 }
@@ -325,7 +344,7 @@ function checkAllPatientsFoundAndPostNotes(results, setError, setUpdateRequired)
 }
 
 function addPatientNotes(content, setUpdateRequired, setError) {
-    const text = new Buffer(content).toString( 'latin1');
+    const text = new Buffer(content).toString('latin1');
     numberOfNotesPosted = 0;
     numberOfNotesAdded = 0;
     numberOfPatientsChecked = 0;
@@ -398,12 +417,12 @@ function Notes({report}) {
         history.push('/notes/patients/' + patientIdGiven + '/new');
     }
 
-    function setSuccess (message) {
+    function setSuccess(message) {
         success.current = message;
         setModal(message.length > 0);
     }
 
-    function setError (message) {
+    function setError(message) {
         error.current = message;
         setModal(message.length > 0);
     }

@@ -85,17 +85,18 @@ function Patient({report}) {
     const error = useRef('');
     const success = useRef('');
     const patient = useRef({id: window.location.pathname.split("/").pop()});
-    const [, setModal] = useState(false);
+    const patientsText = window.location.pathname.split("/").slice(-2).shift();
+    const [modal, setModal] = useState(false);
     const [, setPatientReady] = useState(false);
     const [modify, setModify] = useState(window.location.href.includes('new'));
     const history = useHistory();
 
-    function setError (message) {
+    function setError(message) {
         error.current = message;
         setModal(message.length > 0);
     }
 
-    function setSuccess (message) {
+    function setSuccess(message) {
         success.current = message;
         setModal(message.length > 0);
     }
@@ -115,6 +116,10 @@ function Patient({report}) {
                 });
         }
     }, []);
+
+    if (patientsText !== 'patients' && ! modal) {
+        setError('It looks like you entered an invalid URL. Please check your request or ask your IT support !');
+    }
 
     function setPatient(data) {
         patient.current = data;
@@ -137,7 +142,11 @@ function Patient({report}) {
                     setSuccess("Patient created successfully with id=" + body.id);
                 })
                 .catch(exception => {
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    if (exception.response) {
+                        setError(exception.response.data);
+                    } else {
+                        setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    }
                 });
         } else {
             axios.put(patientsApiUrl + "/" + patient.current.id, body)
@@ -146,7 +155,11 @@ function Patient({report}) {
                     setSuccess('Patient has been saved successfully !');
                 })
                 .catch(exception => {
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    if (exception.response) {
+                        setError(exception.response.data);
+                    } else {
+                        setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    }
                 });
         }
     }
@@ -165,7 +178,7 @@ function Patient({report}) {
 
     function closeErrorModal() {
         setError('');
-        if (!window.location.href.includes('new')) {
+        if (!window.location.href.includes('new') || patientsText !== 'patients') {
             history.push('/patients');
         }
     }

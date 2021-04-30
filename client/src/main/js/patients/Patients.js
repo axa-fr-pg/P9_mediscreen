@@ -214,7 +214,11 @@ function generateRandomPatients(event, setUpdateRequired, setSuccess, setError) 
             setSuccess(response.data.length + " random patients have been generated successfully !");
         })
         .catch(exception => {
-            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            if (exception.response) {
+                setError(exception.response.data);
+            } else {
+                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            }
         });
 }
 
@@ -250,7 +254,11 @@ function postPatient(line, setError) {
         .then(() => {numberOfPatientsPosted++; numberOfPatientsAdded++;})
         .catch(exception => {
             numberOfPatientsPosted++;
-            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            if (exception.response) {
+                setError(exception.response.data);
+            } else {
+                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            }
         });
 }
 
@@ -338,12 +346,12 @@ function Patients() {
     const [updateRequired, setUpdateRequired] = useState('false');
     const history = useHistory();
 
-    function setError (message) {
+    function setError(message) {
         error.current = message;
         setModal(message.length > 0);
     }
 
-    function setSuccess (message) {
+    function setSuccess(message) {
         success.current = message;
         setModal(message.length > 0);
     }
