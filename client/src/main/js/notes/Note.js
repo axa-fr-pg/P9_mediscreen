@@ -123,7 +123,6 @@ function Note() {
 
     function onChangeSwitch() {
         setModify(!modify);
-        setError('');
     }
 
     function closeErrorModal() {

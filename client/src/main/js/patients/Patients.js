@@ -319,7 +319,7 @@ function PatientsRandom({setUpdateRequired, setSuccess, setError}) {
     return (
             <form className="form-random">
                 <button
-                    onClick={(event) => generateRandomPatients(event, setUpdateRequired, setError)}>Add
+                    onClick={(event) => generateRandomPatients(event, setUpdateRequired, setSuccess, setError)}>Add
                 </button>
                 <input id="input-expected-number-of-patients" className="input-narrow" defaultValue={5}/>
                 <label>

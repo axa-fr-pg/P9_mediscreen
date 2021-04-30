@@ -1,23 +1,23 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import axios from "axios";
 import {reportsApiUrl} from '../api/URLs';
 import Patient from "../patients/Patient";
 import Notes from "../notes/Notes";
 import {getRiskColorClassName} from "./Reports"
+import ModalError from "../modal/error";
+import {useHistory} from "react-router";
 
 function Report() {
 
-    const [error, setError] = useState('');
+    const error = useRef('');
+    const [, setModal] = useState(false);
     const [patient, setPatient] = useState({assessment : ''});
     const patientId = window.location.pathname.split("/").pop();
+    const history = useHistory();
 
-    function DisplayError() {
-        if (! error) return null;
-        return (
-            <footer>
-                {error}
-            </footer>
-        );
+    function setError (message) {
+        error.current = message;
+        setModal(message.length > 0);
     }
 
     React.useEffect(() => {
@@ -27,11 +27,10 @@ function Report() {
             axios.get(reportsApiUrl + "/patients?id=" + patientId)
                 .then(response => {
                     setPatient(response.data);
-                    setError('');
                 })
                 .catch( error => {
                     if (error.response) {
-                        setError(error.response.status + " " + error.response.data);
+                        setError("Error " + error.response.status + " : Please ask your IT support ! it seems that the patient can't be read !");
                     } else {
                         setError(error.message + " ! Please ask your IT support : it seems that the server or the database is unavailable !");
                     }
@@ -39,11 +38,11 @@ function Report() {
         }
     }, [patientId]);
 
-    if (error !== '') {
-        return <div>
-            <h1/>
-            <DisplayError />
-        </div>
+    function closeErrorModal() {
+        setError('');
+        if (!window.location.href.includes('new')) {
+            history.push('/reports');
+        }
     }
 
     return (
@@ -51,6 +50,7 @@ function Report() {
             <h1 className={getRiskColorClassName(patient.assessment)}>{patient.assessment}</h1>
             <Patient report="true"/>
             <Notes report="true"/>
+            <ModalError message={error.current} closureAction={closeErrorModal}/>
         </div>
     );
 }

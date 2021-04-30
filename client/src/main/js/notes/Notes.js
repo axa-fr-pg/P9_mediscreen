@@ -32,7 +32,6 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, h
             setPatientIdGiven(-1);
             history.push('/notes');
         }
-        setError('');
     }
 
     return (
