@@ -423,8 +423,10 @@ function Notes({report}) {
     }
 
     function setError(message) {
-        error.current = message;
-        setModal(message.length > 0);
+        if (!report===true) {
+            error.current = message;
+            setModal(message.length>0);
+        }
     }
 
     function closeErrorModal() {
