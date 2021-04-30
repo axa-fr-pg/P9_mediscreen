@@ -12,12 +12,11 @@ import moment from 'moment';
 import ModalError from "../modal/error";
 import ModalSuccess from "../modal/success";
 
-export function getPatients(inputData) {
+export function getPatients(getPatientsInputData) {
     const {
-        pageNumber, rowsPerPage, orderField, orderDirection,
-        filterId, filterFamily, filterDob,
-        setPatients, setUpdateRequired, setError
-    } = inputData;
+        pageNumber, rowsPerPage, orderField, orderDirection, filterId,
+        filterFamily, filterDob, setPatients, setError
+    } = getPatientsInputData;
     let url = patientsApiUrl
         + "?page=" + pageNumber + "&size=" + rowsPerPage
         + "&sort=" + orderField + "," + orderDirection;
@@ -40,29 +39,26 @@ export function getPatients(inputData) {
         .catch(exception => {
             setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
-    setUpdateRequired(false);
 }
 
-function PatientList({patients, setPatients, updateRequired, setUpdateRequired, setError, history}) {
+function PatientList({patients, setPatients, setError, addedPatients, setAddedPatients, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [orderField, setOrderField] = React.useState('id');
-    const [orderDirection, setOrderDirection] = React.useState('asc');
-    const [filterId, setFilterId] = React.useState('');
-    const [filterFamily, setFilterFamily] = React.useState('');
-    const [filterDob, setFilterDob] = React.useState('');
+    const [orderField, setOrderField] = useState('id');
+    const [orderDirection, setOrderDirection] = useState('asc');
+    const [filterId, setFilterId] = useState('');
+    const [filterFamily, setFilterFamily] = useState('');
+    const [filterDob, setFilterDob] = useState('');
 
     useEffect(() => {
-        if (updateRequired) {
-            const inputData = {
-                pageNumber, rowsPerPage, orderField, orderDirection,
-                filterId, filterFamily, filterDob,
-                setPatients, setUpdateRequired, setError
-            };
-            getPatients(inputData);
-        }
-    });
+        setAddedPatients(false);
+        const getPatientsInputData = {
+            pageNumber, rowsPerPage, orderField, orderDirection, filterId,
+            filterFamily, filterDob, setPatients, setError
+        };
+        getPatients(getPatientsInputData);
+    }, [addedPatients, pageNumber, rowsPerPage, orderField, orderDirection, filterId, filterFamily, filterDob]);
 
     if (patients.length === 0) return null;
 
@@ -70,21 +66,18 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         const isAsc = orderField === 'id' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
         setOrderField('id');
-        setUpdateRequired(true);
     };
 
     const handleSortByFamily = (event) => {
         const isAsc = orderField === 'family' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
         setOrderField('family');
-        setUpdateRequired(true);
     };
 
     const handleSortByDob = (event) => {
         const isAsc = orderField === 'dob' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
         setOrderField('dob');
-        setUpdateRequired(true);
     };
 
     function submitFilterId(event) {
@@ -93,14 +86,12 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         const expectedId = inputField.value;
         setFilterId(expectedId);
         setPageNumber(0);
-        setUpdateRequired(true);
     }
 
     function submitFilterDob(event) {
         event.preventDefault();
         setFilterDob(document.getElementById('input-filter-dob').value);
         setPageNumber(0);
-        setUpdateRequired(true);
     }
 
     function onChange(event) {
@@ -110,14 +101,12 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
             setPageNumber(Math.floor(patients.totalElements / numberItems));
         }
         setRowsPerPage(numberItems);
-        setUpdateRequired(true);
     }
 
     function submitFilterFamily(event) {
         event.preventDefault();
         setFilterFamily(document.getElementById('input-filter-family').value);
         setPageNumber(0);
-        setUpdateRequired(true);
     }
 
     return (
@@ -201,7 +190,7 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
     );
 }
 
-function generateRandomPatients(event, setUpdateRequired, setSuccess, setError) {
+function generateRandomPatients(event, setSuccess, setError, setAddedPatients) {
     event.preventDefault();
     const inputField = document.getElementById('input-expected-number-of-patients');
     inputField.blur();
@@ -210,7 +199,7 @@ function generateRandomPatients(event, setUpdateRequired, setSuccess, setError) 
 
     axios.post(patientsApiUrl + "/random/" + randomVolume)
         .then(response => {
-            setUpdateRequired(true);
+            setAddedPatients(true);
             setSuccess(response.data.length + " random patients have been generated successfully !");
         })
         .catch(exception => {
@@ -239,19 +228,22 @@ let numberOfPatientsAdded;
 
 function postPatient(line, setError) {
     const patient = {
-        id : 0,
-        family : line[0],
-        given : line[1],
-        dob : line[2],
-        sex : line[3].replace(/ /g,''),
-        address : line[4],
-        phone : line[5]
+        id: 0,
+        family: line[0],
+        given: line[1],
+        dob: line[2],
+        sex: line[3].replace(/ /g, ''),
+        address: line[4],
+        phone: line[5]
     };
     if (patient.dob.includes('/')) {
         patient.dob = convertSlashDateToDashDate(patient.dob, setError);
     }
     axios.post(patientsApiUrl, patient)
-        .then(() => {numberOfPatientsPosted++; numberOfPatientsAdded++;})
+        .then(() => {
+            numberOfPatientsPosted++;
+            numberOfPatientsAdded++;
+        })
         .catch(exception => {
             numberOfPatientsPosted++;
             if (exception.response) {
@@ -262,18 +254,18 @@ function postPatient(line, setError) {
         });
 }
 
-function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setUpdateRequired, setSuccess, setError) {
+function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setSuccess, setError, setAddedPatients) {
     if (numberOfPatientsPosted < numberOfPatientsToPost) {
-        setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setUpdateRequired, setSuccess, setError);
+        setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setSuccess, setError, setAddedPatients);
     } else {
-        setUpdateRequired(true);
         if (numberOfPatientsAdded === numberOfPatientsPosted) {
-            setSuccess(numberOfPatientsToPost +" patients have been uploaded successfully !")
+            setAddedPatients(true);
+            setSuccess(numberOfPatientsToPost + " patients have been uploaded successfully !")
         }
     }
 }
 
-function addPatients(text, setUpdateRequired, setSuccess, setError) {
+function addPatients(text, setSuccess, setError, setAddedPatients) {
     numberOfPatientsPosted = 0;
     numberOfPatientsAdded = 0;
     const csvConfig = {
@@ -296,10 +288,10 @@ function addPatients(text, setUpdateRequired, setSuccess, setError) {
         return;
     }
     results.data.forEach(line => postPatient(line, setError));
-    waitAllPatientsPostedAndRefreshDisplay(results.data.length, setUpdateRequired, setSuccess, setError);
+    waitAllPatientsPostedAndRefreshDisplay(results.data.length, setSuccess, setError, setAddedPatients);
 }
 
-function uploadPatientFile(values, setUpdateRequired, setSuccess, setError) {
+function uploadPatientFile(values, setSuccess, setError, setAddedPatients) {
     if (values.length === 0) {
         setError("You selected an invalid file format. Please check and try again or ask your IT");
         return;
@@ -308,24 +300,24 @@ function uploadPatientFile(values, setUpdateRequired, setSuccess, setError) {
     fetch(values[0].file.preview)
         .then(response => response.blob())
         .then(blob => blob.text())
-        .then(content => addPatients(content, setUpdateRequired, setSuccess, setError));
+        .then(content => addPatients(content, setSuccess, setError, setAddedPatients));
 }
 
-function PatientsRandom({setUpdateRequired, setSuccess, setError}) {
+function PatientsRandom({setSuccess, setError, setAddedPatients}) {
     return (
-            <form className="form-random">
-                <button
-                    onClick={(event) => generateRandomPatients(event, setUpdateRequired, setSuccess, setError)}>Add
-                </button>
-                <input id="input-expected-number-of-patients" className="input-narrow" defaultValue={5}/>
-                <label>
-                    random patient(s) to database
-                </label>
-            </form>
+        <form className="form-random">
+            <button
+                onClick={(event) => generateRandomPatients(event, setSuccess, setError, setAddedPatients)}>Add
+            </button>
+            <input id="input-expected-number-of-patients" className="input-narrow" defaultValue={5}/>
+            <label>
+                random patient(s) to database
+            </label>
+        </form>
     );
 }
 
-function PatientsUpload({setUpdateRequired, setSuccess, setError}) {
+function PatientsUpload({setSuccess, setError, setAddedPatients}) {
     return (
         <File
             label="Browse file"
@@ -333,7 +325,7 @@ function PatientsUpload({setUpdateRequired, setSuccess, setError}) {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChange={(values) => uploadPatientFile(values.values, setUpdateRequired, setSuccess, setError)}
+            onChange={(values) => uploadPatientFile(values.values, setSuccess, setError, setAddedPatients)}
         />
     );
 }
@@ -343,7 +335,7 @@ function Patients() {
     const success = useRef('');
     const [, setModal] = useState(false);
     const [patients, setPatients] = useState([]);
-    const [updateRequired, setUpdateRequired] = useState('false');
+    const [addedPatients, setAddedPatients] = useState(false);
     const history = useHistory();
 
     function setError(message) {
@@ -367,11 +359,11 @@ function Patients() {
     return (
         <div>
             <h1>Patient list</h1>
-            <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
-                         setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
+            <PatientList patients={patients} setPatients={setPatients} setError={setError}
+                         addedPatients={addedPatients} setAddedPatients={setAddedPatients} history={history}/>
             <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
-            <PatientsRandom setUpdateRequired={setUpdateRequired} setSuccess={setSuccess} setError={setError}/>
-            <PatientsUpload setUpdateRequired={setUpdateRequired} setSuccess={setSuccess} setError={setError}/>
+            <PatientsRandom setSuccess={setSuccess} setError={setError} setAddedPatients={setAddedPatients}/>
+            <PatientsUpload setSuccess={setSuccess} setError={setError} setAddedPatients={setAddedPatients}/>
             <ModalError message={error.current} closureAction={closeErrorModal}/>
             <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
             <a className="swagger-url" href={patientUrl + "/swagger-ui/"}>Swagger</a>

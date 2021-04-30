@@ -18,14 +18,13 @@ import {postNote} from './Note';
 import ModalError from "../modal/error";
 import ModalSuccess from "../modal/success";
 
-function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, history, setUpdateRequired}) {
+function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, history}) {
 
     if (!report === false) {
         return null;
     }
 
     function onChangePatientIdSwitch() {
-        setUpdateRequired(true);
         if (patientIdGiven < 0) {
             setPatientIdGiven(0);
         } else {
@@ -42,7 +41,7 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, setError, h
     );
 }
 
-function NotesRandom({patientIdGiven, setUpdateRequired, setSuccess, setError, report}) {
+function NotesRandom({patientIdGiven, setSuccess, setError, report, setAddedNotes}) {
 
     if (!report === false) {
         return null;
@@ -63,7 +62,7 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setSuccess, setError, r
 
         axios.post(url + "/random/" + inputFieldRandomVolume.value)
             .then(response => {
-                setUpdateRequired(true);
+                setAddedNotes(true);
                 setSuccess(response.data.length + " random notes have been generated successfully !");
             })
             .catch(exception => {
@@ -86,7 +85,7 @@ function NotesRandom({patientIdGiven, setUpdateRequired, setSuccess, setError, r
     );
 }
 
-function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setUpdateRequired, setError) {
+function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setError) {
     let url = notesApiUrl;
     if (patientIdGiven >= 0) {
         url = url + "/patients/" + patientIdGiven;
@@ -97,10 +96,9 @@ function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, set
     }
     axios.get(url)
         .then(response => {
-            setUpdateRequired(false);
             setNotes(response.data);
             if ((response.data.content !== undefined && response.data.content.length === 0)
-                || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven>0)) {
+                || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven > 0)) {
                 setError('Your selection criteria match no note. Database may also be empty.');
             }
         })
@@ -109,7 +107,7 @@ function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, set
         });
 }
 
-function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired, setPatientIdGiven}) {
+function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven}) {
 
     function stripHtml(html) {
         const temporaryElement = document.createElement("div");
@@ -119,7 +117,6 @@ function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired
 
     const handleSelect = () => {
         setPatientIdGiven(branch.patId);
-        setUpdateRequired(true);
         history.push('/notes/patients/' + branch.patId);
     };
 
@@ -143,7 +140,7 @@ function PatientNotes({branch, history, expanded, setExpanded, setUpdateRequired
     );
 }
 
-function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateRequired, setUpdateRequired, setError, history}) {
+function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNotes, setAddedNotes, setError, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -151,10 +148,9 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
 
     useEffect(() => {
-        if (updateRequired) {
-            getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setUpdateRequired, setError);
-        }
-    });
+        setAddedNotes(false);
+        getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setError);
+    }, [addedNotes, pageNumber, rowsPerPage, filter, patientIdGiven]);
 
     if (notes.length === 0) return null;
 
@@ -171,7 +167,6 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
         event.preventDefault();
         setFilter(document.getElementById('input-filter').value);
         setPageNumber(0);
-        setUpdateRequired(true);
     }
 
     function onChange(event) {
@@ -181,7 +176,6 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
             setPageNumber(Math.floor(notes.totalElements / numberItems));
         }
         setRowsPerPage(numberItems);
-        setUpdateRequired(true);
     }
 
     return (
@@ -196,8 +190,7 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
                       defaultCollapseIcon={<ExpandMoreIcon/>} defaultExpandIcon={<ChevronRightIcon/>}>
                 {notesTree.map(branch => (
                     <PatientNotes key={branch.patId} branch={branch} history={history}
-                                  setPatientIdGiven={setPatientIdGiven}
-                                  expanded={expanded} setExpanded={setExpanded} setUpdateRequired={setUpdateRequired}/>
+                                  setPatientIdGiven={setPatientIdGiven} expanded={expanded} setExpanded={setExpanded}/>
                 ))}
             </TreeView>
             <p/>
@@ -217,13 +210,12 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, updateReq
     );
 }
 
-function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, report, setUpdateRequired, setError, history}) {
+function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, report, setError, history}) {
 
     function onSubmitPatientIdGivenField() {
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
         history.push('/notes/patients/' + inputFieldPatientId.value);
         setPatientIdGiven(inputFieldPatientId.value);
-        setUpdateRequired(true);
     }
 
     function onChangePatientIdGiven() {
@@ -233,8 +225,8 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, re
 
     return (
         <h1 className="title-note-list">Note list
-            <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} report={report}
-                             setError={setError} history={history} setUpdateRequired={setUpdateRequired}/>
+            <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
+                             report={report} history={history}/>
             <div hidden={patientIdGiven >= 0}>
                 <label>for all patients</label>
             </div>
@@ -261,13 +253,13 @@ let numberOfNotesAdded;
 let numberOfPatientsChecked;
 let numberOfPatientsFound;
 
-function waitAllNotesPosted(numberOfNotesToPost, setError, setUpdateRequired) {
+function waitAllNotesPosted(numberOfNotesToPost, setSuccess, setAddedNotes) {
     if (numberOfNotesPosted < numberOfNotesToPost) {
-        setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setError, setUpdateRequired);
+        setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setSuccess, setAddedNotes);
     } else if (numberOfNotesAdded === numberOfNotesPosted) {
-        setError(numberOfNotesToPost + " patient notes have been uploaded successfully !")
+        setAddedNotes(true);
+        setSuccess(numberOfNotesToPost + " patient notes have been uploaded successfully !")
     }
-    setUpdateRequired(true);
 }
 
 function postPatientNoteByPatientId(results, noteContent) {
@@ -288,8 +280,7 @@ function postPatientNote(line, setError) {
     const inputData = {
         pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
         filterId: '', filterFamily: family, filterDob: '',
-        setPatients: setPatients, setUpdateRequired: () => {
-        },
+        setPatients: setPatients,
         setError: (text) => {
             setError(text);
             numberOfNotesPosted++
@@ -309,24 +300,23 @@ function countLinesWithFormatError(results) {
 }
 
 function checkPatientByFamily(family) {
-    const inputData = {
-        pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
-        filterId: '', filterFamily: family, filterDob: '',
+    const getPatientsInputData = {
+        pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc', filterId: '',
+        filterFamily: family, filterDob: '',
         setPatients: () => {
             numberOfPatientsFound++;
             numberOfPatientsChecked++
         },
-        setUpdateRequired: () => {
-        }, setError: () => {
+        setError: () => {
             numberOfPatientsChecked++
         }
-    };
-    getPatients(inputData);
+    }
+    getPatients(getPatientsInputData);
 }
 
-function waitAllPatientsCheckedAndPostNotes(results, setError, setUpdateRequired) {
+function waitAllPatientsCheckedAndPostNotes(results, setSuccess, setError, setAddedNotes) {
     if (numberOfPatientsChecked < results.data.length) {
-        setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setError, setUpdateRequired);
+        setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setSuccess, setError, setAddedNotes);
         return;
     }
     if (numberOfPatientsFound < numberOfPatientsChecked) {
@@ -335,15 +325,15 @@ function waitAllPatientsCheckedAndPostNotes(results, setError, setUpdateRequired
         return;
     }
     results.data.forEach(line => postPatientNote(line, setError));
-    waitAllNotesPosted(results.data.length, setError, setUpdateRequired);
+    waitAllNotesPosted(results.data.length, setSuccess, setAddedNotes);
 }
 
-function checkAllPatientsFoundAndPostNotes(results, setError, setUpdateRequired) {
+function checkAllPatientsFoundAndPostNotes(results, setSuccess, setError, setAddedNotes) {
     results.data.forEach(results => checkPatientByFamily(results[0]));
-    waitAllPatientsCheckedAndPostNotes(results, setError, setUpdateRequired);
+    waitAllPatientsCheckedAndPostNotes(results, setSuccess, setError, setAddedNotes);
 }
 
-function addPatientNotes(content, setUpdateRequired, setError) {
+function addPatientNotes(content, setSuccess, setError, setAddedNotes) {
     const text = new Buffer(content).toString('latin1');
     numberOfNotesPosted = 0;
     numberOfNotesAdded = 0;
@@ -363,22 +353,22 @@ function addPatientNotes(content, setUpdateRequired, setError) {
         setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
         return;
     }
-    checkAllPatientsFoundAndPostNotes(results, setError, setUpdateRequired);
+    checkAllPatientsFoundAndPostNotes(results, setSuccess, setError, setAddedNotes);
 }
 
-function uploadPatientNoteFile(values, setUpdateRequired, setError) {
+function uploadPatientNoteFile(values, setSuccess, setError, setAddedNotes) {
     if (values.length === 0) {
         setError("You selected an invalid file format. Please check and try again or ask your IT");
         return;
     }
-    setError("Uploading " + values[0].file.name + " ...");
+    // TODO setError("Uploading " + values[0].file.name + " ...");
     fetch(values[0].file.preview)
         .then(response => response.blob())
         .then(blob => blob.arrayBuffer())
-        .then(content => addPatientNotes(content, setUpdateRequired, setError));
+        .then(content => addPatientNotes(content, setSuccess, setError, setAddedNotes));
 }
 
-function NotesUpload({setUpdateRequired, setError, report}) {
+function NotesUpload({setSuccess, setError, report, setAddedNotes}) {
     if (!report === false) {
         return null;
     }
@@ -389,18 +379,18 @@ function NotesUpload({setUpdateRequired, setError, report}) {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChange={(values) => uploadPatientNoteFile(values.values, setUpdateRequired, setError)}
+            onChange={(values) => uploadPatientNoteFile(values.values, setSuccess, setError, setAddedNotes)}
         />
     );
 }
 
 function Notes({report}) {
     const [notes, setNotes] = useState([]);
-    const [updateRequired, setUpdateRequired] = useState(false);
-    const error = useRef('');
-    const success = useRef('');
     const [, setModal] = useState(false);
     const [patientIdGiven, setPatientIdGiven] = useState(-1);
+    const [addedNotes, setAddedNotes] = useState(false);
+    const error = useRef('');
+    const success = useRef('');
     const history = useHistory();
 
     useEffect(() => {
@@ -409,7 +399,6 @@ function Notes({report}) {
             setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
         } else {
             setPatientIdGiven(patientId);
-            setUpdateRequired(true);
         }
     }, [history.location.pathname]);
 
@@ -423,9 +412,9 @@ function Notes({report}) {
     }
 
     function setError(message) {
-        if (!report===true) {
+        if (!report === true) {
             error.current = message;
-            setModal(message.length>0);
+            setModal(message.length > 0);
         }
     }
 
@@ -444,18 +433,15 @@ function Notes({report}) {
     return (
         <div>
             <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                                              report={report}
-                                              setUpdateRequired={setUpdateRequired} history={history}
-                                              setError={setError}/>
+                                              report={report} history={history} setError={setError}/>
             <button hidden={patientIdGiven < 0 || !report === false} className="button-new" onClick={newNote}>
                 Register new note
             </button>
-            <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                      notes={notes} setNotes={setNotes} updateRequired={updateRequired}
-                      setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} setUpdateRequired={setUpdateRequired}
-                         setSuccess={setSuccess} setError={setError} report={report}/>
-            <NotesUpload setUpdateRequired={setUpdateRequired} setError={setError} report={report}/>
+            <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} notes={notes} setNotes={setNotes}
+                      addedNotes={addedNotes} setAddedNotes={setAddedNotes} setError={setError} history={history}/>
+            <NotesRandom patientIdGiven={patientIdGiven} setSuccess={setSuccess} setError={setError}
+                         report={report} setAddedNotes={setAddedNotes}/>
+            <NotesUpload setSuccess={setSuccess} setError={setError} report={report} setAddedNotes={setAddedNotes}/>
             <ModalError message={error.current} closureAction={closeErrorModal}/>
             <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
             <a className="swagger-url" href={doctorUrl + "/swagger-ui/"}>Swagger</a>

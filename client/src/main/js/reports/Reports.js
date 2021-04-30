@@ -6,12 +6,11 @@ import {reportUrl, reportsApiUrl} from "../api/URLs";
 import axios from "axios";
 import ModalError from "../modal/error";
 
-function getPatients(inputData) {
+function getPatients(getPatientsInputData) {
     const {
         pageNumber, rowsPerPage, orderField, orderDirection,
-        filterId, filterFamily,
-        setPatients, setUpdateRequired, setError
-    } = inputData;
+        filterId, filterFamily, setPatients, setError
+    } = getPatientsInputData;
     let url = reportsApiUrl + "/patients"
         + "?page=" + pageNumber + "&size=" + rowsPerPage
         + "&sort=" + orderField + "," + orderDirection;
@@ -31,7 +30,6 @@ function getPatients(inputData) {
         .catch(exception => {
             setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
         });
-    setUpdateRequired(false);
 }
 
 export function getRiskColorClassName(risk) {
@@ -49,30 +47,27 @@ export function getRiskColorClassName(risk) {
     }
 }
 
-function PatientList({patients, setPatients, updateRequired, setUpdateRequired, setError, history}) {
+function PatientList({patients, setPatients, setError, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [orderField, setOrderField] = React.useState('id');
-    const [orderDirection, setOrderDirection] = React.useState('asc');
-    const [filterId, setFilterId] = React.useState('');
-    const [filterFamily, setFilterFamily] = React.useState('');
+    const [orderField, setOrderField] = useState('id');
+    const [orderDirection, setOrderDirection] = useState('asc');
+    const [filterId, setFilterId] = useState('');
+    const [filterFamily, setFilterFamily] = useState('');
 
     useEffect(() => {
-        if (updateRequired) {
-            const inputData = {
-                pageNumber, rowsPerPage, orderField, orderDirection,
-                filterId, filterFamily, setPatients, setUpdateRequired, setError
-            };
-            getPatients(inputData);
-        }
-    });
+        const getPatientsInputData = {
+            pageNumber, rowsPerPage, orderField, orderDirection,
+            filterId, filterFamily, setPatients, setError
+        };
+        getPatients(getPatientsInputData);
+    }, [pageNumber, rowsPerPage, orderField, orderDirection, filterId, filterFamily]);
 
     const handleSortByFamily = (event) => {
         const isAsc = orderField === 'family' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
         setOrderField('family');
-        setUpdateRequired(true);
     };
 
     if (patients.length === 0) return null;
@@ -81,7 +76,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         const isAsc = orderField === 'id' && orderDirection === 'asc';
         setOrderDirection(isAsc ? 'desc' : 'asc');
         setOrderField('id');
-        setUpdateRequired(true);
     };
 
     function submitFilterId(event) {
@@ -90,14 +84,12 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
         const expectedId = inputField.value;
         setFilterId(expectedId);
         setPageNumber(0);
-        setUpdateRequired(true);
     }
 
     function submitFilterFamily(event) {
         event.preventDefault();
         setFilterFamily(document.getElementById('input-filter-family').value);
         setPageNumber(0);
-        setUpdateRequired(true);
     }
 
     function onChange(event) {
@@ -107,7 +99,6 @@ function PatientList({patients, setPatients, updateRequired, setUpdateRequired, 
             setPageNumber(Math.floor(patients.totalElements / numberItems));
         }
         setRowsPerPage(numberItems);
-        setUpdateRequired(true);
     }
 
     return (
@@ -182,10 +173,9 @@ function Reports() {
     const [patients, setPatients] = useState([]);
     const error = useRef('');
     const [, setModal] = useState(false);
-    const [updateRequired, setUpdateRequired] = useState('false');
     const history = useHistory();
 
-    function setError (message) {
+    function setError(message) {
         error.current = message;
         setModal(message.length > 0);
     }
@@ -197,8 +187,7 @@ function Reports() {
     return (
         <>
             <h1>Report list</h1>
-            <PatientList patients={patients} setPatients={setPatients} updateRequired={updateRequired}
-                         setUpdateRequired={setUpdateRequired} setError={setError} history={history}/>
+            <PatientList patients={patients} setPatients={setPatients} setError={setError} history={history}/>
             <ModalError message={error.current} closureAction={closeErrorModal}/>
             <a className="swagger-url" href={reportUrl + "/swagger-ui/"}>Swagger</a>
         </>
