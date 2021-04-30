@@ -429,7 +429,8 @@ function Notes({report}) {
 
     function closeErrorModal() {
         setError('');
-        if (window.location.href.includes('/notes/patients/')) {
+        // TODO user experience when registering a new note for a given patient
+        if (window.location.href.includes('/notes/patients/') && patientIdGiven < 0) {
             history.push('/notes');
         }
     }
