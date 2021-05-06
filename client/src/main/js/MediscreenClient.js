@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route, NavLink } from "react-router-dom";
+import {BrowserRouter, Switch, Route, NavLink} from "react-router-dom";
 import Patients from "./patients/Patients";
 import Patient from "./patients/Patient";
 import "../css/MediscreenClient.css";
@@ -7,12 +7,23 @@ import Notes from "./notes/Notes";
 import Note from "./notes/Note";
 import Reports from "./reports/Reports";
 import Report from "./reports/Report";
+import {useSelector, useDispatch} from "react-redux";
 
-const Home = () => (
-    <div>
-        <h1>Mediscreen home page</h1>
-    </div>
-);
+function Home() {
+
+    const message = useSelector(state => state.text)
+    const dispatch = useDispatch();
+
+    return (
+        <div>
+            <h1>Mediscreen home page</h1>
+            <br/>
+            <h2>Text : {message}</h2>
+            <button onClick={()=>dispatch({type: null})}>button</button>
+        </div>
+    );
+}
+
 
 const MediscreenMenu = () => {
 
@@ -37,38 +48,38 @@ const MediscreenMenu = () => {
 function MediscreenClient() {
     return (
         <BrowserRouter>
-            <MediscreenMenu />
+            <MediscreenMenu/>
             <div>
                 <Switch>
                     <Route exact path="/">
-                        <Home />
+                        <Home/>
                     </Route>
                     <Route exact path="/patients">
-                        <Patients />
+                        <Patients/>
                     </Route>
                     <Route exact path="/patients/new">
-                        <Patient />
+                        <Patient/>
                     </Route>
                     <Route path="/patients">
-                        <Patient />
+                        <Patient/>
                     </Route>
                     <Route exact path="/notes">
-                        <Notes />
+                        <Notes/>
                     </Route>
                     <Route path="/notes/patients/*/new">
-                        <Note />
+                        <Note/>
                     </Route>
                     <Route path="/notes/patients">
-                        <Notes />
+                        <Notes/>
                     </Route>
                     <Route path="/notes">
-                        <Note />
+                        <Note/>
                     </Route>
                     <Route exact path="/reports">
-                        <Reports />
+                        <Reports/>
                     </Route>
                     <Route path="/reports">
-                        <Report />
+                        <Report/>
                     </Route>
                 </Switch>
             </div>
