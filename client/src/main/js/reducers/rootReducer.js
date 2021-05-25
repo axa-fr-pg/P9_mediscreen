@@ -1,11 +1,9 @@
-const initialState = {
-    text : 'initial text'
-}
+import {combineReducers} from 'redux';
+import {PATIENT} from './reducerConstants';
+import patientReducer from './patientReducer';
 
-//https://redux.js.org/recipes/structuring-reducers/using-combinereducers
-
-const rootReducer = (state=initialState, action) => {
-    return { text: state.text + "x"};
-    }
+const rootReducer = combineReducers({
+    [PATIENT] : patientReducer
+});
 
 export default rootReducer;

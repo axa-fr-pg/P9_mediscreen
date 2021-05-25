@@ -8,24 +8,41 @@ import Note from "./notes/Note";
 import Reports from "./reports/Reports";
 import Report from "./reports/Report";
 import {useSelector, useDispatch} from "react-redux";
+import {PATIENT} from "./reducers/reducerConstants";
+
+function Button() {
+    const dispatch = useDispatch();
+    console.log("Render button");
+    return (
+        <button onClick={() => {
+            console.log("clic bouton");
+            dispatch({type: 'clic', payload : 'bouton'})
+        }}>button
+        </button>
+    );
+}
+
+function Text() {
+    const message = useSelector(state =>  state[PATIENT].text);
+    console.log("Render text " + message);
+    return (<h2>Text : {message}</h2>);
+}
 
 function Home() {
-
-    const message = useSelector(state => state.text)
-    const dispatch = useDispatch();
-
+    console.log("Render home");
     return (
         <div>
             <h1>Mediscreen home page</h1>
             <br/>
-            <h2>Text : {message}</h2>
-            <button onClick={()=>dispatch({type: null})}>button</button>
+            <Text/>
+            <Button/>
         </div>
     );
 }
 
 
 const MediscreenMenu = () => {
+    console.log("render MediscreenMenu")
 
     return (
         <nav className="mediscreen-menu">
@@ -46,6 +63,7 @@ const MediscreenMenu = () => {
 };
 
 function MediscreenClient() {
+    console.log("render MediscreenClient")
     return (
         <BrowserRouter>
             <MediscreenMenu/>
