@@ -1,41 +1,42 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import axios from "axios";
 import {reportsApiUrl} from '../api/URLs';
 import Patient from "../patients/Patient";
 import Notes from "../notes/Notes";
 import {getRiskColorClassName} from "./Reports"
-import ModalError from "../modal/error";
+import Modal from "../modal/modal";
 import {useHistory} from "react-router";
+import {useDispatch} from "react-redux";
+import {ACTION_DISPLAY_ERROR_MODAL} from "../reducers/reducerConstants";
 
 function Report() {
 
-    const error = useRef('');
-    const [, setModal] = useState(false);
     const [patient, setPatient] = useState({assessment : ''});
     const patientId = window.location.pathname.split("/").pop();
     const history = useHistory();
-
-    function setError (message) {
-        error.current = message;
-        setModal(message.length > 0);
-    }
+    const dispatch = useDispatch();
 
     React.useEffect(() => {
         if (isNaN(patientId)) {
-            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. ' +
+                    'Please check your request or ask your IT support !'});
         } else {
             axios.get(reportsApiUrl + "/patients?id=" + patientId)
                 .then(response => {
                     setPatient(response.data);
                 })
                 .catch( exception => {
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
+                            + exception.message});
                 });
         }
     }, [patientId]);
 
     function closeErrorModal() {
-        setError('');
         history.push('/reports');
     }
 
@@ -44,7 +45,7 @@ function Report() {
             <h1 className={getRiskColorClassName(patient.assessment)}>{patient.assessment}</h1>
             <Patient report="true"/>
             <Notes report="true"/>
-            <ModalError message={error.current} closureAction={closeErrorModal}/>
+            <Modal errorClosureAction={closeErrorModal}/>
         </div>
     );
 }
