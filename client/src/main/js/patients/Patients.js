@@ -37,13 +37,17 @@ export function getPatients(getPatientsInputData) {
         .then(response => {
             setPatients(response.data);
             if (response.data.numberOfElements === 0) {
-                dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                    payload: 'Your selection criteria match no patient. Database may also be empty.'});
+                dispatch({
+                    type: ACTION_DISPLAY_ERROR_MODAL,
+                    payload: 'Your selection criteria match no patient. Database may also be empty.'
+                });
             }
         })
         .catch(exception => {
-            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+            });
         });
 }
 
@@ -235,8 +239,10 @@ function postPatient(line, dispatch) {
             if (exception.response) {
                 dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
             } else {
-                dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                    payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+                dispatch({
+                    type: ACTION_DISPLAY_ERROR_MODAL,
+                    payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                });
             }
         });
 }
@@ -254,15 +260,19 @@ function PatientsRandom({setAddedPatients}) {
         axios.post(patientsApiUrl + "/random/" + randomVolume)
             .then(response => {
                 setAddedPatients(true);
-                dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
-                    payload: response.data.length + " random patients have been generated successfully !"});
+                dispatch({
+                    type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    payload: response.data.length + " random patients have been generated successfully !"
+                });
             })
             .catch(exception => {
                 if (exception.response) {
                     dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
                 } else {
-                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                    });
                 }
             });
     }
@@ -290,8 +300,10 @@ function PatientsUpload({setAddedPatients}) {
         } else {
             if (numberOfPatientsAdded === numberOfPatientsPosted) {
                 setAddedPatients(true);
-                dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
-                    payload: numberOfPatientsToPost + " patients have been uploaded successfully !"});
+                dispatch({
+                    type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    payload: numberOfPatientsToPost + " patients have been uploaded successfully !"
+                });
             }
         }
     }
@@ -305,8 +317,10 @@ function PatientsUpload({setAddedPatients}) {
         };
         const results = readString(text, csvConfig);
         if (results.errors.length > 0) {
-            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                payload: "File parsing has encountered errors. Please check and try again or ask your IT"});
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "File parsing has encountered errors. Please check and try again or ask your IT"
+            });
             return;
         }
         let numberOfLinesWithWrongFormat = 0;
@@ -316,8 +330,10 @@ function PatientsUpload({setAddedPatients}) {
             }
         });
         if (numberOfLinesWithWrongFormat > 0) {
-            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                payload: "CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload."});
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload."
+            });
             return;
         }
         results.data.forEach(line => postPatient(line, dispatch));
@@ -326,8 +342,10 @@ function PatientsUpload({setAddedPatients}) {
 
     function uploadPatientFile(values, setAddedPatients) {
         if (values.length === 0) {
-            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                payload: "You selected an invalid file format. Please check and try again or ask your IT"});
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "You selected an invalid file format. Please check and try again or ask your IT"
+            });
             return;
         }
 // TODO   SetError("Uploading " + values[0].file.name + " ...");
@@ -363,7 +381,7 @@ function Patients() {
             <PatientsRandom setAddedPatients={setAddedPatients}/>
             <PatientsUpload setAddedPatients={setAddedPatients}/>
             <Modal/>
-            <a className="swagger-url"  href={patientUrl + "/swagger-ui/"}>Swagger</a>
+            <a className="swagger-url" href={patientUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );
 }

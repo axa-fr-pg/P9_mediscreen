@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import axios from "axios";
 import {doctorUrl, notesApiUrl} from "../api/URLs";
@@ -15,8 +15,9 @@ import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
 import {readString} from 'react-papaparse';
 import {getPatients} from '../patients/Patients';
 import {postNote} from './Note';
-import ModalError from "../modal/error";
-import ModalSuccess from "../modal/success";
+import {useDispatch} from "react-redux";
+import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL} from "../reducers/reducerConstants";
+import Modal from "../modal/modal";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, history}) {
 
@@ -41,7 +42,9 @@ function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, history}) {
     );
 }
 
-function NotesRandom({patientIdGiven, setSuccess, setError, report, setAddedNotes}) {
+function NotesRandom({patientIdGiven, report, setAddedNotes}) {
+
+    const dispatch = useDispatch();
 
     if (!report === false) {
         return null;
@@ -63,13 +66,19 @@ function NotesRandom({patientIdGiven, setSuccess, setError, report, setAddedNote
         axios.post(url + "/random/" + inputFieldRandomVolume.value)
             .then(response => {
                 setAddedNotes(true);
-                setSuccess(response.data.length + " random notes have been generated successfully !");
+                dispatch({
+                    type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    payload: response.data.length + " random notes have been generated successfully !"
+                });
             })
             .catch(exception => {
                 if (exception.response) {
-                    setError(exception.response.data);
+                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
                 } else {
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                    });
                 }
             });
     }
@@ -83,28 +92,6 @@ function NotesRandom({patientIdGiven, setSuccess, setError, report, setAddedNote
             </label>
         </form>
     );
-}
-
-function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setError) {
-    let url = notesApiUrl;
-    if (patientIdGiven >= 0) {
-        url = url + "/patients/" + patientIdGiven;
-    } else {
-        url = url + "?page=" + pageNumber;
-        url = url + "&size=" + rowsPerPage;
-        url = url + "&e=" + filter;
-    }
-    axios.get(url)
-        .then(response => {
-            setNotes(response.data);
-            if ((response.data.content !== undefined && response.data.content.length === 0)
-                || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven > 0)) {
-                setError('Your selection criteria match no note. Database may also be empty.');
-            }
-        })
-        .catch(exception => {
-            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
-        });
 }
 
 function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven}) {
@@ -140,16 +127,45 @@ function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven
     );
 }
 
-function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNotes, setAddedNotes, setError, history}) {
+function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNotes, setAddedNotes, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filter, setFilter] = useState('');
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
+    const dispatch = useDispatch();
+
+    function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes) {
+        let url = notesApiUrl;
+        if (patientIdGiven >= 0) {
+            url = url + "/patients/" + patientIdGiven;
+        } else {
+            url = url + "?page=" + pageNumber;
+            url = url + "&size=" + rowsPerPage;
+            url = url + "&e=" + filter;
+        }
+        axios.get(url)
+            .then(response => {
+                setNotes(response.data);
+                if ((response.data.content !== undefined && response.data.content.length === 0)
+                    || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven > 0)) {
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: 'Your selection criteria match no note. Database may also be empty.'
+                    });
+                }
+            })
+            .catch(exception => {
+                dispatch({
+                    type: ACTION_DISPLAY_ERROR_MODAL,
+                    payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                });
+            });
+    }
 
     useEffect(() => {
         setAddedNotes(false);
-        getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes, setError);
+        getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes);
     }, [addedNotes, pageNumber, rowsPerPage, filter, patientIdGiven]);
 
     if (notes.length === 0) return null;
@@ -210,7 +226,7 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
     );
 }
 
-function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, report, setError, history}) {
+function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, report, history}) {
 
     function onSubmitPatientIdGivenField() {
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
@@ -253,15 +269,6 @@ let numberOfNotesAdded;
 let numberOfPatientsChecked;
 let numberOfPatientsFound;
 
-function waitAllNotesPosted(numberOfNotesToPost, setSuccess, setAddedNotes) {
-    if (numberOfNotesPosted < numberOfNotesToPost) {
-        setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setSuccess, setAddedNotes);
-    } else if (numberOfNotesAdded === numberOfNotesPosted) {
-        setAddedNotes(true);
-        setSuccess(numberOfNotesToPost + " patient notes have been uploaded successfully !")
-    }
-}
-
 function postPatientNoteByPatientId(results, noteContent) {
     const patientId = results.content[0].id;
     numberOfNotesPosted++;
@@ -270,23 +277,6 @@ function postPatientNoteByPatientId(results, noteContent) {
     postNote(body, patientId, () => {
     }, () => {
     });
-}
-
-function postPatientNote(line, setError) {
-    const family = line[0];
-    const setPatients = (results) => {
-        postPatientNoteByPatientId(results, line[1])
-    };
-    const inputData = {
-        pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
-        filterId: '', filterFamily: family, filterDob: '',
-        setPatients: setPatients,
-        setError: (text) => {
-            setError(text);
-            numberOfNotesPosted++
-        }
-    };
-    getPatients(inputData);
 }
 
 function countLinesWithFormatError(results) {
@@ -307,71 +297,116 @@ function checkPatientByFamily(family) {
             numberOfPatientsFound++;
             numberOfPatientsChecked++
         },
-        setError: () => {
+        dispatch: () => {
             numberOfPatientsChecked++
         }
     }
     getPatients(getPatientsInputData);
 }
 
-function waitAllPatientsCheckedAndPostNotes(results, setSuccess, setError, setAddedNotes) {
-    if (numberOfPatientsChecked < results.data.length) {
-        setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setSuccess, setError, setAddedNotes);
-        return;
-    }
-    if (numberOfPatientsFound < numberOfPatientsChecked) {
-        setError("CSV file contains " + (numberOfPatientsChecked - numberOfPatientsFound) +
-            " note(s) for unknown or ambiguous patient(s). Aborting upload.");
-        return;
-    }
-    results.data.forEach(line => postPatientNote(line, setError));
-    waitAllNotesPosted(results.data.length, setSuccess, setAddedNotes);
-}
+function NotesUpload({report, setAddedNotes}) {
 
-function checkAllPatientsFoundAndPostNotes(results, setSuccess, setError, setAddedNotes) {
-    results.data.forEach(results => checkPatientByFamily(results[0]));
-    waitAllPatientsCheckedAndPostNotes(results, setSuccess, setError, setAddedNotes);
-}
+    const dispatch = useDispatch();
 
-function addPatientNotes(content, setSuccess, setError, setAddedNotes) {
-    const text = new Buffer(content).toString('latin1');
-    numberOfNotesPosted = 0;
-    numberOfNotesAdded = 0;
-    numberOfPatientsChecked = 0;
-    numberOfPatientsFound = 0;
-    const csvConfig = {
-        delimiter: ";",
-        skipEmptyLines: true
-    };
-    const results = readString(text, csvConfig);
-    if (results.errors.length > 0) {
-        setError("File parsing has encountered errors. Please check and try again or ask your IT");
-        return;
-    }
-    const numberOfLinesWithWrongFormat = countLinesWithFormatError(results);
-    if (numberOfLinesWithWrongFormat > 0) {
-        setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
-        return;
-    }
-    checkAllPatientsFoundAndPostNotes(results, setSuccess, setError, setAddedNotes);
-}
-
-function uploadPatientNoteFile(values, setSuccess, setError, setAddedNotes) {
-    if (values.length === 0) {
-        setError("You selected an invalid file format. Please check and try again or ask your IT");
-        return;
-    }
-    // TODO setError("Uploading " + values[0].file.name + " ...");
-    fetch(values[0].file.preview)
-        .then(response => response.blob())
-        .then(blob => blob.arrayBuffer())
-        .then(content => addPatientNotes(content, setSuccess, setError, setAddedNotes));
-}
-
-function NotesUpload({setSuccess, setError, report, setAddedNotes}) {
     if (!report === false) {
         return null;
     }
+
+    function waitAllNotesPosted(numberOfNotesToPost, setAddedNotes) {
+        if (numberOfNotesPosted < numberOfNotesToPost) {
+            setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setAddedNotes);
+        } else if (numberOfNotesAdded === numberOfNotesPosted) {
+            setAddedNotes(true);
+            dispatch({
+                type: ACTION_DISPLAY_SUCCESS_MODAL,
+                payload: numberOfNotesToPost + " patient notes have been uploaded successfully !"
+            });
+        }
+    }
+
+    function postPatientNote(line) {
+        const family = line[0];
+        const setPatients = (results) => {
+            postPatientNoteByPatientId(results, line[1])
+        };
+        const inputData = {
+            pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
+            filterId: '', filterFamily: family, filterDob: '',
+            setPatients: setPatients,
+            dispatch: (text) => {
+                dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: text});
+                numberOfNotesPosted++
+            }
+        };
+        getPatients(inputData);
+    }
+
+    function waitAllPatientsCheckedAndPostNotes(results, setAddedNotes) {
+        if (numberOfPatientsChecked < results.data.length) {
+            setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setAddedNotes);
+            return;
+        }
+        if (numberOfPatientsFound < numberOfPatientsChecked) {
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "CSV file contains " + (numberOfPatientsChecked - numberOfPatientsFound) +
+                    " note(s) for unknown or ambiguous patient(s). Aborting upload."
+            });
+            return;
+        }
+        results.data.forEach(line => postPatientNote(line));
+        waitAllNotesPosted(results.data.length, setAddedNotes);
+    }
+
+    function checkAllPatientsFoundAndPostNotes(results, setAddedNotes) {
+        results.data.forEach(results => checkPatientByFamily(results[0]));
+        waitAllPatientsCheckedAndPostNotes(results, setAddedNotes);
+    }
+
+    function addPatientNotes(content, setAddedNotes) {
+        const text = new Buffer(content).toString('latin1');
+        numberOfNotesPosted = 0;
+        numberOfNotesAdded = 0;
+        numberOfPatientsChecked = 0;
+        numberOfPatientsFound = 0;
+        const csvConfig = {
+            delimiter: ";",
+            skipEmptyLines: true
+        };
+        const results = readString(text, csvConfig);
+        if (results.errors.length > 0) {
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "File parsing has encountered errors. Please check and try again or ask your IT"
+            });
+            return;
+        }
+        const numberOfLinesWithWrongFormat = countLinesWithFormatError(results);
+        if (numberOfLinesWithWrongFormat > 0) {
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload."
+            });
+            return;
+        }
+        checkAllPatientsFoundAndPostNotes(results, setAddedNotes);
+    }
+
+    function uploadPatientNoteFile(values, setAddedNotes) {
+        if (values.length === 0) {
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "You selected an invalid file format. Please check and try again or ask your IT"
+            });
+            return;
+        }
+        // TODO setError("Uploading " + values[0].file.name + " ...");
+        fetch(values[0].file.preview)
+            .then(response => response.blob())
+            .then(blob => blob.arrayBuffer())
+            .then(content => addPatientNotes(content, setAddedNotes));
+    }
+
     return (
         <File
             label="Browse file"
@@ -379,24 +414,26 @@ function NotesUpload({setSuccess, setError, report, setAddedNotes}) {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChange={(values) => uploadPatientNoteFile(values.values, setSuccess, setError, setAddedNotes)}
+            onChange={(values) => uploadPatientNoteFile(values.values, setAddedNotes)}
         />
     );
 }
 
 function Notes({report}) {
     const [notes, setNotes] = useState([]);
-    const [, setModal] = useState(false);
     const [patientIdGiven, setPatientIdGiven] = useState(-1);
     const [addedNotes, setAddedNotes] = useState(false);
-    const error = useRef('');
-    const success = useRef('');
     const history = useHistory();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const patientId = getPatientIdByUrl(window.location.href);
         if (isNaN(parseInt(patientId))) {
-            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. ' +
+                    'Please check your request or ask your IT support !'
+            });
         } else {
             setPatientIdGiven(patientId);
         }
@@ -406,44 +443,26 @@ function Notes({report}) {
         history.push('/notes/patients/' + patientIdGiven + '/new');
     }
 
-    function setSuccess(message) {
-        success.current = message;
-        setModal(message.length > 0);
-    }
-
-    function setError(message) {
-        if (!report === true) {
-            error.current = message;
-            setModal(message.length > 0);
-        }
-    }
-
     function closeErrorModal() {
-        setError('');
         // TODO user experience when registering a new note for a given patient
         if (window.location.href.includes('/notes/patients/') && patientIdGiven < 0) {
             history.push('/notes');
         }
     }
 
-    function closeSuccessModal() {
-        setSuccess('');
-    }
-
     return (
         <div>
             <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                                              report={report} history={history} setError={setError}/>
+                                              report={report} history={history}/>
             <button hidden={patientIdGiven < 0 || !report === false} className="button-new" onClick={newNote}>
                 Register new note
             </button>
-            <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} notes={notes} setNotes={setNotes}
-                      addedNotes={addedNotes} setAddedNotes={setAddedNotes} setError={setError} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} setSuccess={setSuccess} setError={setError}
-                         report={report} setAddedNotes={setAddedNotes}/>
-            <NotesUpload setSuccess={setSuccess} setError={setError} report={report} setAddedNotes={setAddedNotes}/>
-            <ModalError message={error.current} closureAction={closeErrorModal}/>
-            <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
+            <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} notes={notes}
+                      setNotes={setNotes}
+                      addedNotes={addedNotes} setAddedNotes={setAddedNotes} history={history}/>
+            <NotesRandom patientIdGiven={patientIdGiven} report={report} setAddedNotes={setAddedNotes}/>
+            <NotesUpload report={report} setAddedNotes={setAddedNotes}/>
+            <Modal errorClosureAction={closeErrorModal}/>
             <a className="swagger-url" href={doctorUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );

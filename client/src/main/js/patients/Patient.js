@@ -69,7 +69,7 @@ function PatientFields({patient, modify}) {
     return patientFields.map(fieldSpec => {
         return (
             <PatientField key={fieldSpec.field} patient={patient} modify={modify}
-                   field={fieldSpec.field} label={fieldSpec.label} readOnly={fieldSpec.readOnly}
+                          field={fieldSpec.field} label={fieldSpec.label} readOnly={fieldSpec.readOnly}
             />);
     });
 }
@@ -92,8 +92,10 @@ function Patient({report}) {
     useEffect(() => {
         if (patient.current.id === 'new') return;
         if (isNaN(parseInt(patient.current.id))) {
-            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !'});
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !'
+            });
         } else {
             axios.get(patientsApiUrl + "/" + patient.current.id)
                 .then(response => {
@@ -101,15 +103,19 @@ function Patient({report}) {
                 })
                 .catch(exception => {
                     patient.current.id = 'not-found';
-                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                    });
                 });
         }
     }, []);
 
     if (baseUri !== 'patients') {
-        dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-            payload: 'It looks like you entered an invalid URL. Please check your request or ask your IT support !'});
+        dispatch({
+            type: ACTION_DISPLAY_ERROR_MODAL,
+            payload: 'It looks like you entered an invalid URL. Please check your request or ask your IT support !'
+        });
     }
 
     function setPatient(data) {
@@ -124,37 +130,47 @@ function Patient({report}) {
         const givenTime = givenDate.getTime();
 
         if (isNaN(givenTime) || givenTime < -5000000000000) {
-            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                payload: "Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid)."});
+            dispatch({
+                type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid)."
+            });
         } else if (body.id === 'new') {
             body.id = 0;
             axios.post(patientsApiUrl, body)
                 .then(response => {
                     body.id = response.data.id;
-                    dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
-                        payload: "Patient created successfully with id=" + body.id});
+                    dispatch({
+                        type: ACTION_DISPLAY_SUCCESS_MODAL,
+                        payload: "Patient created successfully with id=" + body.id
+                    });
                 })
                 .catch(exception => {
                     if (exception.response) {
                         dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
                     } else {
-                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                            payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+                        dispatch({
+                            type: ACTION_DISPLAY_ERROR_MODAL,
+                            payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                        });
                     }
                 });
         } else {
             axios.put(patientsApiUrl + "/" + patient.current.id, body)
                 .then(response => {
                     setPatient(response.data);
-                    dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
-                        payload: 'Patient has been saved successfully !'});
+                    dispatch({
+                        type: ACTION_DISPLAY_SUCCESS_MODAL,
+                        payload: 'Patient has been saved successfully !'
+                    });
                 })
                 .catch(exception => {
                     if (exception.response) {
                         dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
                     } else {
-                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
-                            payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+                        dispatch({
+                            type: ACTION_DISPLAY_ERROR_MODAL,
+                            payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                        });
                     }
                 });
         }

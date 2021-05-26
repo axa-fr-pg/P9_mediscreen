@@ -3,39 +3,32 @@ import axios from "axios";
 import {notesApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import ReactQuill from "react-quill";
-import ModalError from "../modal/error";
-import ModalSuccess from "../modal/success";
 import {useHistory} from "react-router";
+import Modal from "../modal/modal";
+import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL} from "../reducers/reducerConstants";
+import {useDispatch} from "react-redux";
 
 const NOTE_NOT_FOUND = 'note-not-found';
 
-export function postNote(body, patId, setSuccess, setError) {
+export function postNote(body, patId, dispatch) {
     body.noteId = '';
     axios.post(notesApiUrl + '/patients/' + patId, body)
         .then(response => {
             body.noteId = response.data.noteId;
-            setSuccess("Note created successfully with id=" + body.noteId);
+            dispatch({
+                type: ACTION_DISPLAY_SUCCESS_MODAL,
+                payload: "Note created successfully with id=" + body.noteId
+            });
         })
         .catch(exception => {
             if (exception.response) {
-                setError(exception.response.data);
+                dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
             } else {
-                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
-            }
-        });
-}
-
-function putNote(body, setNote, setSuccess, setError) {
-    axios.put(notesApiUrl + "/" + body.noteId, body)
-        .then(response => {
-            setNote(response.data);
-            setSuccess('Note has been saved successfully !');
-        })
-        .catch(exception => {
-            if (exception.response) {
-                setError(exception.response.data);
-            } else {
-                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                dispatch({
+                    type: ACTION_DISPLAY_ERROR_MODAL,
+                    payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
+                        + exception.message
+                });
             }
         });
 }
@@ -69,22 +62,10 @@ function NoteTitleWithModeSelector({note, modify, onChangeSwitch}) {
 function Note() {
     const currentUrl = window.location.pathname.split("/");
     const note = useRef({noteId: currentUrl.pop(), patId: currentUrl.pop(), e: ''});
-    const error = useRef('');
-    const success = useRef('');
-    const [, setModal] = useState(false);
     const [, setNoteReady] = useState(false);
     const [modify, setModify] = useState(window.location.href.includes('new'));
     const history = useHistory();
-
-    function setSuccess (message) {
-        success.current = message;
-        setModal(message.length > 0);
-    }
-
-    function setError (message) {
-        error.current = message;
-        setModal(message.length > 0);
-    }
+    const dispatch = useDispatch();
 
     function setNote(data) {
         note.current = data;
@@ -99,16 +80,45 @@ function Note() {
                 })
                 .catch(exception => {
                     note.current.noteId = NOTE_NOT_FOUND;
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
+                            + exception.message
+                    });
                 });
         }
     }, []);
 
+    function putNote(body, setNote) {
+        axios.put(notesApiUrl + "/" + body.noteId, body)
+            .then(response => {
+                setNote(response.data);
+                dispatch({
+                    type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    payload: 'Note has been saved successfully !'
+                });
+            })
+            .catch(exception => {
+                if (exception.response) {
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: exception.response.data
+                    });
+                } else {
+                    dispatch({
+                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
+                            + exception.message
+                    });
+                }
+            });
+    }
+
     function checkNoteContent(currentNote) {
         let element = document.createElement("div");
         element.innerHTML = currentNote.e;
-        if(element.textContent.length===0) {
-            currentNote.e='';
+        if (element.textContent.length === 0) {
+            currentNote.e = '';
         }
     }
 
@@ -117,9 +127,9 @@ function Note() {
         checkNoteContent(note.current);
         const body = {...note.current};
         if (body.noteId === 'new') {
-            postNote(body, body.patId, setSuccess, setError);
+            postNote(body, body.patId, dispatch);
         } else {
-            putNote(body, setNote, setSuccess, setError);
+            putNote(body, setNote, dispatch);
         }
     }
 
@@ -134,7 +144,6 @@ function Note() {
     }
 
     function closeErrorModal() {
-        setError('');
         if (!window.location.href.includes('new') && note.current.noteId === NOTE_NOT_FOUND) {
             history.push('/notes');
         }
@@ -142,7 +151,6 @@ function Note() {
 
     function closeSuccessModal() {
         setModify(false);
-        setSuccess('');
         if (window.location.href.includes('new')) {
             history.push(window.location.href.split('/').slice(0, -1).join('/'));
         }
@@ -156,8 +164,7 @@ function Note() {
             <ReactQuill className="quill-note-content" key={note.current.noteId} value={note.current.e}
                         readOnly={modify === false} onChange={onChangeNote}
                         modules={{toolbar: modify}}/>
-            <ModalError message={error.current} closureAction={closeErrorModal}/>
-            <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
+            <Modal errorClosureAction={closeErrorModal} successClosureAction={closeSuccessModal}/>
         </div>
     );
 }
