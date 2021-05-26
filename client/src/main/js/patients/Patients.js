@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from "axios";
 import {patientUrl, patientsApiUrl} from '../api/URLs';
 import {useHistory} from "react-router";
@@ -9,31 +9,24 @@ import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
 import {readString} from 'react-papaparse';
 import {NUMBER_OF_PATIENT_FIELDS} from './Patient';
 import moment from 'moment';
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
+    STATE_PATIENT,
     ACTION_DISPLAY_ERROR_MODAL,
-    ACTION_DISPLAY_SUCCESS_MODAL
+    ACTION_DISPLAY_SUCCESS_MODAL,
+    ACTION_SET_FILTER_DOB,
+    ACTION_SET_FILTER_FAMILY,
+    ACTION_SET_FILTER_ID,
+    ACTION_SET_PAGE_NUMBER,
+    ACTION_SET_ROWS_PER_PAGE,
+    ACTION_SET_SORTING_FIELD,
+    ACTION_SET_SORTING_DIRECTION
 } from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
-export function getPatients(getPatientsInputData) {
-    const {
-        pageNumber, rowsPerPage, orderField, orderDirection, filterId,
-        filterFamily, filterDob, setPatients, dispatch
-    } = getPatientsInputData;
-    let url = patientsApiUrl
-        + "?page=" + pageNumber + "&size=" + rowsPerPage
-        + "&sort=" + orderField + "," + orderDirection;
-    if (filterId !== '') {
-        url = url + "&id=" + filterId;
-    }
-    if (filterFamily !== '') {
-        url = url + "&family=" + filterFamily;
-    }
-    if (filterDob !== '') {
-        url = url + "&dob=" + filterDob;
-    }
-    axios.get(url)
+export function getPatients(patientState, dispatch, setPatients) {
+
+    axios.get(patientState.getPatientsUrl)
         .then(response => {
             setPatients(response.data);
             if (response.data.numberOfElements === 0) {
@@ -53,71 +46,70 @@ export function getPatients(getPatientsInputData) {
 
 function PatientList({patients, setPatients, addedPatients, setAddedPatients, history}) {
 
-    const [pageNumber, setPageNumber] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [orderField, setOrderField] = useState('id');
-    const [orderDirection, setOrderDirection] = useState('asc');
-    const [filterId, setFilterId] = useState('');
-    const [filterFamily, setFilterFamily] = useState('');
-    const [filterDob, setFilterDob] = useState('');
     const dispatch = useDispatch();
+    const patientState = useSelector(state => state[STATE_PATIENT]);
 
     useEffect(() => {
         setAddedPatients(false);
-        const getPatientsInputData = {
-            pageNumber, rowsPerPage, orderField, orderDirection, filterId,
-            filterFamily, filterDob, setPatients, dispatch
-        };
-        getPatients(getPatientsInputData);
-    }, [addedPatients, pageNumber, rowsPerPage, orderField, orderDirection, filterId, filterFamily, filterDob]);
+        getPatients(patientState, dispatch, setPatients);
+    }, [addedPatients, patientState]);
 
     if (patients.length === 0) return null;
 
     const handleSortById = (event) => {
-        const isAsc = orderField === 'id' && orderDirection === 'asc';
-        setOrderDirection(isAsc ? 'desc' : 'asc');
-        setOrderField('id');
+        const isAsc = patientState.sorting.field === 'id' && patientState.sorting.direction === 'asc';
+        dispatch({type: ACTION_SET_SORTING_FIELD, payload : 'id'});
+        dispatch({type: ACTION_SET_SORTING_DIRECTION, payload : isAsc ? 'desc' : 'asc'});
     };
 
     const handleSortByFamily = (event) => {
-        const isAsc = orderField === 'family' && orderDirection === 'asc';
-        setOrderDirection(isAsc ? 'desc' : 'asc');
-        setOrderField('family');
+        const isAsc = patientState.sorting.field === 'family' && patientState.sorting.direction === 'asc';
+        dispatch({type: ACTION_SET_SORTING_FIELD, payload : 'family'});
+        dispatch({type: ACTION_SET_SORTING_DIRECTION, payload : isAsc ? 'desc' : 'asc'});
     };
 
     const handleSortByDob = (event) => {
-        const isAsc = orderField === 'dob' && orderDirection === 'asc';
-        setOrderDirection(isAsc ? 'desc' : 'asc');
-        setOrderField('dob');
+        const isAsc = patientState.sorting.field === 'dob' && patientState.sorting.direction === 'asc';
+        dispatch({type: ACTION_SET_SORTING_FIELD, payload : 'dob'});
+        dispatch({type: ACTION_SET_SORTING_DIRECTION, payload : isAsc ? 'desc' : 'asc'});
     };
 
     function submitFilterId(event) {
         event.preventDefault();
         const inputField = document.getElementById('input-filter-id');
         const expectedId = inputField.value;
-        setFilterId(expectedId);
-        setPageNumber(0);
+        dispatch({type: ACTION_SET_FILTER_ID, payload: expectedId})
+        dispatch({type: ACTION_SET_PAGE_NUMBER, payload: 0})
     }
 
     function submitFilterDob(event) {
         event.preventDefault();
-        setFilterDob(document.getElementById('input-filter-dob').value);
-        setPageNumber(0);
+        dispatch({
+            type: ACTION_SET_FILTER_DOB,
+            payload: document.getElementById('input-filter-dob').value
+        })
+        dispatch({type: ACTION_SET_PAGE_NUMBER, payload: 0})
     }
 
     function onChange(event) {
         const {numberItems, page} = event;
-        setPageNumber(page - 1);
+        dispatch({type: ACTION_SET_PAGE_NUMBER, payload: page - 1})
         if (page > (patients.totalElements / numberItems)) {
-            setPageNumber(Math.floor(patients.totalElements / numberItems));
+            dispatch({
+                type: ACTION_SET_PAGE_NUMBER,
+                payload: Math.floor(patients.totalElements / numberItems)
+            })
         }
-        setRowsPerPage(numberItems);
+        dispatch({type: ACTION_SET_ROWS_PER_PAGE, payload: numberItems})
     }
 
     function submitFilterFamily(event) {
         event.preventDefault();
-        setFilterFamily(document.getElementById('input-filter-family').value);
-        setPageNumber(0);
+        dispatch({
+            type: ACTION_SET_FILTER_FAMILY,
+            payload: document.getElementById('input-filter-family').value
+        })
+        dispatch({type: ACTION_SET_PAGE_NUMBER, payload: 0})
     }
 
     return (
@@ -127,24 +119,24 @@ function PatientList({patients, setPatients, addedPatients, setAddedPatients, hi
                 <tr>
                     <th>
                         <TableSortLabel
-                            active={orderField === 'id'}
-                            direction={orderDirection}
+                            active={patientState.sorting.field === 'id'}
+                            direction={patientState.sorting.direction}
                             onClick={handleSortById}>
                             Patient id
                         </TableSortLabel>
                     </th>
                     <th>
                         <TableSortLabel
-                            active={orderField === 'family'}
-                            direction={orderDirection}
+                            active={patientState.sorting.field === 'family'}
+                            direction={patientState.sorting.direction}
                             onClick={handleSortByFamily}>
                             Family name
                         </TableSortLabel>
                     </th>
                     <th>
                         <TableSortLabel
-                            active={orderField === 'dob'}
-                            direction={orderDirection}
+                            active={patientState.sorting.field === 'dob'}
+                            direction={patientState.sorting.direction}
                             onClick={handleSortByDob}>
                             Date of birth
                         </TableSortLabel>
@@ -184,9 +176,9 @@ function PatientList({patients, setPatients, addedPatients, setAddedPatients, hi
                 <tr>
                     <td colSpan={3}>
                         <Paging
-                            currentPage={pageNumber + 1}
+                            currentPage={patientState.paging.pageNumber + 1}
                             numberPages={patients.totalPages}
-                            numberItems={rowsPerPage}
+                            numberItems={patientState.paging.rowsPerPage}
                             displayLabel=""
                             elementsLabel=" patients per page"
                             previousLabel="« Previous"
