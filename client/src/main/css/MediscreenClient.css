@@ -169,6 +169,12 @@ footer {
     display: none;
 }
 
+.ReactModal__Overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .modal-error .af-modal__header-title {
     font-weight: bold;
     font-size: xx-large;

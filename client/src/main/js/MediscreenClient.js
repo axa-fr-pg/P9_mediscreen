@@ -8,7 +8,7 @@ import Note from "./notes/Note";
 import Reports from "./reports/Reports";
 import Report from "./reports/Report";
 import {useSelector, useDispatch} from "react-redux";
-import {PATIENT} from "./reducers/reducerConstants";
+import {STATE_PATIENT} from "./reducers/reducerConstants";
 
 function Button() {
     const dispatch = useDispatch();
@@ -23,7 +23,7 @@ function Button() {
 }
 
 function Text() {
-    const message = useSelector(state =>  state[PATIENT].text);
+    const message = useSelector(state =>  state[STATE_PATIENT].text);
     console.log("Render text " + message);
     return (<h2>Text : {message}</h2>);
 }

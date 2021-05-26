@@ -9,13 +9,17 @@ import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
 import {readString} from 'react-papaparse';
 import {NUMBER_OF_PATIENT_FIELDS} from './Patient';
 import moment from 'moment';
-import ModalError from "../modal/error";
-import ModalSuccess from "../modal/success";
+import {useDispatch} from "react-redux";
+import {
+    ACTION_DISPLAY_ERROR_MODAL,
+    ACTION_DISPLAY_SUCCESS_MODAL
+} from "../reducers/reducerConstants";
+import Modal from "../modal/modal";
 
 export function getPatients(getPatientsInputData) {
     const {
         pageNumber, rowsPerPage, orderField, orderDirection, filterId,
-        filterFamily, filterDob, setPatients, setError
+        filterFamily, filterDob, setPatients, dispatch
     } = getPatientsInputData;
     let url = patientsApiUrl
         + "?page=" + pageNumber + "&size=" + rowsPerPage
@@ -33,15 +37,17 @@ export function getPatients(getPatientsInputData) {
         .then(response => {
             setPatients(response.data);
             if (response.data.numberOfElements === 0) {
-                setError('Your selection criteria match no patient. Database may also be empty.');
+                dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                    payload: 'Your selection criteria match no patient. Database may also be empty.'});
             }
         })
         .catch(exception => {
-            setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
         });
 }
 
-function PatientList({patients, setPatients, setError, addedPatients, setAddedPatients, history}) {
+function PatientList({patients, setPatients, addedPatients, setAddedPatients, history}) {
 
     const [pageNumber, setPageNumber] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -50,12 +56,13 @@ function PatientList({patients, setPatients, setError, addedPatients, setAddedPa
     const [filterId, setFilterId] = useState('');
     const [filterFamily, setFilterFamily] = useState('');
     const [filterDob, setFilterDob] = useState('');
+    const dispatch = useDispatch();
 
     useEffect(() => {
         setAddedPatients(false);
         const getPatientsInputData = {
             pageNumber, rowsPerPage, orderField, orderDirection, filterId,
-            filterFamily, filterDob, setPatients, setError
+            filterFamily, filterDob, setPatients, dispatch
         };
         getPatients(getPatientsInputData);
     }, [addedPatients, pageNumber, rowsPerPage, orderField, orderDirection, filterId, filterFamily, filterDob]);
@@ -190,31 +197,10 @@ function PatientList({patients, setPatients, setError, addedPatients, setAddedPa
     );
 }
 
-function generateRandomPatients(event, setSuccess, setError, setAddedPatients) {
-    event.preventDefault();
-    const inputField = document.getElementById('input-expected-number-of-patients');
-    inputField.blur();
-    const randomVolume = inputField.value;
-// TODO    setError("Processing request...");
-
-    axios.post(patientsApiUrl + "/random/" + randomVolume)
-        .then(response => {
-            setAddedPatients(true);
-            setSuccess(response.data.length + " random patients have been generated successfully !");
-        })
-        .catch(exception => {
-            if (exception.response) {
-                setError(exception.response.data);
-            } else {
-                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
-            }
-        });
-}
-
-function convertSlashDateToDashDate(slashDate, setError) {
+function convertSlashDateToDashDate(slashDate, dispatch) {
     const numbers = slashDate.split('/');
     if (numbers.length !== 3) {
-        setError("File contains at least one date with wrong format !")
+        dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: "File contains at least one date with wrong format !"});
     }
     const day = numbers[0];
     const month = numbers[1];
@@ -226,7 +212,7 @@ function convertSlashDateToDashDate(slashDate, setError) {
 let numberOfPatientsPosted;
 let numberOfPatientsAdded;
 
-function postPatient(line, setError) {
+function postPatient(line, dispatch) {
     const patient = {
         id: 0,
         family: line[0],
@@ -237,7 +223,7 @@ function postPatient(line, setError) {
         phone: line[5]
     };
     if (patient.dob.includes('/')) {
-        patient.dob = convertSlashDateToDashDate(patient.dob, setError);
+        patient.dob = convertSlashDateToDashDate(patient.dob, dispatch);
     }
     axios.post(patientsApiUrl, patient)
         .then(() => {
@@ -247,67 +233,44 @@ function postPatient(line, setError) {
         .catch(exception => {
             numberOfPatientsPosted++;
             if (exception.response) {
-                setError(exception.response.data);
+                dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
             } else {
-                setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                    payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
             }
         });
 }
 
-function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setSuccess, setError, setAddedPatients) {
-    if (numberOfPatientsPosted < numberOfPatientsToPost) {
-        setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setSuccess, setError, setAddedPatients);
-    } else {
-        if (numberOfPatientsAdded === numberOfPatientsPosted) {
-            setAddedPatients(true);
-            setSuccess(numberOfPatientsToPost + " patients have been uploaded successfully !")
-        }
-    }
-}
+function PatientsRandom({setAddedPatients}) {
+    const dispatch = useDispatch();
 
-function addPatients(text, setSuccess, setError, setAddedPatients) {
-    numberOfPatientsPosted = 0;
-    numberOfPatientsAdded = 0;
-    const csvConfig = {
-        delimiter: ";",
-        skipEmptyLines: true
-    };
-    const results = readString(text, csvConfig);
-    if (results.errors.length > 0) {
-        setError("File parsing has encountered errors. Please check and try again or ask your IT");
-        return;
-    }
-    let numberOfLinesWithWrongFormat = 0;
-    results.data.forEach(line => {
-        if (line.length !== NUMBER_OF_PATIENT_FIELDS - 1) {
-            numberOfLinesWithWrongFormat++;
-        }
-    });
-    if (numberOfLinesWithWrongFormat > 0) {
-        setError("CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload.");
-        return;
-    }
-    results.data.forEach(line => postPatient(line, setError));
-    waitAllPatientsPostedAndRefreshDisplay(results.data.length, setSuccess, setError, setAddedPatients);
-}
+    function generateRandomPatients(event, setAddedPatients) {
+        event.preventDefault();
+        const inputField = document.getElementById('input-expected-number-of-patients');
+        inputField.blur();
+        const randomVolume = inputField.value;
+// TODO    SetError("Processing request...");
 
-function uploadPatientFile(values, setSuccess, setError, setAddedPatients) {
-    if (values.length === 0) {
-        setError("You selected an invalid file format. Please check and try again or ask your IT");
-        return;
+        axios.post(patientsApiUrl + "/random/" + randomVolume)
+            .then(response => {
+                setAddedPatients(true);
+                dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    payload: response.data.length + " random patients have been generated successfully !"});
+            })
+            .catch(exception => {
+                if (exception.response) {
+                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
+                } else {
+                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
+                }
+            });
     }
-// TODO   setError("Uploading " + values[0].file.name + " ...");
-    fetch(values[0].file.preview)
-        .then(response => response.blob())
-        .then(blob => blob.text())
-        .then(content => addPatients(content, setSuccess, setError, setAddedPatients));
-}
 
-function PatientsRandom({setSuccess, setError, setAddedPatients}) {
     return (
         <form className="form-random">
             <button
-                onClick={(event) => generateRandomPatients(event, setSuccess, setError, setAddedPatients)}>Add
+                onClick={(event) => generateRandomPatients(event, setAddedPatients)}>Add
             </button>
             <input id="input-expected-number-of-patients" className="input-narrow" defaultValue={5}/>
             <label>
@@ -317,7 +280,63 @@ function PatientsRandom({setSuccess, setError, setAddedPatients}) {
     );
 }
 
-function PatientsUpload({setSuccess, setError, setAddedPatients}) {
+function PatientsUpload({setAddedPatients}) {
+
+    const dispatch = useDispatch();
+
+    function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost, setAddedPatients) {
+        if (numberOfPatientsPosted < numberOfPatientsToPost) {
+            setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost, setAddedPatients);
+        } else {
+            if (numberOfPatientsAdded === numberOfPatientsPosted) {
+                setAddedPatients(true);
+                dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    payload: numberOfPatientsToPost + " patients have been uploaded successfully !"});
+            }
+        }
+    }
+
+    function addPatients(text, setAddedPatients) {
+        numberOfPatientsPosted = 0;
+        numberOfPatientsAdded = 0;
+        const csvConfig = {
+            delimiter: ";",
+            skipEmptyLines: true
+        };
+        const results = readString(text, csvConfig);
+        if (results.errors.length > 0) {
+            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "File parsing has encountered errors. Please check and try again or ask your IT"});
+            return;
+        }
+        let numberOfLinesWithWrongFormat = 0;
+        results.data.forEach(line => {
+            if (line.length !== NUMBER_OF_PATIENT_FIELDS - 1) {
+                numberOfLinesWithWrongFormat++;
+            }
+        });
+        if (numberOfLinesWithWrongFormat > 0) {
+            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload."});
+            return;
+        }
+        results.data.forEach(line => postPatient(line, dispatch));
+        waitAllPatientsPostedAndRefreshDisplay(results.data.length, setAddedPatients);
+    }
+
+    function uploadPatientFile(values, setAddedPatients) {
+        if (values.length === 0) {
+            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "You selected an invalid file format. Please check and try again or ask your IT"});
+            return;
+        }
+// TODO   SetError("Uploading " + values[0].file.name + " ...");
+        fetch(values[0].file.preview)
+            .then(response => response.blob())
+            .then(blob => blob.text())
+            .then(content => addPatients(content, setAddedPatients));
+    }
+
     return (
         <File
             label="Browse file"
@@ -325,48 +344,26 @@ function PatientsUpload({setSuccess, setError, setAddedPatients}) {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChange={(values) => uploadPatientFile(values.values, setSuccess, setError, setAddedPatients)}
+            onChange={(values) => uploadPatientFile(values.values, setAddedPatients)}
         />
     );
 }
 
 function Patients() {
-    const error = useRef('');
-    const success = useRef('');
-    const [, setModal] = useState(false);
     const [patients, setPatients] = useState([]);
     const [addedPatients, setAddedPatients] = useState(false);
     const history = useHistory();
 
-    function setError(message) {
-        error.current = message;
-        setModal(message.length > 0);
-    }
-
-    function setSuccess(message) {
-        success.current = message;
-        setModal(message.length > 0);
-    }
-
-    function closeErrorModal() {
-        setError('');
-    }
-
-    function closeSuccessModal() {
-        setSuccess('');
-    }
-
     return (
         <div>
             <h1>Patient list</h1>
-            <PatientList patients={patients} setPatients={setPatients} setError={setError}
-                         addedPatients={addedPatients} setAddedPatients={setAddedPatients} history={history}/>
+            <PatientList patients={patients} setPatients={setPatients} addedPatients={addedPatients}
+                         setAddedPatients={setAddedPatients} history={history}/>
             <button className="button-new" onClick={() => history.push('/patients/new')}>Register new patient</button>
-            <PatientsRandom setSuccess={setSuccess} setError={setError} setAddedPatients={setAddedPatients}/>
-            <PatientsUpload setSuccess={setSuccess} setError={setError} setAddedPatients={setAddedPatients}/>
-            <ModalError message={error.current} closureAction={closeErrorModal}/>
-            <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
-            <a className="swagger-url" href={patientUrl + "/swagger-ui/"}>Swagger</a>
+            <PatientsRandom setAddedPatients={setAddedPatients}/>
+            <PatientsUpload setAddedPatients={setAddedPatients}/>
+            <Modal/>
+            <a className="swagger-url"  href={patientUrl + "/swagger-ui/"}>Swagger</a>
         </div>
     );
 }

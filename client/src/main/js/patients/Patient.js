@@ -3,9 +3,10 @@ import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import Switch from "react-switch";
 import moment from 'moment'
-import ModalError from "../modal/error";
-import ModalSuccess from "../modal/success";
 import {useHistory} from "react-router";
+import {useDispatch} from "react-redux";
+import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL} from "../reducers/reducerConstants";
+import Modal from "../modal/modal";
 
 const patientFields = [
     {field: "id", label: "Patient id", readOnly: true},
@@ -80,31 +81,19 @@ function SaveButton({modify, onClickSave}) {
     );
 }
 
-
 function Patient({report}) {
-    const error = useRef('');
-    const success = useRef('');
     const patient = useRef({id: window.location.pathname.split("/").pop()});
-    const patientsText = window.location.pathname.split("/").slice(-2).shift();
-    const [modal, setModal] = useState(false);
+    const baseUri = window.location.pathname.split("/").slice(-2).shift();
     const [, setPatientReady] = useState(false);
     const [modify, setModify] = useState(window.location.href.includes('new'));
     const history = useHistory();
-
-    function setError(message) {
-        error.current = message;
-        setModal(message.length > 0);
-    }
-
-    function setSuccess(message) {
-        success.current = message;
-        setModal(message.length > 0);
-    }
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (patient.current.id === 'new') return;
         if (isNaN(parseInt(patient.current.id))) {
-            setError('It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !');
+            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !'});
         } else {
             axios.get(patientsApiUrl + "/" + patient.current.id)
                 .then(response => {
@@ -112,13 +101,15 @@ function Patient({report}) {
                 })
                 .catch(exception => {
                     patient.current.id = 'not-found';
-                    setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                        payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
                 });
         }
     }, []);
 
-    if (patientsText !== 'patients' && ! modal) {
-        setError('It looks like you entered an invalid URL. Please check your request or ask your IT support !');
+    if (baseUri !== 'patients') {
+        dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+            payload: 'It looks like you entered an invalid URL. Please check your request or ask your IT support !'});
     }
 
     function setPatient(data) {
@@ -133,32 +124,37 @@ function Patient({report}) {
         const givenTime = givenDate.getTime();
 
         if (isNaN(givenTime) || givenTime < -5000000000000) {
-            setError("Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid).");
+            dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                payload: "Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid)."});
         } else if (body.id === 'new') {
             body.id = 0;
             axios.post(patientsApiUrl, body)
                 .then(response => {
                     body.id = response.data.id;
-                    setSuccess("Patient created successfully with id=" + body.id);
+                    dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
+                        payload: "Patient created successfully with id=" + body.id});
                 })
                 .catch(exception => {
                     if (exception.response) {
-                        setError(exception.response.data);
+                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
                     } else {
-                        setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                            payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
                     }
                 });
         } else {
             axios.put(patientsApiUrl + "/" + patient.current.id, body)
                 .then(response => {
                     setPatient(response.data);
-                    setSuccess('Patient has been saved successfully !');
+                    dispatch({type: ACTION_DISPLAY_SUCCESS_MODAL,
+                        payload: 'Patient has been saved successfully !'});
                 })
                 .catch(exception => {
                     if (exception.response) {
-                        setError(exception.response.data);
+                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
                     } else {
-                        setError("Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message);
+                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                            payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message});
                     }
                 });
         }
@@ -177,15 +173,13 @@ function Patient({report}) {
     }
 
     function closeErrorModal() {
-        setError('');
-        if (!window.location.href.includes('new') || patientsText !== 'patients') {
+        if (!window.location.href.includes('new') || baseUri !== 'patients') {
             history.push('/patients');
         }
     }
 
     function closeSuccessModal() {
         setModify(false);
-        setSuccess('');
         if (window.location.href.includes('new')) {
             history.push('/patients')
         }
@@ -198,8 +192,7 @@ function Patient({report}) {
                 <PatientFields patient={patient} modify={modify}/>
                 <ModifySwitch modify={modify} onChangeModify={onChangeModify} report={report}/>
                 <SaveButton modify={modify} onClickSave={onClickSave}/>
-                <ModalError message={error.current} closureAction={closeErrorModal}/>
-                <ModalSuccess message={success.current} closureAction={closeSuccessModal}/>
+                <Modal errorClosureAction={closeErrorModal} successClosureAction={closeSuccessModal}/>
             </form>
         </div>
     );

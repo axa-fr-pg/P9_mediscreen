@@ -1,28 +1,33 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import ModalBoolean from "@axa-fr/react-toolkit-modal-boolean";
 import '@axa-fr/react-toolkit-modal-default/dist/modal.scss';
+import {useDispatch, useSelector} from "react-redux";
+import {ACTION_HIDE_MODAL, STATE_MODAL} from "../reducers/reducerConstants";
 
-function Modal({message, closureAction, className, title}) {
+function Modal({successClosureAction, errorClosureAction}) {
 
-    const [isOpen, setIsOpen] = useState(false);
-    useEffect(()=>{
-        if (!isOpen) {
-            setIsOpen(message.length>0);
-        }
-    }, [isOpen, message.length]);
+    const modalState = useSelector(state => state[STATE_MODAL]);
+    const dispatch = useDispatch();
 
     function onClosure() {
-        setIsOpen(false);
-        if (closureAction !== undefined) {
-            closureAction();
+        dispatch({type: ACTION_HIDE_MODAL});
+        if (modalState.isError) {
+            if (errorClosureAction !== undefined) {
+                errorClosureAction();
+            }
+        } else {
+            if (successClosureAction !== undefined) {
+                successClosureAction();
+            }
         }
     }
 
     return (
         <ModalBoolean
-            id="id-modal-boolean" className={className} title={title} submitTitle="OK"
-            isOpen={isOpen} onSubmit={onClosure} onCancel={undefined} >
-            {message}
+            id="id-modal-boolean" className={modalState.className} title={modalState.title} submitTitle="OK"
+            isOpen={modalState.isVisible} onSubmit={onClosure} onCancel={undefined}
+        >
+            {modalState.message}
         </ModalBoolean>
     );
 }
