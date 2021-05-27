@@ -7,7 +7,9 @@ import {
     ACTION_SET_PAGE_NUMBER,
     ACTION_SET_ROWS_PER_PAGE,
     ACTION_SET_SORTING_FIELD,
-    ACTION_SET_SORTING_DIRECTION
+    ACTION_SET_SORTING_DIRECTION,
+    ACTION_SET_PATIENT_LIST,
+    ACTION_SET_UPDATE_REQUIRED
 } from "./reducerConstants";
 
 const pagingState = {
@@ -19,26 +21,33 @@ const filterState = {
     id: '',
     family: '',
     dob: ''
-}
+};
 
 const sortingState = {
     field : 'id',
     direction: 'asc'
-}
+};
 
 const pagingFilterSortingState = {
     paging: pagingState,
     filter: filterState,
     sorting: sortingState
-}
+};
+
+const emptyPatientList = {
+    totalElements : 0,
+    totalPages : 0,
+    content : []
+};
 
 const patientState = {
     ...pagingFilterSortingState,
-    getPatientsUrl: getPatientsUrl(pagingFilterSortingState),
-    patients: []
+    getPatientListUrl: getPatientListUrl(pagingFilterSortingState),
+    patientList: emptyPatientList,
+    isUpdateRequired : true
 };
 
-function getPatientsUrl(state) {
+function getPatientListUrl(state) {
     let url = patientsApiUrl
         + "?page=" + state.paging.pageNumber
         + "&size=" + state.paging.rowsPerPage
@@ -53,7 +62,7 @@ function getPatientsUrl(state) {
     if (!!state.filter.dob) {
         url = url + "&dob=" + state.filter.dob;
     }
-    console.log("getPatientsUrl " + url);
+    console.log("getPatientListUrl " + url);
     return url;
 }
 
@@ -131,12 +140,26 @@ const patientReducer = (state = patientState, action) => {
             };
             break;
 
+        case ACTION_SET_PATIENT_LIST :
+            updatedState = {
+                ...state,
+                patientList:  action.payload
+            };
+            break;
+
+        case ACTION_SET_UPDATE_REQUIRED :
+            updatedState = {
+                ...state,
+                isUpdateRequired:  action.payload
+            };
+            break;
+
         default :
             updatedState = state;
     }
     return {
         ...updatedState,
-        getPatientsUrl: getPatientsUrl(updatedState)
+        getPatientsUrl: getPatientListUrl(updatedState)
     }
 };
 

@@ -16,7 +16,7 @@ import {readString} from 'react-papaparse';
 import {getPatients} from '../patients/Patients';
 import {postNote} from './Note';
 import {useDispatch} from "react-redux";
-import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL} from "../reducers/reducerConstants";
+import {ACTION_DISPLAY_MODAL_ERROR, ACTION_DISPLAY_MODAL_SUCCESS} from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, history}) {
@@ -67,16 +67,16 @@ function NotesRandom({patientIdGiven, report, setAddedNotes}) {
             .then(response => {
                 setAddedNotes(true);
                 dispatch({
-                    type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    type: ACTION_DISPLAY_MODAL_SUCCESS,
                     payload: response.data.length + " random notes have been generated successfully !"
                 });
             })
             .catch(exception => {
                 if (exception.response) {
-                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
+                    dispatch({type: ACTION_DISPLAY_MODAL_ERROR, payload: exception.response.data});
                 } else {
                     dispatch({
-                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
                     });
                 }
@@ -150,14 +150,14 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
                 if ((response.data.content !== undefined && response.data.content.length === 0)
                     || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven > 0)) {
                     dispatch({
-                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: 'Your selection criteria match no note. Database may also be empty.'
                     });
                 }
             })
             .catch(exception => {
                 dispatch({
-                    type: ACTION_DISPLAY_ERROR_MODAL,
+                    type: ACTION_DISPLAY_MODAL_ERROR,
                     payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
                 });
             });
@@ -318,7 +318,7 @@ function NotesUpload({report, setAddedNotes}) {
         } else if (numberOfNotesAdded === numberOfNotesPosted) {
             setAddedNotes(true);
             dispatch({
-                type: ACTION_DISPLAY_SUCCESS_MODAL,
+                type: ACTION_DISPLAY_MODAL_SUCCESS,
                 payload: numberOfNotesToPost + " patient notes have been uploaded successfully !"
             });
         }
@@ -334,7 +334,7 @@ function NotesUpload({report, setAddedNotes}) {
             filterId: '', filterFamily: family, filterDob: '',
             setPatients: setPatients,
             dispatch: (text) => {
-                dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: text});
+                dispatch({type: ACTION_DISPLAY_MODAL_ERROR, payload: text});
                 numberOfNotesPosted++
             }
         };
@@ -348,7 +348,7 @@ function NotesUpload({report, setAddedNotes}) {
         }
         if (numberOfPatientsFound < numberOfPatientsChecked) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: "CSV file contains " + (numberOfPatientsChecked - numberOfPatientsFound) +
                     " note(s) for unknown or ambiguous patient(s). Aborting upload."
             });
@@ -376,7 +376,7 @@ function NotesUpload({report, setAddedNotes}) {
         const results = readString(text, csvConfig);
         if (results.errors.length > 0) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: "File parsing has encountered errors. Please check and try again or ask your IT"
             });
             return;
@@ -384,7 +384,7 @@ function NotesUpload({report, setAddedNotes}) {
         const numberOfLinesWithWrongFormat = countLinesWithFormatError(results);
         if (numberOfLinesWithWrongFormat > 0) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: "CSV file parsing has found " + numberOfLinesWithWrongFormat + " line(s) with wrong format. Aborting upload."
             });
             return;
@@ -395,7 +395,7 @@ function NotesUpload({report, setAddedNotes}) {
     function uploadPatientNoteFile(values, setAddedNotes) {
         if (values.length === 0) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: "You selected an invalid file format. Please check and try again or ask your IT"
             });
             return;
@@ -430,7 +430,7 @@ function Notes({report}) {
         const patientId = getPatientIdByUrl(window.location.href);
         if (isNaN(parseInt(patientId))) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. ' +
                     'Please check your request or ask your IT support !'
             });

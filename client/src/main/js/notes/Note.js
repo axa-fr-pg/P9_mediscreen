@@ -5,7 +5,7 @@ import Switch from "react-switch";
 import ReactQuill from "react-quill";
 import {useHistory} from "react-router";
 import Modal from "../modal/modal";
-import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL} from "../reducers/reducerConstants";
+import {ACTION_DISPLAY_MODAL_ERROR, ACTION_DISPLAY_MODAL_SUCCESS} from "../reducers/reducerConstants";
 import {useDispatch} from "react-redux";
 
 const NOTE_NOT_FOUND = 'note-not-found';
@@ -16,16 +16,16 @@ export function postNote(body, patId, dispatch) {
         .then(response => {
             body.noteId = response.data.noteId;
             dispatch({
-                type: ACTION_DISPLAY_SUCCESS_MODAL,
+                type: ACTION_DISPLAY_MODAL_SUCCESS,
                 payload: "Note created successfully with id=" + body.noteId
             });
         })
         .catch(exception => {
             if (exception.response) {
-                dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
+                dispatch({type: ACTION_DISPLAY_MODAL_ERROR, payload: exception.response.data});
             } else {
                 dispatch({
-                    type: ACTION_DISPLAY_ERROR_MODAL,
+                    type: ACTION_DISPLAY_MODAL_ERROR,
                     payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
                         + exception.message
                 });
@@ -81,7 +81,7 @@ function Note() {
                 .catch(exception => {
                     note.current.noteId = NOTE_NOT_FOUND;
                     dispatch({
-                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
                             + exception.message
                     });
@@ -94,19 +94,19 @@ function Note() {
             .then(response => {
                 setNote(response.data);
                 dispatch({
-                    type: ACTION_DISPLAY_SUCCESS_MODAL,
+                    type: ACTION_DISPLAY_MODAL_SUCCESS,
                     payload: 'Note has been saved successfully !'
                 });
             })
             .catch(exception => {
                 if (exception.response) {
                     dispatch({
-                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: exception.response.data
                     });
                 } else {
                     dispatch({
-                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
                             + exception.message
                     });

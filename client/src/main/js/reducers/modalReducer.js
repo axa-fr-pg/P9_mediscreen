@@ -1,4 +1,4 @@
-import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL, ACTION_HIDE_MODAL} from './reducerConstants';
+import {ACTION_DISPLAY_MODAL_ERROR, ACTION_DISPLAY_MODAL_SUCCESS, ACTION_HIDE_MODAL} from './reducerConstants';
 
 const initialState = {
     message: 'modal text',
@@ -17,7 +17,7 @@ const modalReducer = (state = initialState, action) => {
         }
     }
     switch (action.type) {
-        case ACTION_DISPLAY_ERROR_MODAL :
+        case ACTION_DISPLAY_MODAL_ERROR :
             return {
                 ...state,
                 isError: true,
@@ -26,7 +26,7 @@ const modalReducer = (state = initialState, action) => {
                 title : "Request could not be processed",
                 message: action.payload
             };
-        case ACTION_DISPLAY_SUCCESS_MODAL :
+        case ACTION_DISPLAY_MODAL_SUCCESS :
             return {
                 ...state,
                 isError: false,

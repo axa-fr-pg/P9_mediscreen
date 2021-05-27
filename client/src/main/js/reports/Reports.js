@@ -6,7 +6,7 @@ import {reportUrl, reportsApiUrl} from "../api/URLs";
 import axios from "axios";
 import Modal from "../modal/modal";
 import {useDispatch} from "react-redux";
-import {ACTION_DISPLAY_ERROR_MODAL} from "../reducers/reducerConstants";
+import {ACTION_DISPLAY_MODAL_ERROR} from "../reducers/reducerConstants";
 
 export function getRiskColorClassName(risk) {
     if (risk.includes('None')) {
@@ -58,13 +58,13 @@ function PatientList({patients, setPatients, history}) {
         axios.get(url)
             .then(response => {
                 if (response.data.numberOfElements === 0) {
-                    dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                    dispatch({type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: 'Your selection criteria match no patient. Database may also be empty.'});
                 }
                 setPatients(response.data);
             })
             .catch(exception => {
-                dispatch({type: ACTION_DISPLAY_ERROR_MODAL,
+                dispatch({type: ACTION_DISPLAY_MODAL_ERROR,
                     payload: "Please ask your IT support : it seems that the server or the database is unavailable ! "
                         + exception.message});
             });

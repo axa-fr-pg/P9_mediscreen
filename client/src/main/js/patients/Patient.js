@@ -5,7 +5,7 @@ import Switch from "react-switch";
 import moment from 'moment'
 import {useHistory} from "react-router";
 import {useDispatch} from "react-redux";
-import {ACTION_DISPLAY_ERROR_MODAL, ACTION_DISPLAY_SUCCESS_MODAL} from "../reducers/reducerConstants";
+import {ACTION_DISPLAY_MODAL_ERROR, ACTION_DISPLAY_MODAL_SUCCESS} from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
 const patientFields = [
@@ -93,7 +93,7 @@ function Patient({report}) {
         if (patient.current.id === 'new') return;
         if (isNaN(parseInt(patient.current.id))) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !'
             });
         } else {
@@ -104,7 +104,7 @@ function Patient({report}) {
                 .catch(exception => {
                     patient.current.id = 'not-found';
                     dispatch({
-                        type: ACTION_DISPLAY_ERROR_MODAL,
+                        type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
                     });
                 });
@@ -113,7 +113,7 @@ function Patient({report}) {
 
     if (baseUri !== 'patients') {
         dispatch({
-            type: ACTION_DISPLAY_ERROR_MODAL,
+            type: ACTION_DISPLAY_MODAL_ERROR,
             payload: 'It looks like you entered an invalid URL. Please check your request or ask your IT support !'
         });
     }
@@ -131,7 +131,7 @@ function Patient({report}) {
 
         if (isNaN(givenTime) || givenTime < -5000000000000) {
             dispatch({
-                type: ACTION_DISPLAY_ERROR_MODAL,
+                type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: "Please enter a valid date of birth with format YYYY-MM-DD (" + body.dob + " is invalid)."
             });
         } else if (body.id === 'new') {
@@ -140,16 +140,16 @@ function Patient({report}) {
                 .then(response => {
                     body.id = response.data.id;
                     dispatch({
-                        type: ACTION_DISPLAY_SUCCESS_MODAL,
+                        type: ACTION_DISPLAY_MODAL_SUCCESS,
                         payload: "Patient created successfully with id=" + body.id
                     });
                 })
                 .catch(exception => {
                     if (exception.response) {
-                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
+                        dispatch({type: ACTION_DISPLAY_MODAL_ERROR, payload: exception.response.data});
                     } else {
                         dispatch({
-                            type: ACTION_DISPLAY_ERROR_MODAL,
+                            type: ACTION_DISPLAY_MODAL_ERROR,
                             payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
                         });
                     }
@@ -159,16 +159,16 @@ function Patient({report}) {
                 .then(response => {
                     setPatient(response.data);
                     dispatch({
-                        type: ACTION_DISPLAY_SUCCESS_MODAL,
+                        type: ACTION_DISPLAY_MODAL_SUCCESS,
                         payload: 'Patient has been saved successfully !'
                     });
                 })
                 .catch(exception => {
                     if (exception.response) {
-                        dispatch({type: ACTION_DISPLAY_ERROR_MODAL, payload: exception.response.data});
+                        dispatch({type: ACTION_DISPLAY_MODAL_ERROR, payload: exception.response.data});
                     } else {
                         dispatch({
-                            type: ACTION_DISPLAY_ERROR_MODAL,
+                            type: ACTION_DISPLAY_MODAL_ERROR,
                             payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
                         });
                     }
