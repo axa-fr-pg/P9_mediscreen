@@ -7,26 +7,6 @@ import Notes from "./notes/Notes";
 import Note from "./notes/Note";
 import Reports from "./reports/Reports";
 import Report from "./reports/Report";
-import {useSelector, useDispatch} from "react-redux";
-import {STATE_PATIENT} from "./reducers/reducerConstants";
-
-function Button() {
-    const dispatch = useDispatch();
-    console.log("Render button");
-    return (
-        <button onClick={() => {
-            console.log("clic bouton");
-            dispatch({type: 'clic', payload : 'bouton'})
-        }}>button
-        </button>
-    );
-}
-
-function Text() {
-    const message = useSelector(state =>  state[STATE_PATIENT].text);
-    console.log("Render text " + message);
-    return (<h2>Text : {message}</h2>);
-}
 
 function Home() {
     console.log("Render home");
@@ -34,8 +14,7 @@ function Home() {
         <div>
             <h1>Mediscreen home page</h1>
             <br/>
-            <Text/>
-            <Button/>
+            <p>Welcome in our new high tech medical software !</p>
         </div>
     );
 }

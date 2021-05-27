@@ -1,14 +1,21 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import Switch from "react-switch";
 import moment from 'moment'
 import {useHistory} from "react-router";
-import {useDispatch} from "react-redux";
-import {ACTION_DISPLAY_MODAL_ERROR, ACTION_DISPLAY_MODAL_SUCCESS} from "../reducers/reducerConstants";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    ACTION_DISPLAY_MODAL_ERROR,
+    ACTION_DISPLAY_MODAL_SUCCESS,
+    ACTION_SET_ALL_PATIENT_FIELDS,
+    ACTION_SET_MODIFY_ALLOWED,
+    ACTION_SET_PATIENT_FIELD,
+    STATE_PATIENT
+} from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
-const patientFields = [
+const patientFieldListSpecification = [
     {field: "id", label: "Patient id", readOnly: true},
     {field: "family", label: "Family name"},
     {field: "given", label: "Given name"},
@@ -20,89 +27,107 @@ const patientFields = [
 
 export const NUMBER_OF_PATIENT_FIELDS = 7;
 
-function ModifySwitch({modify, onChangeModify, report}) {
+function ModifySwitch({report}) {
+
+    const patientState = useSelector(state => state[STATE_PATIENT]);
+    const dispatch = useDispatch();
+
     if (window.location.href.includes('new') || !report === false) {
         return null;
     }
+
+    function onChangeModify() {
+        dispatch({type: ACTION_SET_MODIFY_ALLOWED, payload: !patientState.isModifyAllowed});
+    }
+
     return (
         <div key={"div-read-only"} className="div-read-only">
             <label>View</label>
             <div className="switch-read-only">
-                <Switch checked={modify} onChange={onChangeModify} checkedIcon={false} uncheckedIcon={false}/>
+                <Switch checked={patientState.isModifyAllowed} onChange={onChangeModify} checkedIcon={false}
+                        uncheckedIcon={false}/>
             </div>
             <label>Edit</label>
         </div>
     );
 }
 
-function PatientField({patient, modify, field, label, readOnly}) {
+function PatientField({field, label, readOnly}) {
 
-    const [value, setValue] = useState(undefined);
-    const patientData = patient.current;
+    const patientState = useSelector(state => state[STATE_PATIENT]);
+    const value = useRef(undefined);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        if (value === undefined && patientData !== undefined && patientData[field] !== undefined) {
-            setValue(patientData[field]);
-        }
-    }, [field, patientData, value]);
+        value.current = patientState.patientFields[field];
+    }, [patientState.patientFields[field]]);
 
-    if (field === 'id' && value === 'new') {
+    if (field === 'id' && patientState.patientFields[field] === 'new') {
         return null;
     }
 
     function onChangeField(field) {
         field.persist(); // make input available asynchronously
-        patient.current[field.target.name] = field.target.value;
-        setValue(field.target.value);
+        patientState.patientFields[field.target.name] = field.target.value;
+        dispatch({
+            type: ACTION_SET_PATIENT_FIELD,
+            payload: {field: field.target.name, value: field.target.value}
+        });
     }
 
     const disabled = !!readOnly;
     return (<div key={field}>
         <label>{label}
-            <input value={value} name={field} onChange={onChangeField}
-                   disabled={disabled || modify === false}/>
+            <input value={patientState.patientFields[field]} name={field} onChange={onChangeField}
+                   disabled={disabled || patientState.isModifyAllowed === false}/>
         </label>
     </div>);
 }
 
-function PatientFields({patient, modify}) {
-    return patientFields.map(fieldSpec => {
+function PatientFields() {
+    return patientFieldListSpecification.map(fieldSpec => {
         return (
-            <PatientField key={fieldSpec.field} patient={patient} modify={modify}
-                          field={fieldSpec.field} label={fieldSpec.label} readOnly={fieldSpec.readOnly}
+            <PatientField key={fieldSpec.field} field={fieldSpec.field}
+                          label={fieldSpec.label} readOnly={fieldSpec.readOnly}
             />);
     });
 }
 
-function SaveButton({modify, onClickSave}) {
-    if (!modify) return null;
+function SaveButton({onClickSave}) {
+
+    const patientState = useSelector(state => state[STATE_PATIENT]);
+
+    if (! patientState.isModifyAllowed) return null;
     return (
         <button className="button-save" onClick={onClickSave}>Save</button>
     );
 }
 
 function Patient({report}) {
-    const patient = useRef({id: window.location.pathname.split("/").pop()});
+    const patientId = window.location.pathname.split("/").pop();
     const baseUri = window.location.pathname.split("/").slice(-2).shift();
-    const [, setPatientReady] = useState(false);
-    const [modify, setModify] = useState(window.location.href.includes('new'));
     const history = useHistory();
     const dispatch = useDispatch();
+    const patientState = useSelector(state => state[STATE_PATIENT]);
 
     useEffect(() => {
-        if (patient.current.id === 'new') return;
-        if (isNaN(parseInt(patient.current.id))) {
+        dispatch({type: ACTION_SET_MODIFY_ALLOWED, payload: window.location.href.includes('new')});
+        if (patientId === 'new') return;
+        if (isNaN(parseInt(patientId))) {
             dispatch({
                 type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !'
             });
         } else {
-            axios.get(patientsApiUrl + "/" + patient.current.id)
+            axios.get(patientsApiUrl + "/" + patientId)
                 .then(response => {
-                    setPatient(response.data);
+                    dispatch({type: ACTION_SET_ALL_PATIENT_FIELDS, payload: response.data});
                 })
                 .catch(exception => {
-                    patient.current.id = 'not-found';
+                    dispatch({
+                        type: ACTION_SET_PATIENT_FIELD,
+                        payload: {field: 'id', value: 'not-found'}
+                    });
                     dispatch({
                         type: ACTION_DISPLAY_MODAL_ERROR,
                         payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
@@ -118,14 +143,9 @@ function Patient({report}) {
         });
     }
 
-    function setPatient(data) {
-        patient.current = data;
-        setPatientReady(true);
-    }
-
     function onClickSave(event) {
         event.preventDefault();
-        const body = {...patient.current};
+        const body = {...patientState.patientFields};
         const givenDate = moment(body.dob, "YYYY-MM-DD", true).toDate();
         const givenTime = givenDate.getTime();
 
@@ -155,9 +175,9 @@ function Patient({report}) {
                     }
                 });
         } else {
-            axios.put(patientsApiUrl + "/" + patient.current.id, body)
+            axios.put(patientsApiUrl + "/" + patientState.patientFields.id, body)
                 .then(response => {
-                    setPatient(response.data);
+                    dispatch({type: ACTION_SET_ALL_PATIENT_FIELDS, payload: response.data});
                     dispatch({
                         type: ACTION_DISPLAY_MODAL_SUCCESS,
                         payload: 'Patient has been saved successfully !'
@@ -176,26 +196,23 @@ function Patient({report}) {
         }
     }
 
-    function onChangeModify() {
-        setModify(!modify);
-    }
-
     function displayTitle() {
-        const view = modify ? 'edit' : 'view';
-        const title = patient.current.id === 'new' ? 'creation' : view;
+        const view = patientState.isModifyAllowed ? 'edit' : 'view';
+        const title = patientState.patientFields.id === 'new' ? 'creation' : view;
         return (
             <h1>Patient {title}</h1>
         );
     }
 
     function closeErrorModal() {
-        if (!window.location.href.includes('new') || baseUri !== 'patients') {
+        if ((!window.location.href.includes('new') && ! patientState.isModifyAllowed)
+            || baseUri !== 'patients') {
             history.push('/patients');
         }
     }
 
     function closeSuccessModal() {
-        setModify(false);
+        dispatch({type: ACTION_SET_MODIFY_ALLOWED, payload: false});
         if (window.location.href.includes('new')) {
             history.push('/patients')
         }
@@ -205,9 +222,9 @@ function Patient({report}) {
         <div>
             {displayTitle()}
             <form>
-                <PatientFields patient={patient} modify={modify}/>
-                <ModifySwitch modify={modify} onChangeModify={onChangeModify} report={report}/>
-                <SaveButton modify={modify} onClickSave={onClickSave}/>
+                <PatientFields/>
+                <ModifySwitch report={report}/>
+                <SaveButton onClickSave={onClickSave}/>
                 <Modal errorClosureAction={closeErrorModal} successClosureAction={closeSuccessModal}/>
             </form>
         </div>

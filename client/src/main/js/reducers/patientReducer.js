@@ -9,7 +9,10 @@ import {
     ACTION_SET_SORTING_FIELD,
     ACTION_SET_SORTING_DIRECTION,
     ACTION_SET_PATIENT_LIST,
-    ACTION_SET_UPDATE_REQUIRED
+    ACTION_SET_PATIENT_FIELD,
+    ACTION_SET_UPDATE_REQUIRED,
+    ACTION_SET_ALL_PATIENT_FIELDS,
+    ACTION_SET_MODIFY_ALLOWED
 } from "./reducerConstants";
 
 const pagingState = {
@@ -44,7 +47,9 @@ const patientState = {
     ...pagingFilterSortingState,
     getPatientListUrl: getPatientListUrl(pagingFilterSortingState),
     patientList: emptyPatientList,
-    isUpdateRequired : true
+    patientFields: {},
+    isUpdateRequired : true,
+    isModifyAllowed : false
 };
 
 function getPatientListUrl(state) {
@@ -147,10 +152,34 @@ const patientReducer = (state = patientState, action) => {
             };
             break;
 
+        case ACTION_SET_PATIENT_FIELD :
+            updatedState = {
+                ...state,
+                patientFields:  {
+                    ...state.patientFields,
+                    [action.payload.field] : action.payload.value
+                }
+            };
+            break;
+
+        case ACTION_SET_ALL_PATIENT_FIELDS :
+            updatedState = {
+                ...state,
+                patientFields:  action.payload
+            };
+            break;
+
         case ACTION_SET_UPDATE_REQUIRED :
             updatedState = {
                 ...state,
                 isUpdateRequired:  action.payload
+            };
+            break;
+
+        case ACTION_SET_MODIFY_ALLOWED :
+            updatedState = {
+                ...state,
+                isModifyAllowed:  action.payload
             };
             break;
 

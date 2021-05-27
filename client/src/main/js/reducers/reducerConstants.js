@@ -14,5 +14,8 @@ export const
     ACTION_SET_SORTING_FIELD = 'action-set-sorting-field',
     ACTION_SET_SORTING_DIRECTION = 'action-set-sorting-direction',
     ACTION_SET_PATIENT_LIST = 'action-set-patient-list',
-    ACTION_SET_UPDATE_REQUIRED = 'action-set-update-required'
+    ACTION_SET_ALL_PATIENT_FIELDS = 'action-set-all-patient-fields',
+    ACTION_SET_PATIENT_FIELD = 'action-set-patient-field',
+    ACTION_SET_UPDATE_REQUIRED = 'action-set-update-required',
+    ACTION_SET_MODIFY_ALLOWED = 'action-set-modify-allowed'
 ;
