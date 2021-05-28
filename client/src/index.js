@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {createStore} from 'redux';
-import rootReducer from './main/js/reducers/rootReducer'
+import {rootReducer} from './main/js/reducers/rootReducer'
 import {Provider} from 'react-redux';
 import MediscreenClient from './main/js/MediscreenClient';
 

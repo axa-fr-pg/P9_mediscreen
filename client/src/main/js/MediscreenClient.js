@@ -9,7 +9,6 @@ import Reports from "./reports/Reports";
 import Report from "./reports/Report";
 
 function Home() {
-    console.log("Render home");
     return (
         <div>
             <h1>Mediscreen home page</h1>
@@ -21,7 +20,6 @@ function Home() {
 
 
 const MediscreenMenu = () => {
-    console.log("render MediscreenMenu")
 
     return (
         <nav className="mediscreen-menu">
@@ -42,7 +40,7 @@ const MediscreenMenu = () => {
 };
 
 function MediscreenClient() {
-    console.log("render MediscreenClient")
+
     return (
         <BrowserRouter>
             <MediscreenMenu/>

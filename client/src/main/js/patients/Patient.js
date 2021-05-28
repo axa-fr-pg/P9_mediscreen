@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import axios from "axios";
 import {patientsApiUrl} from '../api/URLs';
 import Switch from "react-switch";
@@ -55,12 +55,7 @@ function ModifySwitch({report}) {
 function PatientField({field, label, readOnly}) {
 
     const patientState = useSelector(state => state[STATE_PATIENT]);
-    const value = useRef(undefined);
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        value.current = patientState.patientFields[field];
-    }, []);
 
     if (field === 'id' && patientState.patientFields[field] === 'new') {
         return null;

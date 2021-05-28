@@ -1,18 +1,12 @@
 import {patientsApiUrl} from "../api/URLs";
-
+import {handleStateWithRootReducer} from "./rootReducer";
 import {
     ACTION_SET_FILTER_DOB,
     ACTION_SET_FILTER_FAMILY,
     ACTION_SET_FILTER_ID,
-    ACTION_SET_PAGE_NUMBER,
-    ACTION_SET_ROWS_PER_PAGE,
-    ACTION_SET_SORTING_FIELD,
-    ACTION_SET_SORTING_DIRECTION,
     ACTION_SET_PATIENT_LIST,
     ACTION_SET_PATIENT_FIELD,
-    ACTION_SET_UPDATE_REQUIRED,
-    ACTION_SET_ALL_PATIENT_FIELDS,
-    ACTION_SET_MODIFY_ALLOWED
+    ACTION_SET_ALL_PATIENT_FIELDS
 } from "./reducerConstants";
 
 const pagingState = {
@@ -67,33 +61,15 @@ function getPatientListUrl(state) {
     if (!!state.filter.dob) {
         url = url + "&dob=" + state.filter.dob;
     }
-    console.log("getPatientListUrl " + url);
     return url;
 }
 
-const patientReducer = (state = patientState, action) => {
-    console.log("patientReducer with action " + action.type + " and payload " + action.payload);
-    let updatedState;
-    switch (action.type) {
-        case ACTION_SET_PAGE_NUMBER :
-            updatedState = {
-                ...state,
-                paging: {
-                    ...state.paging,
-                    pageNumber: action.payload
-                }
-            };
-            break;
+const patientReducer = (inputState = patientState, action) => {
 
-        case ACTION_SET_ROWS_PER_PAGE :
-            updatedState = {
-                ...state,
-                paging: {
-                    ...state.paging,
-                    rowsPerPage: action.payload
-                }
-            };
-            break;
+    const state = handleStateWithRootReducer(inputState, action);
+    let updatedState;
+
+    switch (action.type) {
 
         case ACTION_SET_FILTER_ID :
             updatedState = {
@@ -125,26 +101,6 @@ const patientReducer = (state = patientState, action) => {
             };
             break;
 
-        case ACTION_SET_SORTING_FIELD :
-            updatedState = {
-                ...state,
-                sorting: {
-                    ...state.sorting,
-                    field: action.payload
-                }
-            };
-            break;
-
-        case ACTION_SET_SORTING_DIRECTION :
-            updatedState = {
-                ...state,
-                sorting: {
-                    ...state.sorting,
-                    direction: action.payload
-                }
-            };
-            break;
-
         case ACTION_SET_PATIENT_LIST :
             updatedState = {
                 ...state,
@@ -169,26 +125,12 @@ const patientReducer = (state = patientState, action) => {
             };
             break;
 
-        case ACTION_SET_UPDATE_REQUIRED :
-            updatedState = {
-                ...state,
-                isUpdateRequired:  action.payload
-            };
-            break;
-
-        case ACTION_SET_MODIFY_ALLOWED :
-            updatedState = {
-                ...state,
-                isModifyAllowed:  action.payload
-            };
-            break;
-
         default :
             updatedState = state;
     }
     return {
         ...updatedState,
-        getPatientsUrl: getPatientListUrl(updatedState)
+        getPatientListUrl: getPatientListUrl(updatedState)
     }
 };
 

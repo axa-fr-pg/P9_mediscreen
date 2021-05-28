@@ -9,7 +9,7 @@ const initialState = {
 };
 
 const modalReducer = (state = initialState, action) => {
-    console.log("modalReducer with action " + action.type + " and payload " + action.payload);
+
     if (!!action.payload && action.payload.toString().length === 0 ) {
         return {
             ...state,

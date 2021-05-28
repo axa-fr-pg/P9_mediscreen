@@ -26,11 +26,11 @@ import {
 } from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
-export function getPatients(patientState, dispatch) {
+export function getPatientList(patientState, dispatch) {
 
     dispatch({type: ACTION_SET_UPDATE_REQUIRED, payload: false});
 
-    axios.get(patientState.getPatientsUrl)
+    axios.get(patientState.getPatientListUrl)
         .then((response = {numberOfElements: 0}) => {
             if (response.data.numberOfElements === 0) {
                 dispatch({
@@ -56,7 +56,7 @@ function PatientList() {
     const patientState = useSelector(state => state[STATE_PATIENT]);
 
     useEffect(() => {
-            getPatients(patientState, dispatch);
+            getPatientList(patientState, dispatch);
     }, [patientState.paging, patientState.filter, patientState.sorting, patientState.isUpdateRequired]);
 
     if (patientState.patientList.length === 0) return null;

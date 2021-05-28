@@ -13,10 +13,17 @@ import '@axa-fr/react-toolkit-table/dist/Paging/paging.scss';
 import {File} from '@axa-fr/react-toolkit-form-input-file';
 import '@axa-fr/react-toolkit-form-input-file/dist/file.scss';
 import {readString} from 'react-papaparse';
-import {getPatients} from '../patients/Patients';
+import {getPatientList} from '../patients/Patients';
 import {postNote} from './Note';
-import {useDispatch} from "react-redux";
-import {ACTION_DISPLAY_MODAL_ERROR, ACTION_DISPLAY_MODAL_SUCCESS} from "../reducers/reducerConstants";
+import {useDispatch, useSelector} from "react-redux";
+import {
+    ACTION_DISPLAY_MODAL_ERROR,
+    ACTION_DISPLAY_MODAL_SUCCESS,
+    ACTION_SET_FILTER_E,
+    ACTION_SET_PAGE_NUMBER,
+    ACTION_SET_ROWS_PER_PAGE,
+    STATE_DOCTOR
+} from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
 function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, history}) {
@@ -129,20 +136,16 @@ function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven
 
 function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNotes, setAddedNotes, history}) {
 
-    const [pageNumber, setPageNumber] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [filter, setFilter] = useState('');
     const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
     const dispatch = useDispatch();
+    const doctorState = useSelector(state => state[STATE_DOCTOR]);
 
-    function getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes) {
+    function getNotes(patientIdGiven, setNotes) {
         let url = notesApiUrl;
         if (patientIdGiven >= 0) {
             url = url + "/patients/" + patientIdGiven;
         } else {
-            url = url + "?page=" + pageNumber;
-            url = url + "&size=" + rowsPerPage;
-            url = url + "&e=" + filter;
+            url = doctorState.getNoteListUrl;
         }
         axios.get(url)
             .then(response => {
@@ -165,8 +168,8 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
 
     useEffect(() => {
         setAddedNotes(false);
-        getNotes(pageNumber, rowsPerPage, filter, patientIdGiven, setNotes);
-    }, [addedNotes, pageNumber, rowsPerPage, filter, patientIdGiven]);
+        getNotes(patientIdGiven, setNotes);
+    }, [addedNotes, doctorState.paging, doctorState.filter, patientIdGiven]);
 
     if (notes.length === 0) return null;
 
@@ -181,17 +184,19 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
 
     function submitFilter(event) {
         event.preventDefault();
-        setFilter(document.getElementById('input-filter').value);
-        setPageNumber(0);
+        dispatch({type: ACTION_SET_FILTER_E,
+            payload: document.getElementById('input-filter').value})
+        dispatch({type: ACTION_SET_PAGE_NUMBER, payload: 0})
     }
 
     function onChange(event) {
         const {numberItems, page} = event;
-        setPageNumber(page - 1);
+        let pageNumber = page - 1;
         if (page > (notes.totalElements / numberItems)) {
-            setPageNumber(Math.floor(notes.totalElements / numberItems));
+            pageNumber = Math.floor(notes.totalElements / numberItems);
         }
-        setRowsPerPage(numberItems);
+        dispatch({type: ACTION_SET_PAGE_NUMBER, payload: pageNumber})
+        dispatch({type: ACTION_SET_ROWS_PER_PAGE, payload: numberItems})
     }
 
     return (
@@ -212,9 +217,9 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
             <p/>
             <div hidden={patientIdGiven >= 0}>
                 <Paging
-                    currentPage={pageNumber + 1}
+                    currentPage={doctorState.paging.pageNumber + 1}
                     numberPages={notes.totalPages}
-                    numberItems={rowsPerPage}
+                    numberItems={doctorState.paging.rowsPerPage}
                     displayLabel=""
                     elementsLabel=" notes per page"
                     previousLabel="« Previous"
@@ -290,9 +295,10 @@ function countLinesWithFormatError(results) {
 }
 
 function checkPatientByFamily(family) {
-    const getPatientsInputData = {
-        pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc', filterId: '',
-        filterFamily: family, filterDob: '',
+    const getPatientListInputData = {
+        pageNumber: 0, rowsPerPage: 10,
+        orderField: 'id', orderDirection: 'asc',
+        filterId: '', filterFamily: family, filterDob: '',
         setPatients: () => {
             numberOfPatientsFound++;
             numberOfPatientsChecked++
@@ -301,7 +307,7 @@ function checkPatientByFamily(family) {
             numberOfPatientsChecked++
         }
     }
-    getPatients(getPatientsInputData);
+    getPatientList(getPatientListInputData);
 }
 
 function NotesUpload({report, setAddedNotes}) {
@@ -329,8 +335,9 @@ function NotesUpload({report, setAddedNotes}) {
         const setPatients = (results) => {
             postPatientNoteByPatientId(results, line[1])
         };
-        const inputData = {
-            pageNumber: 0, rowsPerPage: 10, orderField: 'id', orderDirection: 'asc',
+        const getPatientListInputData = {
+            pageNumber: 0, rowsPerPage: 10,
+            orderField: 'id', orderDirection: 'asc',
             filterId: '', filterFamily: family, filterDob: '',
             setPatients: setPatients,
             dispatch: (text) => {
@@ -338,7 +345,7 @@ function NotesUpload({report, setAddedNotes}) {
                 numberOfNotesPosted++
             }
         };
-        getPatients(inputData);
+        getPatientList(getPatientListInputData);
     }
 
     function waitAllPatientsCheckedAndPostNotes(results, setAddedNotes) {

@@ -11,6 +11,7 @@ export const
     ACTION_SET_FILTER_ID = 'action-set-filter-id',
     ACTION_SET_FILTER_FAMILY = 'action-set-filter-family',
     ACTION_SET_FILTER_DOB = 'action-set-filter-dob',
+    ACTION_SET_FILTER_E = 'action-set-filter-e',
     ACTION_SET_SORTING_FIELD = 'action-set-sorting-field',
     ACTION_SET_SORTING_DIRECTION = 'action-set-sorting-direction',
     ACTION_SET_PATIENT_LIST = 'action-set-patient-list',
