@@ -22,7 +22,7 @@ import {
     ACTION_SET_SORTING_FIELD,
     ACTION_SET_SORTING_DIRECTION,
     ACTION_SET_PATIENT_LIST,
-    ACTION_SET_UPDATE_REQUIRED
+    ACTION_SET_UPDATE_REQUIRED, ACTION_SET_ALL_PATIENT_FIELDS
 } from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
@@ -367,8 +367,10 @@ function PatientsUpload() {
 function Patients() {
     const history = useHistory();
     const swaggerUrl = patientUrl + "/swagger-ui/";
+    const dispatch = useDispatch();
 
     function onClickRegisterNewPatient() {
+        dispatch({type: ACTION_SET_ALL_PATIENT_FIELDS, payload: {}});
         history.push('/patients/new');
     }
 

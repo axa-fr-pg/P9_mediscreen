@@ -32,7 +32,7 @@ function ModifySwitch({report}) {
     const patientState = useSelector(state => state[STATE_PATIENT]);
     const dispatch = useDispatch();
 
-    if (window.location.href.includes('new') || !report === false) {
+    if (window.location.pathname.includes('new') || !report === false) {
         return null;
     }
 
@@ -60,7 +60,7 @@ function PatientField({field, label, readOnly}) {
 
     useEffect(() => {
         value.current = patientState.patientFields[field];
-    }, [patientState.patientFields[field]]);
+    }, []);
 
     if (field === 'id' && patientState.patientFields[field] === 'new') {
         return null;
@@ -97,7 +97,7 @@ function SaveButton({onClickSave}) {
 
     const patientState = useSelector(state => state[STATE_PATIENT]);
 
-    if (! patientState.isModifyAllowed) return null;
+    if (!patientState.isModifyAllowed) return null;
     return (
         <button className="button-save" onClick={onClickSave}>Save</button>
     );
@@ -111,9 +111,10 @@ function Patient({report}) {
     const patientState = useSelector(state => state[STATE_PATIENT]);
 
     useEffect(() => {
-        dispatch({type: ACTION_SET_MODIFY_ALLOWED, payload: window.location.href.includes('new')});
-        if (patientId === 'new') return;
-        if (isNaN(parseInt(patientId))) {
+        dispatch({type: ACTION_SET_MODIFY_ALLOWED, payload: window.location.pathname.includes('new')});
+        if (patientId === 'new') {
+            dispatch({type: ACTION_SET_ALL_PATIENT_FIELDS, payload: { id : patientId}});
+        } else if (isNaN(parseInt(patientId))) {
             dispatch({
                 type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. Please check your request or ask your IT support !'
@@ -205,7 +206,7 @@ function Patient({report}) {
     }
 
     function closeErrorModal() {
-        if ((!window.location.href.includes('new') && ! patientState.isModifyAllowed)
+        if ((!window.location.pathname.includes('new') && !patientState.isModifyAllowed)
             || baseUri !== 'patients') {
             history.push('/patients');
         }
@@ -213,7 +214,7 @@ function Patient({report}) {
 
     function closeSuccessModal() {
         dispatch({type: ACTION_SET_MODIFY_ALLOWED, payload: false});
-        if (window.location.href.includes('new')) {
+        if (window.location.pathname.includes('new')) {
             history.push('/patients')
         }
     }
