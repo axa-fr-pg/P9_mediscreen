@@ -22,36 +22,42 @@ import {
     ACTION_SET_FILTER_E,
     ACTION_SET_PAGE_NUMBER,
     ACTION_SET_ROWS_PER_PAGE,
+    ACTION_SET_DOCTOR_PATIENT_ID,
     STATE_DOCTOR
 } from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
-function PatientIdSwitch({patientIdGiven, setPatientIdGiven, report, history}) {
+function PatientIdSwitch({report}) {
+
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const doctorState = useSelector(state => state[STATE_DOCTOR]);
 
     if (!report === false) {
         return null;
     }
 
-    function onChangePatientIdSwitch() {
-        if (patientIdGiven < 0) {
-            setPatientIdGiven(0);
+    function onChangePatientIdSwitch(checked) {
+        if (checked) {
+            dispatch({type: ACTION_SET_DOCTOR_PATIENT_ID, payload: 0});
         } else {
-            setPatientIdGiven(-1);
+            dispatch({type: ACTION_SET_DOCTOR_PATIENT_ID, payload: -1});
             history.push('/notes');
         }
     }
 
     return (
         <div key={"switch-patient-id"} className="switch-patient-id">
-            <Switch checked={patientIdGiven >= 0} onChange={onChangePatientIdSwitch}
+            <Switch checked={doctorState.patientId >= 0} onChange={onChangePatientIdSwitch}
                     checkedIcon={false} uncheckedIcon={false} height={15} width={30} handleDiameter={13}/>
         </div>
     );
 }
 
-function NotesRandom({patientIdGiven, report, setAddedNotes}) {
+function NotesRandom({report, setAddedNotes}) {
 
     const dispatch = useDispatch();
+    const doctorState = useSelector(state => state[STATE_DOCTOR]);
 
     if (!report === false) {
         return null;
@@ -66,8 +72,8 @@ function NotesRandom({patientIdGiven, report, setAddedNotes}) {
         inputFieldPatientId.blur();
 // TODO         setError("Processing request...");
 
-        if (patientIdGiven >= 0) {
-            url = url + "/patients/" + patientIdGiven;
+        if (doctorState.patientId >= 0) {
+            url = url + "/patients/" + doctorState.patientId;
         }
 
         axios.post(url + "/random/" + inputFieldRandomVolume.value)
@@ -91,8 +97,8 @@ function NotesRandom({patientIdGiven, report, setAddedNotes}) {
     }
 
     return (
-        <form className="form-random">
-            <button onClick={generateRandomNotes}>Add</button>
+        <form className="form-random" onSubmit={generateRandomNotes}>
+            <button>Add</button>
             <input id="input-random-volume" className="input-narrow" defaultValue={5}/>
             <label>
                 random note(s) to database
@@ -101,7 +107,10 @@ function NotesRandom({patientIdGiven, report, setAddedNotes}) {
     );
 }
 
-function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven}) {
+function PatientNotes({branch, expanded, setExpanded}) {
+
+    const history = useHistory();
+    const dispatch = useDispatch();
 
     function stripHtml(html) {
         const temporaryElement = document.createElement("div");
@@ -110,7 +119,7 @@ function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven
     }
 
     const handleSelect = () => {
-        setPatientIdGiven(branch.patId);
+        dispatch({type: ACTION_SET_DOCTOR_PATIENT_ID, payload: branch.patId})
         history.push('/notes/patients/' + branch.patId);
     };
 
@@ -134,28 +143,30 @@ function PatientNotes({branch, history, expanded, setExpanded, setPatientIdGiven
     );
 }
 
-function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNotes, setAddedNotes, history}) {
+function NoteList({notes, setNotes, addedNotes, setAddedNotes}) {
 
-    const [expanded, setExpanded] = useState([patientIdGiven.toString()]);
-    const dispatch = useDispatch();
     const doctorState = useSelector(state => state[STATE_DOCTOR]);
+    const [expanded, setExpanded] = useState([doctorState.patientId.toString()]);
+    const dispatch = useDispatch();
+    const history = useHistory();
 
-    function getNotes(patientIdGiven, setNotes) {
-        let url = notesApiUrl;
-        if (patientIdGiven >= 0) {
-            url = url + "/patients/" + patientIdGiven;
-        } else {
-            url = doctorState.getNoteListUrl;
-        }
+    function getNoteList(patientId, setNotes) {
+        const url = doctorState.getNoteListUrl;
+        const defaultResponse = {
+            data: {
+                content: {},
+                noteDTOList: []
+            }
+        };
         axios.get(url)
-            .then(response => {
-                setNotes(response.data);
-                if ((response.data.content !== undefined && response.data.content.length === 0)
-                    || ((response.data.noteDTOList !== undefined && response.data.noteDTOList.length === 0) && patientIdGiven > 0)) {
-                    dispatch({
-                        type: ACTION_DISPLAY_MODAL_ERROR,
-                        payload: 'Your selection criteria match no note. Database may also be empty.'
-                    });
+            .then((response = defaultResponse) => {
+                if (!!response.data.content && response.data.content.length === 0) {
+                        dispatch({
+                            type: ACTION_DISPLAY_MODAL_ERROR,
+                            payload: 'Your selection criteria match no note. Database may also be empty.'
+                        });
+                } else {
+                    setNotes(response.data);
                 }
             })
             .catch(exception => {
@@ -168,8 +179,8 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
 
     useEffect(() => {
         setAddedNotes(false);
-        getNotes(patientIdGiven, setNotes);
-    }, [addedNotes, doctorState.paging, doctorState.filter, patientIdGiven]);
+        getNoteList(doctorState.patientId, setNotes);
+    }, [history.location.pathname, addedNotes, doctorState.paging, doctorState.filter, doctorState.patientId]);
 
     if (notes.length === 0) return null;
 
@@ -184,12 +195,14 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
 
     function submitFilter(event) {
         event.preventDefault();
-        dispatch({type: ACTION_SET_FILTER_E,
-            payload: document.getElementById('input-filter').value})
+        dispatch({
+            type: ACTION_SET_FILTER_E,
+            payload: document.getElementById('input-filter').value
+        })
         dispatch({type: ACTION_SET_PAGE_NUMBER, payload: 0})
     }
 
-    function onChange(event) {
+    function onChangePaging(event) {
         const {numberItems, page} = event;
         let pageNumber = page - 1;
         if (page > (notes.totalElements / numberItems)) {
@@ -202,20 +215,20 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
     return (
         <div className="div-note-list">
             <form className="form-filter" onSubmit={submitFilter}>
-                <label hidden={patientIdGiven >= 0}>Expected note content :&nbsp;</label>
+                <label hidden={doctorState.patientId >= 0}>Expected note content :&nbsp;</label>
                 <input className="filter-input" id="input-filter" type="text"
-                       onBlur={submitFilter} hidden={patientIdGiven >= 0}/>
+                       onBlur={submitFilter} hidden={doctorState.patientId >= 0}/>
             </form>
             <p/>
             <TreeView className="tree-view" expanded={activeBranches}
                       defaultCollapseIcon={<ExpandMoreIcon/>} defaultExpandIcon={<ChevronRightIcon/>}>
                 {notesTree.map(branch => (
-                    <PatientNotes key={branch.patId} branch={branch} history={history}
-                                  setPatientIdGiven={setPatientIdGiven} expanded={expanded} setExpanded={setExpanded}/>
+                    <PatientNotes key={branch.patId} branch={branch}
+                                  expanded={expanded} setExpanded={setExpanded}/>
                 ))}
             </TreeView>
             <p/>
-            <div hidden={patientIdGiven >= 0}>
+            <div hidden={doctorState.patientId >= 0}>
                 <Paging
                     currentPage={doctorState.paging.pageNumber + 1}
                     numberPages={notes.totalPages}
@@ -224,41 +237,37 @@ function NoteList({patientIdGiven, setPatientIdGiven, notes, setNotes, addedNote
                     elementsLabel=" notes per page"
                     previousLabel="« Previous"
                     nextLabel="Next »"
-                    onChange={onChange}
+                    onChange={onChangePaging}
                 />
             </div>
         </div>
     );
 }
 
-function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, report, history}) {
+function NoteListTitleWithPatientSelector({report}) {
 
-    function onSubmitPatientIdGivenField() {
-        const inputFieldPatientId = document.getElementById('input-patient-id-given');
-        history.push('/notes/patients/' + inputFieldPatientId.value);
-        setPatientIdGiven(inputFieldPatientId.value);
-    }
+    const dispatch = useDispatch();
+    const doctorState = useSelector(state => state[STATE_DOCTOR]);
+    const history = useHistory();
 
-    function onChangePatientIdGiven() {
+    function onChangeDoctorPatientId() {
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
-        setPatientIdGiven(inputFieldPatientId.value);
+        const controlledPatientId = inputFieldPatientId.value ? parseInt(inputFieldPatientId.value.toString()) : 0;
+        dispatch({type: ACTION_SET_DOCTOR_PATIENT_ID, payload: controlledPatientId});
+        history.push('/notes/patients/' + controlledPatientId);
     }
 
     return (
         <h1 className="title-note-list">Note list
-            <PatientIdSwitch patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                             report={report} history={history}/>
-            <div hidden={patientIdGiven >= 0}>
+            <PatientIdSwitch report={report}/>
+            <div hidden={doctorState.patientId >= 0}>
                 <label>for all patients</label>
             </div>
-            <div hidden={patientIdGiven < 0 || !report === false}>
-                <form>
+            <div hidden={doctorState.patientId < 0 || !report === false}>
                     <label>for patient with id</label>
                     <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
-                           value={patientIdGiven >= 0 ? patientIdGiven : 0}
-                           onChange={onChangePatientIdGiven}/>
-                    <button className="button-submit" onClick={onSubmitPatientIdGivenField}>Submit</button>
-                </form>
+                           value={doctorState.patientId >= 0 ? doctorState.patientId : 0}
+                           onChange={onChangeDoctorPatientId}/>
             </div>
         </h1>
     );
@@ -266,7 +275,7 @@ function NoteListTitleWithPatientSelector({patientIdGiven, setPatientIdGiven, re
 
 function getPatientIdByUrl(rawUrl) {
     const url = rawUrl.split("?").shift();
-    return url.includes('patients') ? url.split("/").pop() : -1;
+    return url.includes('patients') ? parseInt(url.split("/").pop()) : -1;
 }
 
 let numberOfNotesPosted;
@@ -427,47 +436,51 @@ function NotesUpload({report, setAddedNotes}) {
 }
 
 function Notes({report}) {
+
     const [notes, setNotes] = useState([]);
-    const [patientIdGiven, setPatientIdGiven] = useState(-1);
     const [addedNotes, setAddedNotes] = useState(false);
     const history = useHistory();
     const dispatch = useDispatch();
+    const doctorState = useSelector(state => state[STATE_DOCTOR]);
 
     useEffect(() => {
-        const patientId = getPatientIdByUrl(window.location.href);
-        if (isNaN(parseInt(patientId))) {
+        const patientId = getPatientIdByUrl(history.location.pathname);
+        if (isNaN(patientId)) {
             dispatch({
                 type: ACTION_DISPLAY_MODAL_ERROR,
                 payload: 'It looks like you entered an invalid URL. Patient id must have a numeric value. ' +
                     'Please check your request or ask your IT support !'
             });
         } else {
-            setPatientIdGiven(patientId);
+            dispatch({type: ACTION_SET_DOCTOR_PATIENT_ID, payload: patientId})
+            if (patientId >= 0) {
+                history.push('/notes/patients/' + patientId);
+            }
         }
     }, [history.location.pathname]);
 
     function newNote() {
-        history.push('/notes/patients/' + patientIdGiven + '/new');
+        history.push('/notes/patients/' + doctorState.patientId + '/new');
     }
 
     function closeErrorModal() {
         // TODO user experience when registering a new note for a given patient
-        if (window.location.href.includes('/notes/patients/') && patientIdGiven < 0) {
+        if (history.location.pathname.includes('/notes/patients/') && doctorState.patientId < 0) {
             history.push('/notes');
         }
     }
 
+    const isNewNoteButtonHidden = doctorState.patientId < 0 || !report === false;
+
     return (
         <div>
-            <NoteListTitleWithPatientSelector patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven}
-                                              report={report} history={history}/>
-            <button hidden={patientIdGiven < 0 || !report === false} className="button-new" onClick={newNote}>
+            <NoteListTitleWithPatientSelector report={report}/>
+            <button hidden={isNewNoteButtonHidden} className="button-new" onClick={newNote}>
                 Register new note
             </button>
-            <NoteList patientIdGiven={patientIdGiven} setPatientIdGiven={setPatientIdGiven} notes={notes}
-                      setNotes={setNotes}
-                      addedNotes={addedNotes} setAddedNotes={setAddedNotes} history={history}/>
-            <NotesRandom patientIdGiven={patientIdGiven} report={report} setAddedNotes={setAddedNotes}/>
+            <NoteList notes={notes} setNotes={setNotes}
+                      addedNotes={addedNotes} setAddedNotes={setAddedNotes}/>
+            <NotesRandom report={report} setAddedNotes={setAddedNotes}/>
             <NotesUpload report={report} setAddedNotes={setAddedNotes}/>
             <Modal errorClosureAction={closeErrorModal}/>
             <a className="swagger-url" href={doctorUrl + "/swagger-ui/"}>Swagger</a>

@@ -2,6 +2,7 @@ import {notesApiUrl} from "../api/URLs";
 import {handleStateWithRootReducer} from "./rootReducer";
 
 import {
+    ACTION_SET_DOCTOR_PATIENT_ID,
     ACTION_SET_FILTER_E
 } from "./reducerConstants";
 
@@ -15,39 +16,38 @@ const filterState = {
     e: ''
 };
 
-const sortingState = {
-    field : 'id',
-    direction: 'asc'
-};
-
-const pagingFilterSortingState = {
+const pagingFilterState = {
     paging: pagingState,
-    filter: filterState,
-    sorting: sortingState
+    filter: filterState
 };
 
-const emptyPatientList = {
-    totalElements : 0,
-    totalPages : 0,
-    content : []
+const emptyNoteList = {
+    totalElements: 0,
+    totalPages: 0,
+    content: []
 };
 
 const doctorState = {
-    ...pagingFilterSortingState,
-    getNoteListUrl: getNoteListUrl(pagingFilterSortingState),
-    noteList: emptyPatientList,
+    ...pagingFilterState,
+    getNoteListUrl: getNoteListUrl(pagingFilterState),
+    noteList: emptyNoteList,
     noteFields: {},
-    isUpdateRequired : true,
-    isModifyAllowed : false
+    patientId: -1,
+    isUpdateRequired: true,
+    isModifyAllowed: false
 };
 
 function getNoteListUrl(state) {
-    let url = notesApiUrl
-        + "?page=" + state.paging.pageNumber
-        + "&size=" + state.paging.rowsPerPage
-    ;
-    if (!!state.filter.e) {
-        url = url + "&e=" + state.filter.e;
+
+    let url = notesApiUrl;
+    if (state.patientId >= 0) {
+        url = url + "/patients/" + state.patientId;
+    } else {
+        url = url + "?page=" + state.paging.pageNumber
+            + "&size=" + state.paging.rowsPerPage;
+        if (!!state.filter.e) {
+            url = url + "&e=" + state.filter.e;
+        }
     }
     return url;
 }
@@ -66,6 +66,13 @@ const doctorReducer = (inputState = doctorState, action) => {
                     ...state.filter,
                     e: action.payload
                 }
+            };
+            break;
+
+        case ACTION_SET_DOCTOR_PATIENT_ID :
+            updatedState = {
+                ...state,
+                patientId: action.payload
             };
             break;
 

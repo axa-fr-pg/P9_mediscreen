@@ -96,7 +96,7 @@ function PatientList() {
         dispatch({type: ACTION_SET_PAGE_NUMBER, payload: 0})
     }
 
-    function onChange(event) {
+    function onChangePaging(event) {
         const {numberItems, page} = event;
         dispatch({type: ACTION_SET_PAGE_NUMBER, payload: page - 1})
         if (page > (patientState.patientList.totalElements / numberItems)) {
@@ -188,7 +188,7 @@ function PatientList() {
                             elementsLabel=" patients per page"
                             previousLabel="« Previous"
                             nextLabel="Next »"
-                            onChange={onChange}
+                            onChangePaging={onChangePaging}
                         />
                     </td>
                 </tr>
@@ -359,7 +359,7 @@ function PatientsUpload() {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChange={(values) => uploadPatientFile(values.values)}
+            onChangePaging={(values) => uploadPatientFile(values.values)}
         />
     );
 }

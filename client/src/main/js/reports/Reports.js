@@ -98,7 +98,7 @@ function PatientList({patients, setPatients, history}) {
         setPageNumber(0);
     }
 
-    function onChange(event) {
+    function onChangePaging(event) {
         const {numberItems, page} = event;
         setPageNumber(page - 1);
         if (page > (patients.totalElements / numberItems)) {
@@ -165,7 +165,7 @@ function PatientList({patients, setPatients, history}) {
                             elementsLabel=" patients per page"
                             previousLabel="« Previous"
                             nextLabel="Next »"
-                            onChange={onChange}
+                            onChangePaging={onChangePaging}
                         />
                     </td>
                 </tr>
