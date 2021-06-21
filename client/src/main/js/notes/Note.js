@@ -51,7 +51,7 @@ function NoteTitleWithModeSelector({note, modify, onChangeSwitch}) {
         <h1 className="title-note">Note {title}
             <div hidden={switchHidden}>
                 &nbsp;
-                <Switch checked={modify} onChangePaging={onChangeSwitch}
+                <Switch checked={modify} onChange={onChangeSwitch}
                         checkedIcon={false} uncheckedIcon={false}
                         height={15} width={30} handleDiameter={13}/>
             </div>
@@ -162,7 +162,7 @@ function Note() {
             <link rel="stylesheet" href={"//cdn.quilljs.com/1.2.6/quill.snow.css"}/>
             <NoteSaveButton modify={modify} onClick={onClickSave}/>
             <ReactQuill className="quill-note-content" key={note.current.noteId} value={note.current.e}
-                        readOnly={modify === false} onChangePaging={onChangeNote}
+                        readOnly={modify === false} onChange={onChangeNote}
                         modules={{toolbar: modify}}/>
             <Modal errorClosureAction={closeErrorModal} successClosureAction={closeSuccessModal}/>
         </div>
