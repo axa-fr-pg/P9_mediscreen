@@ -143,7 +143,7 @@ function PatientNotes({branch, expanded, setExpanded}) {
     );
 }
 
-function NoteList({notes, setNotes, addedNotes, setAddedNotes}) {
+function NoteList({notes, setNotes, report, addedNotes, setAddedNotes}) {
 
     const doctorState = useSelector(state => state[STATE_DOCTOR]);
     const [expanded, setExpanded] = useState([doctorState.patientId.toString()]);
@@ -151,7 +151,10 @@ function NoteList({notes, setNotes, addedNotes, setAddedNotes}) {
     const history = useHistory();
 
     function getNoteList(patientId, setNotes) {
-        const url = doctorState.getNoteListUrl;
+        let url = doctorState.getNoteListUrl;
+        if (report) {
+            url = notesApiUrl + "/patients/" + getPatientIdByUrl(history.location.pathname);
+        }
         const defaultResponse = {
             data: {
                 content: {},
@@ -433,7 +436,7 @@ function NotesUpload({report, setAddedNotes}) {
     );
 }
 
-function Notes({report}) {
+function Notes({report=false}) {
 
     const [notes, setNotes] = useState([]);
     const [addedNotes, setAddedNotes] = useState(false);
@@ -451,7 +454,7 @@ function Notes({report}) {
             });
         } else {
             dispatch({type: ACTION_SET_DOCTOR_PATIENT_ID, payload: patientId})
-            if (patientId >= 0) {
+            if (patientId >= 0 && !report) {
                 history.push('/notes/patients/' + patientId);
             }
         }
@@ -476,7 +479,7 @@ function Notes({report}) {
             <button hidden={isNewNoteButtonHidden} className="button-new" onClick={newNote}>
                 Register new note
             </button>
-            <NoteList notes={notes} setNotes={setNotes}
+            <NoteList notes={notes} setNotes={setNotes} report={report}
                       addedNotes={addedNotes} setAddedNotes={setAddedNotes}/>
             <NotesRandom report={report} setAddedNotes={setAddedNotes}/>
             <NotesUpload report={report} setAddedNotes={setAddedNotes}/>

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import TableSortLabel from "@material-ui/core/TableSortLabel";
 import {Paging} from "@axa-fr/react-toolkit-table";
 import {useHistory} from "react-router";
