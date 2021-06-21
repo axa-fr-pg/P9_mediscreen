@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router";
 import axios from "axios";
-import {doctorUrl, notesApiUrl} from "../api/URLs";
+import {doctorUrl, notesApiUrl, patientsApiUrl} from "../api/URLs";
 import Switch from "react-switch";
 import {TreeView, TreeItem} from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -70,8 +70,8 @@ function NotesRandom({report, setAddedNotes}) {
         inputFieldRandomVolume.blur();
         const inputFieldPatientId = document.getElementById('input-patient-id-given');
         inputFieldPatientId.blur();
-// TODO         setError("Processing request...");
 
+        // TODO : message("Processing request...");
         if (doctorState.patientId >= 0) {
             url = url + "/patients/" + doctorState.patientId;
         }
@@ -161,10 +161,10 @@ function NoteList({notes, setNotes, addedNotes, setAddedNotes}) {
         axios.get(url)
             .then((response = defaultResponse) => {
                 if (!!response.data.content && response.data.content.length === 0) {
-                        dispatch({
-                            type: ACTION_DISPLAY_MODAL_ERROR,
-                            payload: 'Your selection criteria match no note. Database may also be empty.'
-                        });
+                    dispatch({
+                        type: ACTION_DISPLAY_MODAL_ERROR,
+                        payload: 'Your selection criteria match no note. Doctor database may also be empty.'
+                    });
                 } else {
                     setNotes(response.data);
                 }
@@ -180,7 +180,9 @@ function NoteList({notes, setNotes, addedNotes, setAddedNotes}) {
     useEffect(() => {
         setAddedNotes(false);
         getNoteList(doctorState.patientId, setNotes);
-    }, [history.location.pathname, addedNotes, doctorState.paging, doctorState.filter, doctorState.patientId]);
+    }, [history.location.pathname, addedNotes,
+        doctorState.paging.rowsPerPage, doctorState.paging.pageNumber,
+        doctorState.filter.id, doctorState.filter.e, doctorState.patientId]);
 
     if (notes.length === 0) return null;
 
@@ -264,10 +266,10 @@ function NoteListTitleWithPatientSelector({report}) {
                 <label>for all patients</label>
             </div>
             <div hidden={doctorState.patientId < 0 || !report === false}>
-                    <label>for patient with id</label>
-                    <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
-                           value={doctorState.patientId >= 0 ? doctorState.patientId : 0}
-                           onChange={onChangeDoctorPatientId}/>
+                <label>for patient with id</label>
+                <input id="input-patient-id-given" className="input-narrow input-with-parent-font"
+                       value={doctorState.patientId >= 0 ? doctorState.patientId : 0}
+                       onChange={onChangeDoctorPatientId}/>
             </div>
         </h1>
     );
@@ -288,9 +290,7 @@ function postPatientNoteByPatientId(results, noteContent) {
     numberOfNotesPosted++;
     numberOfNotesAdded++;
     const body = {noteId: '', e: noteContent};
-    postNote(body, patientId, () => {
-    }, () => {
-    });
+    postNote(body, patientId);
 }
 
 function countLinesWithFormatError(results) {
@@ -303,20 +303,22 @@ function countLinesWithFormatError(results) {
     return numberOfLinesWithWrongFormat;
 }
 
+function prepareGetPatientListUrl(family) {
+    return patientsApiUrl + "?page=0&size=1&family=" + family;
+}
+
 function checkPatientByFamily(family) {
-    const getPatientListInputData = {
-        pageNumber: 0, rowsPerPage: 10,
-        orderField: 'id', orderDirection: 'asc',
-        filterId: '', filterFamily: family, filterDob: '',
-        setPatients: () => {
+    getPatientList(
+        { getPatientListUrl : prepareGetPatientListUrl(family) },
+        () => {},
+        () => {
             numberOfPatientsFound++;
-            numberOfPatientsChecked++
+            numberOfPatientsChecked++;
         },
-        dispatch: () => {
-            numberOfPatientsChecked++
+        () => {
+            numberOfPatientsChecked++;
         }
-    }
-    getPatientList(getPatientListInputData);
+    );
 }
 
 function NotesUpload({report, setAddedNotes}) {
@@ -341,20 +343,16 @@ function NotesUpload({report, setAddedNotes}) {
 
     function postPatientNote(line) {
         const family = line[0];
-        const setPatients = (results) => {
-            postPatientNoteByPatientId(results, line[1])
-        };
-        const getPatientListInputData = {
-            pageNumber: 0, rowsPerPage: 10,
-            orderField: 'id', orderDirection: 'asc',
-            filterId: '', filterFamily: family, filterDob: '',
-            setPatients: setPatients,
-            dispatch: (text) => {
-                dispatch({type: ACTION_DISPLAY_MODAL_ERROR, payload: text});
-                numberOfNotesPosted++
+        getPatientList(
+            { getPatientListUrl : prepareGetPatientListUrl(family) },
+            () => {},
+            (results) => {
+                postPatientNoteByPatientId(results, line[1]);
+            },
+            () => {
+                numberOfNotesPosted++;
             }
-        };
-        getPatientList(getPatientListInputData);
+        );
     }
 
     function waitAllPatientsCheckedAndPostNotes(results, setAddedNotes) {
@@ -416,7 +414,7 @@ function NotesUpload({report, setAddedNotes}) {
             });
             return;
         }
-        // TODO setError("Uploading " + values[0].file.name + " ...");
+        // TODO message("Uploading " + values[0].file.name + " ...");
         fetch(values[0].file.preview)
             .then(response => response.blob())
             .then(blob => blob.arrayBuffer())

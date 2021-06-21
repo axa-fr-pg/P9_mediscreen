@@ -59,7 +59,7 @@ function PatientList({patients, setPatients, history}) {
             .then(response => {
                 if (response.data.numberOfElements === 0) {
                     dispatch({type: ACTION_DISPLAY_MODAL_ERROR,
-                        payload: 'Your selection criteria match no patient. Database may also be empty.'});
+                        payload: 'Your selection criteria match no report. Patient database may also be empty.'});
                 }
                 setPatients(response.data);
             })

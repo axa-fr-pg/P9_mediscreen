@@ -26,26 +26,38 @@ import {
 } from "../reducers/reducerConstants";
 import Modal from "../modal/modal";
 
-export function getPatientList(patientState, dispatch) {
+export function getPatientList(patientState, dispatch, successCallback, errorCallback) {
 
     dispatch({type: ACTION_SET_UPDATE_REQUIRED, payload: false});
 
     axios.get(patientState.getPatientListUrl)
         .then((response = {numberOfElements: 0}) => {
             if (response.data.numberOfElements === 0) {
-                dispatch({
-                    type: ACTION_DISPLAY_MODAL_ERROR,
-                    payload: 'Your selection criteria match no patient. Database may also be empty.'
-                });
+                if (errorCallback===undefined) {
+                    dispatch({
+                        type: ACTION_DISPLAY_MODAL_ERROR,
+                        payload: 'Your selection criteria match no patient. Patient database may also be empty.'
+                    });
+                } else {
+                    errorCallback();
+                }
             } else {
-                dispatch({type: ACTION_SET_PATIENT_LIST, payload: response.data});
+                if (successCallback===undefined) {
+                    dispatch({type: ACTION_SET_PATIENT_LIST, payload: response.data});
+                } else {
+                    successCallback(response.data);
+                }
             }
         })
         .catch(exception => {
-            dispatch({
-                type: ACTION_DISPLAY_MODAL_ERROR,
-                payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
-            });
+            if (errorCallback===undefined) {
+                dispatch({
+                    type: ACTION_DISPLAY_MODAL_ERROR,
+                    payload: "Please ask your IT support : it seems that the server or the database is unavailable ! " + exception.message
+                });
+            } else {
+                errorCallback();
+            }
         });
 }
 

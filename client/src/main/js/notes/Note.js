@@ -10,7 +10,7 @@ import {useDispatch} from "react-redux";
 
 const NOTE_NOT_FOUND = 'note-not-found';
 
-export function postNote(body, patId, dispatch) {
+export function postNote(body, patId, dispatch=()=>{}) {
     body.noteId = '';
     axios.post(notesApiUrl + '/patients/' + patId, body)
         .then(response => {
