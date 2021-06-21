@@ -44,7 +44,7 @@ function ModifySwitch({report}) {
         <div key={"div-read-only"} className="div-read-only">
             <label>View</label>
             <div className="switch-read-only">
-                <Switch checked={patientState.isModifyAllowed} onChangePaging={onChangeModify} checkedIcon={false}
+                <Switch checked={patientState.isModifyAllowed} onChange={onChangeModify} checkedIcon={false}
                         uncheckedIcon={false}/>
             </div>
             <label>Edit</label>
@@ -73,7 +73,7 @@ function PatientField({field, label, readOnly}) {
     const disabled = !!readOnly;
     return (<div key={field}>
         <label>{label}
-            <input value={patientState.patientFields[field]} name={field} onChangePaging={onChangeField}
+            <input value={patientState.patientFields[field]} name={field} onChange={onChangeField}
                    disabled={disabled || patientState.isModifyAllowed === false}/>
         </label>
     </div>);
