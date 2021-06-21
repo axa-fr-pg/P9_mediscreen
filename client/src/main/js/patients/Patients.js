@@ -308,7 +308,7 @@ function PatientsUpload() {
 
     function waitAllPatientsPostedAndRefreshDisplay(numberOfPatientsToPost) {
         if (numberOfPatientsPosted < numberOfPatientsToPost) {
-            setTimeout(waitAllPatientsPostedAndRefreshDisplay, 1000, numberOfPatientsToPost);
+            setTimeout(waitAllPatientsPostedAndRefreshDisplay, 100, numberOfPatientsToPost);
         } else {
             if (numberOfPatientsAdded === numberOfPatientsPosted) {
                 dispatch({type: ACTION_SET_UPDATE_REQUIRED, payload: true});

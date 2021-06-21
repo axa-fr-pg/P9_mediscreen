@@ -331,7 +331,7 @@ function NotesUpload({report, setAddedNotes}) {
 
     function waitAllNotesPosted(numberOfNotesToPost, setAddedNotes) {
         if (numberOfNotesPosted < numberOfNotesToPost) {
-            setTimeout(waitAllNotesPosted, 1000, numberOfNotesToPost, setAddedNotes);
+            setTimeout(waitAllNotesPosted, 100, numberOfNotesToPost, setAddedNotes);
         } else if (numberOfNotesAdded === numberOfNotesPosted) {
             setAddedNotes(true);
             dispatch({
@@ -357,7 +357,7 @@ function NotesUpload({report, setAddedNotes}) {
 
     function waitAllPatientsCheckedAndPostNotes(results, setAddedNotes) {
         if (numberOfPatientsChecked < results.data.length) {
-            setTimeout(waitAllPatientsCheckedAndPostNotes, 1000, results, setAddedNotes);
+            setTimeout(waitAllPatientsCheckedAndPostNotes, 100, results, setAddedNotes);
             return;
         }
         if (numberOfPatientsFound < numberOfPatientsChecked) {
