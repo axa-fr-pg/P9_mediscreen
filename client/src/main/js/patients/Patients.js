@@ -57,7 +57,10 @@ function PatientList() {
 
     useEffect(() => {
             getPatientList(patientState, dispatch);
-    }, [patientState.paging, patientState.filter, patientState.sorting, patientState.isUpdateRequired]);
+    }, [history.location.pathname, patientState.isUpdateRequired,
+        patientState.paging.pageNumber, patientState.paging.rowsPerPage,
+        patientState.filter.id, patientState.filter.family, patientState.filter.dob,
+        patientState.sorting]);
 
     if (patientState.patientList.length === 0) return null;
 
@@ -188,7 +191,7 @@ function PatientList() {
                             elementsLabel=" patients per page"
                             previousLabel="« Previous"
                             nextLabel="Next »"
-                            onChangePaging={onChangePaging}
+                            onChange={onChangePaging}
                         />
                     </td>
                 </tr>
@@ -359,7 +362,7 @@ function PatientsUpload() {
             id="file-to-be-uploaded"
             name="file-upload"
             accept=".csv"
-            onChangePaging={(values) => uploadPatientFile(values.values)}
+            onChange={(values) => uploadPatientFile(values.values)}
         />
     );
 }
