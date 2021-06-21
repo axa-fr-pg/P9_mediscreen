@@ -165,7 +165,7 @@ function PatientList({patients, setPatients, history}) {
                             elementsLabel=" patients per page"
                             previousLabel="« Previous"
                             nextLabel="Next »"
-                            onChangePaging={onChangePaging}
+                            onChange={onChangePaging}
                         />
                     </td>
                 </tr>
