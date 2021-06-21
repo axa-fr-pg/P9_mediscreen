@@ -150,10 +150,11 @@ function NoteList({notes, setNotes, report, addedNotes, setAddedNotes}) {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    function getNoteList(patientId, setNotes) {
+    function getNoteList(setNotes) {
         let url = doctorState.getNoteListUrl;
-        if (report) {
-            url = notesApiUrl + "/patients/" + getPatientIdByUrl(history.location.pathname);
+        const patientId = getPatientIdByUrl(history.location.pathname);
+        if (report || patientId >= 0) {
+            url = notesApiUrl + "/patients/" + patientId;
         }
         const defaultResponse = {
             data: {
@@ -182,8 +183,8 @@ function NoteList({notes, setNotes, report, addedNotes, setAddedNotes}) {
 
     useEffect(() => {
         setAddedNotes(false);
-        getNoteList(doctorState.patientId, setNotes);
-    }, [history.location.pathname, addedNotes,
+        getNoteList(setNotes);
+    }, [window.location.pathname, addedNotes,
         doctorState.paging.rowsPerPage, doctorState.paging.pageNumber,
         doctorState.filter.id, doctorState.filter.e, doctorState.patientId]);
 
